@@ -193,7 +193,7 @@ export default function DashboardPage() {
   )
 }
 
-function Field({ label, value, edit, onChange, placeholder }) {
+function Field({ label, value, edit, onChange, placeholder }: { label: any; value: any; edit: any; onChange: any; placeholder?: any }) {
   return (
     <div>
       <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase', letterSpacing:'0.8px', color:'#5A5550', marginBottom:5 }}>{label}</div>
