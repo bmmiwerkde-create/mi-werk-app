@@ -1,3 +1,4 @@
+cat > app/dashboard/page.tsx << 'ENDOFFILE'
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -219,3 +220,5 @@ function Field({ label, value, edit, onChange, placeholder }: { label: string; v
     </div>
   )
 }
+ENDOFFILE
+git add . && git commit -m "clean dashboard with email" && git push
