@@ -27,10 +27,10 @@ export default function Home() {
         {dienstleister.map((d: any) => (
           <div key={d.id} style={{border: '1px solid #ccc', padding: '20px', borderRadius: '8px'}}>
             <div style={{fontSize: '40px'}}>{d.emoji}</div>
-            <h2>{d.Name}</h2>
-            <p>{d.Gewerk} · {d.ort}</p>
-            <p>{d.Beschreibung}</p>
-            <p><strong>{d.Preis}€/h</strong></p>
+            <h2>{d.name}</h2>
+            <p>{d.gewerk} · {d.ort}</p>
+            <p>{d.beschreibung}</p>
+            <p><strong>{d.preis}€/h</strong></p>
           </div>
         ))}
       </div>
