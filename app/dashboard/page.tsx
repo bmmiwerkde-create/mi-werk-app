@@ -221,4 +221,3 @@ function Field({ label, value, edit, onChange, placeholder }: { label: string; v
   )
 }
 ENDOFFILE
-git add . && git commit -m "clean dashboard with email" && git push
