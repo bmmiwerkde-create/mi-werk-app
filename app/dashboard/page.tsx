@@ -15,6 +15,7 @@ interface Profil {
   umkreis?: string
   verfuegbar_ab?: string
   user_id?: string
+  email?: string  // ← diese Zeile hinzufügen
 }
 
 export default function DashboardPage() {
@@ -105,6 +106,7 @@ export default function DashboardPage() {
 
           <div style={{ padding:'20px', display:'flex', flexDirection:'column', gap:14 }}>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
+              <Field label="E-Mail" value={form.email || user?.email || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, email: v }))} />
               <Field label="Name" value={form.name || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, name: v }))} />
               <Field label="Gewerk" value={form.gewerk || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, gewerk: v }))} />
             </div>
