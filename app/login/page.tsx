@@ -12,7 +12,7 @@ export default function Login() {
     if (modus === 'login') {
       const { error } = await supabase.auth.signInWithPassword({ email, password: passwort })
       if (error) setMeldung('Fehler: ' + error.message)
-      else setMeldung('Erfolgreich eingeloggt!')
+      else window.location.href = '/dashboard'
     } else {
       const { error } = await supabase.auth.signUp({ email, password: passwort })
       if (error) setMeldung('Fehler: ' + error.message)
