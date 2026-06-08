@@ -6,6 +6,7 @@ import { supabase } from '../Lib/supabase'
 
 interface Profil {
   id?: string
+  email?: string
   name?: string
   gewerk?: string
   ort?: string
@@ -15,7 +16,6 @@ interface Profil {
   umkreis?: string
   verfuegbar_ab?: string
   user_id?: string
-  email?: string  // ← diese Zeile hinzufügen
 }
 
 export default function DashboardPage() {
@@ -105,11 +105,14 @@ export default function DashboardPage() {
           </div>
 
           <div style={{ padding:'20px', display:'flex', flexDirection:'column', gap:14 }}>
+
+            <Field label="E-Mail" value={form.email || user?.email || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, email: v }))} />
+
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
-              <Field label="E-Mail" value={form.email || user?.email || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, email: v }))} />
               <Field label="Name" value={form.name || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, name: v }))} />
               <Field label="Gewerk" value={form.gewerk || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, gewerk: v }))} />
             </div>
+
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
               <Field label="Ort" value={form.ort || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, ort: v }))} />
               <div>
@@ -128,6 +131,7 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
+
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
               <Field label="Preis" value={form.preis || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, preis: v }))} placeholder="z.B. ab 50 €/Std." />
               <div>
@@ -142,6 +146,7 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
+
             <div>
               <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase', letterSpacing:'0.8px', color:'#5A5550', marginBottom:5 }}>Beschreibung</div>
               {editMode ? (
