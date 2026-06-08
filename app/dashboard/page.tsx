@@ -1,4 +1,3 @@
-cat > app/dashboard/page.tsx << 'ENDOFFILE'
 'use client'
 
 import { useEffect, useState } from 'react'
