@@ -1,37 +1,62 @@
 export default function Datenschutz() {
   return (
-    <div style={{ minHeight:'100vh', background:'#0A0A0A', color:'#E8DDD4', fontFamily:'system-ui', padding:'60px 24px' }}>
-      <div style={{ maxWidth:640, margin:'0 auto' }}>
-        <a href="/" style={{ fontSize:12, color:'#c8956c', textDecoration:'none', display:'block', marginBottom:32 }}>← Zurück</a>
-        <h1 style={{ fontFamily:'Georgia,serif', fontSize:32, fontWeight:700, marginBottom:8 }}>Mi-<span style={{ color:'#c8956c' }}>Werk</span></h1>
-        <h2 style={{ fontSize:14, fontWeight:500, color:'#5A5550', textTransform:'uppercase', letterSpacing:1, marginBottom:32 }}>Datenschutzerklärung</h2>
-        <div style={{ display:'flex', flexDirection:'column', gap:24, fontSize:14, lineHeight:1.8, color:'#9A8878' }}>
-          <div>
-            <div style={{ color:'#E8DDD4', fontWeight:500, marginBottom:8 }}>1. Verantwortlicher</div>
-            <div>Mi-Werk UG, Forstring 24, bm.miwerk.de@gmail.com</div>
-          </div>
-          <div>
-            <div style={{ color:'#E8DDD4', fontWeight:500, marginBottom:8 }}>2. Erhobene Daten</div>
-            <div>Bei der Registrierung erheben wir E-Mail-Adresse und Profildaten (Name, Gewerk, Ort, Beschreibung, Preis). Diese Daten werden zur Bereitstellung der Plattform verwendet.</div>
-          </div>
-          <div>
-            <div style={{ color:'#E8DDD4', fontWeight:500, marginBottom:8 }}>3. Speicherung</div>
-            <div>Daten werden in der Supabase-Datenbank gespeichert (Rechenzentrum in der EU). Es erfolgt keine Weitergabe an Dritte.</div>
-          </div>
-          <div>
-            <div style={{ color:'#E8DDD4', fontWeight:500, marginBottom:8 }}>4. Cookies</div>
-            <div>Wir verwenden technisch notwendige Cookies für den Login-Status. Analytische oder Marketing-Cookies werden nicht eingesetzt.</div>
-          </div>
-          <div>
-            <div style={{ color:'#E8DDD4', fontWeight:500, marginBottom:8 }}>5. Ihre Rechte</div>
-            <div>Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Widerspruch. Kontakt: bm.miwerk.de@gmail.com</div>
-          </div>
-          <div>
-            <div style={{ color:'#E8DDD4', fontWeight:500, marginBottom:8 }}>6. Hosting</div>
-            <div>Diese Website wird bei Vercel Inc., 340 Pine Street, San Francisco, CA 94104, USA gehostet. Vercel verarbeitet dabei Server-Logs gemäß DSGVO-Standardvertragsklauseln.</div>
-          </div>
-        </div>
+    <main style={{ backgroundColor: "#0a0a0a", minHeight: "100vh", padding: "4rem 1.5rem", color: "#e0e0e0" }}>
+      <div style={{ maxWidth: "720px", margin: "0 auto" }}>
+        <h1 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#b87333", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "2.5rem" }}>
+          Datenschutzerklärung
+        </h1>
+        <section style={{ marginBottom: "2rem" }}>
+          <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#fff", marginBottom: "0.5rem" }}>1. Verantwortlicher</h2>
+          <p style={{ color: "#aaa", fontSize: "0.95rem", lineHeight: 1.8, margin: 0 }}>
+            Mi-Werk UG (haftungsbeschränkt)<br />
+            Ben Middeldorf<br />
+            Forstring 24, 44869 Bochum<br />
+            E-Mail: bm.miwerk.de@gmail.com
+          </p>
+        </section>
+        <section style={{ marginBottom: "2rem" }}>
+          <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#fff", marginBottom: "0.5rem" }}>2. Hosting</h2>
+          <p style={{ color: "#aaa", fontSize: "0.95rem", lineHeight: 1.8, margin: 0 }}>
+            Diese Website wird bei Vercel Inc. gehostet. Vercel verarbeitet Verbindungsdaten zur Bereitstellung des Dienstes. Grundlage ist Art. 6 Abs. 1 lit. f DSGVO.
+          </p>
+        </section>
+        <section style={{ marginBottom: "2rem" }}>
+          <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#fff", marginBottom: "0.5rem" }}>3. Datenbank & Authentifizierung</h2>
+          <p style={{ color: "#aaa", fontSize: "0.95rem", lineHeight: 1.8, margin: 0 }}>
+            Wir nutzen Supabase für die Speicherung von Nutzerdaten und Authentifizierung. Dabei werden E-Mail-Adresse und Profildaten verarbeitet. Grundlage ist Art. 6 Abs. 1 lit. b DSGVO.
+          </p>
+        </section>
+        <section style={{ marginBottom: "2rem" }}>
+          <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#fff", marginBottom: "0.5rem" }}>4. Zahlungsabwicklung</h2>
+          <p style={{ color: "#aaa", fontSize: "0.95rem", lineHeight: 1.8, margin: 0 }}>
+            Zahlungen werden über Stripe Inc. abgewickelt. Dabei werden Zahlungsdaten direkt an Stripe übermittelt. Grundlage ist Art. 6 Abs. 1 lit. b DSGVO.
+          </p>
+        </section>
+        <section style={{ marginBottom: "2rem" }}>
+          <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#fff", marginBottom: "0.5rem" }}>5. Google Analytics</h2>
+          <p style={{ color: "#aaa", fontSize: "0.95rem", lineHeight: 1.8, margin: 0 }}>
+            Mit deiner Zustimmung nutzen wir Google Analytics (Google LLC) zur Analyse der Websitenutzung. Dabei werden Cookies gesetzt und Daten an Google in den USA übertragen. Grundlage ist Art. 6 Abs. 1 lit. a DSGVO. Du kannst deine Einwilligung jederzeit widerrufen.
+          </p>
+        </section>
+        <section style={{ marginBottom: "2rem" }}>
+          <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#fff", marginBottom: "0.5rem" }}>6. Cookies</h2>
+          <p style={{ color: "#aaa", fontSize: "0.95rem", lineHeight: 1.8, margin: 0 }}>
+            Wir verwenden technisch notwendige Cookies für die Authentifizierung sowie ein Cookie zur Speicherung deiner Cookie-Einwilligung. Analyse-Cookies nur mit deiner Zustimmung.
+          </p>
+        </section>
+        <section style={{ marginBottom: "2rem" }}>
+          <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#fff", marginBottom: "0.5rem" }}>7. Deine Rechte</h2>
+          <p style={{ color: "#aaa", fontSize: "0.95rem", lineHeight: 1.8, margin: 0 }}>
+            Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung. Wende dich an: bm.miwerk.de@gmail.com
+          </p>
+        </section>
+        <section>
+          <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#fff", marginBottom: "0.5rem" }}>8. Beschwerderecht</h2>
+          <p style={{ color: "#aaa", fontSize: "0.95rem", lineHeight: 1.8, margin: 0 }}>
+            Du kannst dich bei der Landesbeauftragten für Datenschutz und Informationsfreiheit NRW (LDI NRW) beschweren.
+          </p>
+        </section>
       </div>
-    </div>
-  )
+    </main>
+  );
 }
