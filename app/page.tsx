@@ -19,7 +19,7 @@ export default function Home() {
   }, [])
 
   async function laden() {
-    const { data } = await supabase.from('dienstleister').select('*')
+    const { data } = await supabase.from('dienstleister').select('*').eq('abo_aktiv', true)
     if (data) { setDienstleister(data); setGefiltert(data) }
   }
 
