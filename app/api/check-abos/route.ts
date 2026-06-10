@@ -1,57 +1,79 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from 'next/server'
+import { supabase } from '../../Lib/supabase'
+import { Resend } from 'resend'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const resend = new Resend(process.env.RESEND_API_KEY)
 
-export async function GET() {
-  // Dienstleister die vor genau 5 Monaten registriert haben
-  const fuenfMonateAgo = new Date();
-  fuenfMonateAgo.setMonth(fuenfMonateAgo.getMonth() - 5);
-  
-  const vonDatum = new Date(fuenfMonateAgo);
-  vonDatum.setHours(0, 0, 0, 0);
-  
-  const bisDatum = new Date(fuenfMonateAgo);
-  bisDatum.setHours(23, 59, 59, 999);
+export async function GET(request: Request) {
+  const authHeader = request.headers.get('authorization')
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
-  const { data: dienstleister } = await supabase
-    .from("dienstleister")
-    .select("email, name, gewerk")
-    .gte("erstellt_am", vonDatum.toISOString())
-    .lte("erstellt_am", bisDatum.toISOString())
-    .eq("abo_aktiv", false);
+  const supabase = createClient()
+
+  const fiveMonthsAgo = new Date()
+  fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 5)
+
+  const windowStart = new Date(fiveMonthsAgo)
+  windowStart.setDate(windowStart.getDate() - 1)
+
+  const windowEnd = new Date(fiveMonthsAgo)
+  windowEnd.setDate(windowEnd.getDate() + 1)
+
+  const { data: dienstleister, error } = await supabase
+    .from('dienstleister')
+    .select('name, email, erstellt_am')
+    .eq('abo_aktiv', true)
+    .gte('erstellt_am', windowStart.toISOString())
+    .lte('erstellt_am', windowEnd.toISOString())
+
+  if (error) {
+    console.error('Supabase Fehler:', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
 
   if (!dienstleister || dienstleister.length === 0) {
-    return NextResponse.json({ message: "Keine Emails heute" });
+    return NextResponse.json({ message: 'Keine Empfänger heute', sent: 0 })
   }
 
-  // Email an jeden senden
+  let sent = 0
+
   for (const d of dienstleister) {
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "Mi-Werk <noreply@mi-werk.de>",
+    try {
+      await resend.emails.send({
+        from: 'mi-werk <noreply@mi-werk.de>',
         to: d.email,
-        subject: "Deine Probezeit endet bald — jetzt Abo wählen",
+        subject: 'Dein kostenloses Profil läuft bald ab',
         html: `
-          <h2>Hallo ${d.name},</h2>
-          <p>deine kostenlose Probezeit bei Mi-Werk endet in 30 Tagen.</p>
-          <p>Damit dein Profil sichtbar bleibt, wähle jetzt dein Abo:</p>
-          <a href="https://mi-werk.de/abo" style="background:#b87333;color:#000;padding:12px 24px;border-radius:4px;text-decoration:none;font-weight:bold;">
-            Jetzt Abo wählen
-          </a>
-          <p>Deine Kategorie: <strong>${d.gewerk}</strong></p>
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
+            <h2 style="color: #b45309;">Hallo ${d.name},</h2>
+            <p>dein kostenloses Profil auf <strong>mi-werk.de</strong> ist seit 5 Monaten aktiv.</p>
+            <p>In 2 Monaten endet die kostenlose Phase. Danach bleibt dein Profil nur sichtbar, wenn du ein Abo abschließt.</p>
+            <h3 style="margin-top: 2rem;">Was passiert als nächstes?</h3>
+            <ul>
+              <li>Monat 7–8: <strong>Einführungspreis</strong></li>
+              <li>Ab Monat 9: regulärer Preis</li>
+              <li>Ohne Abo: Profil wird ausgeblendet</li>
+            </ul>
+            <a href="https://mi-werk.de/abo"
+               style="display: inline-block; margin-top: 1.5rem; padding: 12px 28px;
+                      background: #b45309; color: white; text-decoration: none;
+                      border-radius: 8px; font-weight: bold;">
+              Jetzt Abo sichern
+            </a>
+            <p style="margin-top: 2rem; font-size: 13px; color: #666;">
+              Du erhältst diese Mail, weil du ein Profil auf mi-werk.de erstellt hast.<br>
+              <a href="https://mi-werk.de/datenschutz" style="color: #666;">Datenschutz</a>
+            </p>
+          </div>
         `,
-      }),
-    });
+      })
+      sent++
+    } catch (err) {
+      console.error(`Mail-Fehler für ${d.email}:`, err)
+    }
   }
 
-  return NextResponse.json({ message: `${dienstleister.length} Emails gesendet` });
+  return NextResponse.json({ message: `${sent} Mails gesendet` })
 }
