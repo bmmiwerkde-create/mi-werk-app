@@ -51,7 +51,7 @@ export default function DashboardPage() {
     if (!user) return
     setSaving(true)
     setMessage('')
-    const payload = { ...form, user_id: user.id }
+    const payload = { ...form, user_id: user.id, abo_aktiv: true, erstellt_am: new Date().toISOString() }
     const { error } = profil?.id
       ? await supabase.from('dienstleister').update(payload).eq('id', profil.id)
       : await supabase.from('dienstleister').insert(payload)
