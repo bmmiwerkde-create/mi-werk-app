@@ -7,15 +7,10 @@ export default function AGB() {
 
   return (
     <div style={{ minHeight:'100vh', background:'#0A0A0A', color:'#E8DDD4', fontFamily:'system-ui' }}>
-      <div style={{ display:'flex', alignItems:'center', padding:'0 32px', height:56, background:'#111', borderBottom:'1px solid rgba(200,149,108,0.18)', position:'sticky', top:0, zIndex:100 }}>
-        <button onClick={() => router.back()} style={{ fontSize:12, color:'#c8956c', background:'none', border:'1px solid rgba(200,149,108,0.3)', borderRadius:8, padding:'6px 14px', cursor:'pointer', fontFamily:'inherit', marginRight:16 }}>
-          ← Zurück
-        </button>
-        <div style={{ fontFamily:'Georgia,serif', fontSize:20, fontWeight:700, cursor:'pointer' }} onClick={() => router.push('/')}>
-          Mi-<span style={{ color:'#c8956c' }}>Werk</span>
-        </div>
-      </div>
       <div style={{ maxWidth:800, margin:'0 auto', padding:'48px 24px 80px' }}>
+        <button onClick={() => router.push('/')} style={{ background:'none', border:'none', color:'#c8956c', fontSize:14, cursor:'pointer', fontFamily:'inherit', marginBottom:32, padding:0 }}>
+          ← Zurück zur Startseite
+        </button>
         <h1 style={{ fontFamily:'Georgia,serif', fontSize:36, fontWeight:700, marginBottom:8 }}>Allgemeine Geschäftsbedingungen</h1>
         <p style={{ fontSize:13, color:'#5A5550', marginBottom:48 }}>Stand: Juni 2026</p>
         <section style={{ marginBottom:40 }}>
