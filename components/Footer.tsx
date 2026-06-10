@@ -1,6 +1,5 @@
 "use client"
 // components/Footer.tsx
-// Einbinden in app/layout.tsx: import Footer from '@/components/Footer'
 
 export default function Footer() {
   return (
@@ -23,20 +22,18 @@ export default function Footer() {
           textAlign: "center",
         }}
       >
-        {/* Logo / Name */}
         <span
           style={{
             fontSize: "1rem",
             fontWeight: 700,
             letterSpacing: "0.08em",
-            color: "#b87333", // Kupfer
+            color: "#b87333",
             textTransform: "uppercase",
           }}
         >
           Mi-Werk
         </span>
 
-        {/* Links */}
         <nav
           style={{
             display: "flex",
@@ -49,6 +46,7 @@ export default function Footer() {
             { label: "Impressum", href: "/impressum" },
             { label: "Datenschutz", href: "/datenschutz" },
             { label: "Kontakt", href: "/kontakt" },
+            { label: "AGB", href: "/agb" },
           ].map(({ label, href }) => (
             <a
               key={href}
@@ -72,14 +70,7 @@ export default function Footer() {
           ))}
         </nav>
 
-        {/* Copyright */}
-        <p
-          style={{
-            color: "#444",
-            fontSize: "0.75rem",
-            margin: 0,
-          }}
-        >
+        <p style={{ color: "#444", fontSize: "0.75rem", margin: 0 }}>
           © {new Date().getFullYear()} Mi-Werk. Alle Rechte vorbehalten.
         </p>
       </div>
