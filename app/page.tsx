@@ -11,6 +11,7 @@ const mobileStyle = `
     .stats-row { gap: 20px !important; }
     .section-pad { padding: 32px 16px 0 !important; }
     .steps-grid { grid-template-columns: repeat(1, 1fr) !important; }
+    .filter-row { flex-direction: column !important; }
   }
 `
 
@@ -176,6 +177,9 @@ export default function Home() {
   const [dienstleister, setDienstleister] = useState<any[]>([])
   const [gefiltert, setGefiltert] = useState<any[]>([])
   const [suche, setSuche] = useState('')
+  const [stadtFilter, setStadtFilter] = useState('')
+  const [plzFilter, setPlzFilter] = useState('')
+  const [datumFilter, setDatumFilter] = useState('')
   const [aktiveKategorie, setAktiveKategorie] = useState<string | null>(null)
   const [selectedGewerk, setSelectedGewerk] = useState('')
   const [user, setUser] = useState<any>(null)
@@ -193,34 +197,73 @@ export default function Home() {
     if (data) { setDienstleister(data); setGefiltert(data) }
   }
 
+  function anwenden(suche_: string, stadt_: string, plz_: string, datum_: string) {
+    let result = dienstleister
+    if (suche_) {
+      const q = suche_.toLowerCase()
+      result = result.filter(d =>
+        d.name?.toLowerCase().includes(q) ||
+        d.gewerk?.toLowerCase().includes(q) ||
+        d.ort?.toLowerCase().includes(q) ||
+        d.beschreibung?.toLowerCase().includes(q)
+      )
+    }
+    if (stadt_) {
+      const q = stadt_.toLowerCase()
+      result = result.filter(d => d.ort?.toLowerCase().includes(q))
+    }
+    if (plz_) {
+      result = result.filter(d => d.postleitzahl?.toString().startsWith(plz_))
+    }
+    if (datum_) {
+      result = result.filter(d => !d.verfuegbar_ab || d.verfuegbar_ab <= datum_)
+    }
+    setGefiltert(result)
+  }
+
   function filtern(wert: string) {
     setSuche(wert)
     setAktiveKategorie(null)
     setSelectedGewerk('')
-    if (!wert) { setGefiltert(dienstleister); return }
-    const q = wert.toLowerCase()
-    setGefiltert(dienstleister.filter(d =>
-      d.name?.toLowerCase().includes(q) ||
-      d.gewerk?.toLowerCase().includes(q) ||
-      d.ort?.toLowerCase().includes(q) ||
-      d.beschreibung?.toLowerCase().includes(q)
-    ))
+    anwenden(wert, stadtFilter, plzFilter, datumFilter)
+  }
+
+  function filterStadt(wert: string) {
+    setStadtFilter(wert)
+    anwenden(suche, wert, plzFilter, datumFilter)
+  }
+
+  function filterPlz(wert: string) {
+    setPlzFilter(wert)
+    anwenden(suche, stadtFilter, wert, datumFilter)
+  }
+
+  function filterDatum(wert: string) {
+    setDatumFilter(wert)
+    anwenden(suche, stadtFilter, plzFilter, wert)
   }
 
   function filterGewerk(gewerk: string) {
     setSelectedGewerk(gewerk)
     setSuche(gewerk)
+    setStadtFilter('')
+    setPlzFilter('')
+    setDatumFilter('')
     setGefiltert(dienstleister.filter(d => d.gewerk?.toLowerCase().includes(gewerk.toLowerCase())))
   }
 
   function resetAlles() {
     setSuche('')
+    setStadtFilter('')
+    setPlzFilter('')
+    setDatumFilter('')
     setAktiveKategorie(null)
     setSelectedGewerk('')
     setGefiltert(dienstleister)
   }
 
   const aktiveKatData = hauptkategorien.find(k => k.name === aktiveKategorie)
+  const hatFilter = suche || stadtFilter || plzFilter || datumFilter
 
   return (
     <div style={{ minHeight:'100vh', background:'#0A0A0A', color:'#E8DDD4', fontFamily:'system-ui' }}>
@@ -257,6 +300,8 @@ export default function Home() {
         <div style={{ fontSize:16, color:'#9A8878', marginBottom:40, maxWidth:480, margin:'0 auto 40px' }}>
           Finde Dienstleister in deiner Region — schnell, einfach, direkt.
         </div>
+
+        {/* SUCHFELD */}
         <div style={{ maxWidth:560, margin:'0 auto', position:'relative' }}>
           <input
             value={suche}
@@ -266,6 +311,45 @@ export default function Home() {
           />
           <div style={{ position:'absolute', right:18, top:'50%', transform:'translateY(-50%)', color:'#c8956c', fontSize:18 }}>🔍</div>
         </div>
+
+        {/* STADT + PLZ FILTER */}
+        <div className="filter-row" style={{ maxWidth:560, margin:'12px auto 0', display:'flex', gap:10 }}>
+          <div style={{ flex:1, position:'relative' }}>
+            <input
+              value={stadtFilter}
+              onChange={e => filterStadt(e.target.value)}
+              placeholder="📍 Stadt filtern…"
+              style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
+              onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
+              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
+            />
+          </div>
+          <div style={{ flex:1, position:'relative' }}>
+            <input
+              value={plzFilter}
+              onChange={e => filterPlz(e.target.value)}
+              placeholder="🔢 PLZ filtern…"
+              maxLength={5}
+              style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
+              onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
+              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
+            />
+          </div>
+        </div>
+
+        {/* DATUM FILTER */}
+        <div style={{ maxWidth:560, margin:'10px auto 0' }}>
+          <input
+            type="date"
+            value={datumFilter}
+            onChange={e => filterDatum(e.target.value)}
+            style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color: datumFilter ? '#E8DDD4' : '#5A5550', fontFamily:'inherit', outline:'none', boxSizing:'border-box', colorScheme:'dark' }}
+            onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
+            onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
+          />
+          {!datumFilter && <div style={{ position:'relative', pointerEvents:'none', marginTop:-38, paddingLeft:16, fontSize:14, color:'#5A5550' }}>📅 Verfügbar ab Datum…</div>}
+        </div>
+
         <div className="stats-row" style={{ display:'flex', gap:40, justifyContent:'center', marginTop:48 }}>
           {[
             [dienstleister.length + '+', 'Dienstleister'],
@@ -281,7 +365,7 @@ export default function Home() {
       </div>
 
       {/* KATEGORIEN */}
-      {!suche && (
+      {!suche && !stadtFilter && !plzFilter && !datumFilter && (
         <div className="section-pad" style={{ maxWidth:1000, margin:'0 auto', padding:'48px 24px 0' }}>
           {!aktiveKategorie && (
             <>
@@ -337,9 +421,11 @@ export default function Home() {
       <div style={{ maxWidth:1000, margin:'0 auto', padding:'32px 24px 48px' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
           <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550' }}>
-            {suche ? `${gefiltert.length} Ergebnisse für "${suche}"` : 'Alle Dienstleister'}
+            {hatFilter ? `${gefiltert.length} Ergebnisse` : 'Alle Dienstleister'}
+            {stadtFilter && ` in ${stadtFilter}`}
+            {plzFilter && ` · PLZ ${plzFilter}`}
           </div>
-          {suche && (
+          {hatFilter && (
             <button onClick={resetAlles} style={{ fontSize:11, color:'#c8956c', background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
               Filter zurücksetzen ✕
             </button>
@@ -355,7 +441,7 @@ export default function Home() {
                 <div style={{ fontSize:28 }}>{d.emoji || '🔧'}</div>
                 <div>
                   <div style={{ fontSize:14, fontWeight:500 }}>{d.name}</div>
-                  <div style={{ fontSize:11, color:'#9A8878', marginTop:2 }}>{d.gewerk}{d.ort ? ' · ' + d.ort : ''}</div>
+                  <div style={{ fontSize:11, color:'#9A8878', marginTop:2 }}>{d.gewerk}{d.ort ? ' · ' + d.ort : ''}{d.postleitzahl ? ' ' + d.postleitzahl : ''}</div>
                 </div>
               </div>
               {d.beschreibung && (
@@ -370,7 +456,7 @@ export default function Home() {
                 )}
               </div>
               {d.email && (
-                <a href={`mailto:${d.email}`} style={{ display:'block', marginTop:12, fontSize:12, color:'#c8956c', textDecoration:'none', padding:'7px 0', borderTop:'1px solid rgba(255,255,255,0.05)', textAlign:'center' }}>
+                <a href={'mailto:' + d.email} onClick={e => e.stopPropagation()} style={{ display:'block', marginTop:12, fontSize:12, color:'#c8956c', textDecoration:'none', padding:'7px 0', borderTop:'1px solid rgba(255,255,255,0.05)', textAlign:'center' }}>
                   Kontakt aufnehmen →
                 </a>
               )}
@@ -379,7 +465,10 @@ export default function Home() {
         </div>
         {gefiltert.length === 0 && (
           <div style={{ textAlign:'center', padding:'60px 0', color:'#5A5550', fontSize:14 }}>
-            Keine Dienstleister gefunden für "{suche}"
+            Keine Dienstleister gefunden
+            {stadtFilter && ` in "${stadtFilter}"`}
+            {plzFilter && ` mit PLZ "${plzFilter}"`}
+            {suche && ` für "${suche}"`}
           </div>
         )}
       </div>
