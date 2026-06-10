@@ -1,5 +1,19 @@
 'use client'
 
+const mobileStyle = `
+  @media (max-width: 640px) {
+    .kat-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .gewerk-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    .dl-grid { grid-template-columns: repeat(1, 1fr) !important; }
+    .hero-pad { padding: 40px 16px 32px !important; }
+    .hero-title { font-size: 36px !important; letter-spacing: -1px !important; }
+    .nav-pad { padding: 0 16px !important; }
+    .stats-row { gap: 20px !important; }
+    .section-pad { padding: 32px 16px 0 !important; }
+    .steps-grid { grid-template-columns: repeat(1, 1fr) !important; }
+  }
+`
+
 import { useEffect, useState } from 'react'
 import { supabase } from './Lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -210,9 +224,10 @@ export default function Home() {
 
   return (
     <div style={{ minHeight:'100vh', background:'#0A0A0A', color:'#E8DDD4', fontFamily:'system-ui' }}>
+      <style dangerouslySetInnerHTML={{ __html: mobileStyle }} />
 
       {/* NAV */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 32px', height:56, background:'#111', borderBottom:'1px solid rgba(200,149,108,0.18)', position:'sticky', top:0, zIndex:100 }}>
+      <div className="nav-pad" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 32px', height:56, background:'#111', borderBottom:'1px solid rgba(200,149,108,0.18)', position:'sticky', top:0, zIndex:100 }}>
         <div style={{ fontFamily:'Georgia,serif', fontSize:20, fontWeight:700, cursor:'pointer' }} onClick={resetAlles}>
           Mi-<span style={{ color:'#c8956c' }}>Werk</span>
         </div>
@@ -235,8 +250,8 @@ export default function Home() {
       </div>
 
       {/* HERO */}
-      <div style={{ textAlign:'center', padding:'72px 24px 56px', background:'linear-gradient(180deg, #111 0%, #0A0A0A 100%)', borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
-        <div style={{ fontFamily:'Georgia,serif', fontSize:52, fontWeight:700, letterSpacing:-1, marginBottom:14 }}>
+      <div className="hero-pad" style={{ textAlign:'center', padding:'72px 24px 56px', background:'linear-gradient(180deg, #111 0%, #0A0A0A 100%)', borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
+        <div className="hero-title" style={{ fontFamily:'Georgia,serif', fontSize:52, fontWeight:700, letterSpacing:-1, marginBottom:14 }}>
           Mi-<span style={{ color:'#c8956c' }}>Werk</span>
         </div>
         <div style={{ fontSize:16, color:'#9A8878', marginBottom:40, maxWidth:480, margin:'0 auto 40px' }}>
@@ -247,11 +262,11 @@ export default function Home() {
             value={suche}
             onChange={e => filtern(e.target.value)}
             placeholder="Name, Gewerk oder Ort suchen…"
-            style={{ width:'100%', padding:'16px 60px 16px 20px', background:'#181818', border:'1px solid rgba(200,149,108,0.3)', borderRadius:12, fontSize:15, color:'#E8DDD4', fontFamily:'inherit', outline:'none' }}
+            style={{ width:'100%', padding:'16px 60px 16px 20px', background:'#181818', border:'1px solid rgba(200,149,108,0.3)', borderRadius:12, fontSize:15, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
           />
           <div style={{ position:'absolute', right:18, top:'50%', transform:'translateY(-50%)', color:'#c8956c', fontSize:18 }}>🔍</div>
         </div>
-        <div style={{ display:'flex', gap:40, justifyContent:'center', marginTop:48 }}>
+        <div className="stats-row" style={{ display:'flex', gap:40, justifyContent:'center', marginTop:48 }}>
           {[
             [dienstleister.length + '+', 'Dienstleister'],
             [hauptkategorien.length + '', 'Kategorien'],
@@ -267,21 +282,21 @@ export default function Home() {
 
       {/* KATEGORIEN */}
       {!suche && (
-        <div style={{ maxWidth:1000, margin:'0 auto', padding:'48px 24px 0' }}>
+        <div className="section-pad" style={{ maxWidth:1000, margin:'0 auto', padding:'48px 24px 0' }}>
           {!aktiveKategorie && (
             <>
               <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:6 }}>Kategorie wählen</div>
               <div style={{ fontSize:22, fontWeight:700, fontFamily:'Georgia,serif', marginBottom:24 }}>Was suchst du?</div>
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12 }}>
+              <div className="kat-grid" style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12 }}>
                 {hauptkategorien.map(kat => (
                   <button
                     key={kat.name}
                     onClick={() => setAktiveKategorie(kat.name)}
-                    style={{ display:'flex', alignItems:'center', gap:14, padding:'18px 20px', borderRadius:12, cursor:'pointer', fontFamily:'inherit', textAlign:'left', border:'1px solid rgba(255,255,255,0.06)', background:'#111', color:'#9A8878', transition:'all 0.15s' }}
+                    style={{ display:'flex', alignItems:'center', gap:14, padding:'18px 20px', borderRadius:12, cursor:'pointer', fontFamily:'inherit', textAlign:'left', border:'1px solid rgba(255,255,255,0.06)', background:'#111', color:'#9A8878', transition:'all 0.15s', width:'100%' }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'; e.currentTarget.style.color = '#c8956c'; e.currentTarget.style.background = 'rgba(200,149,108,0.06)' }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#9A8878'; e.currentTarget.style.background = '#111' }}
                   >
-                    <span style={{ fontSize:28 }}>{kat.emoji}</span>
+                    <span style={{ fontSize:28, flexShrink:0 }}>{kat.emoji}</span>
                     <div>
                       <div style={{ fontSize:13, fontWeight:500, color:'#E8DDD4' }}>{kat.name}</div>
                       <div style={{ fontSize:11, color:'#5A5550', marginTop:2 }}>{kat.gewerke.length} Gewerke</div>
@@ -299,7 +314,7 @@ export default function Home() {
                 </button>
                 <span style={{ fontSize:22, fontWeight:700, fontFamily:'Georgia,serif' }}>{aktiveKatData.emoji} {aktiveKatData.name}</span>
               </div>
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(6, 1fr)', gap:10 }}>
+              <div className="gewerk-grid" style={{ display:'grid', gridTemplateColumns:'repeat(6, 1fr)', gap:10 }}>
                 {aktiveKatData.gewerke.map(kat => (
                   <button
                     key={kat.name}
@@ -330,7 +345,7 @@ export default function Home() {
             </button>
           )}
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:14 }}>
+        <div className="dl-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:14 }}>
           {gefiltert.map((d: any) => (
             <div key={d.id} style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:12, padding:'20px', cursor:'pointer' }}
               onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.35)'}
@@ -374,7 +389,7 @@ export default function Home() {
         <div style={{ maxWidth:800, margin:'0 auto', textAlign:'center' }}>
           <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:12 }}>So funktioniert es</div>
           <div style={{ fontFamily:'Georgia,serif', fontSize:28, fontWeight:700, marginBottom:48 }}>In 3 Schritten zum Dienstleister</div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:32 }}>
+          <div className="steps-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:32 }}>
             {[
               ['🔍', 'Suchen', 'Nach Name, Gewerk oder Ort suchen und den passenden Dienstleister finden.'],
               ['👁️', 'Vergleichen', 'Profile, Beschreibungen und Verfügbarkeit vergleichen.'],
