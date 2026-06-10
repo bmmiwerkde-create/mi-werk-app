@@ -11,12 +11,13 @@ export default function ProfilSeite({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     async function laden() {
-      const { data } = await supabase
+      const id = params.id
+      const { data, error } = await supabase
         .from('dienstleister')
         .select('*')
-        .eq('id', params.id)
-        
+        .eq('id', id)
         .single()
+      console.log('data:', data, 'error:', error)
       setProfil(data)
       setLoading(false)
     }
@@ -73,11 +74,10 @@ export default function ProfilSeite({ params }: { params: { id: string } }) {
         {profil.email && (
           <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:16, padding:'24px', marginBottom:20 }}>
             <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:16 }}>Kontakt aufnehmen</div>
-            <a href={`mailto:${profil.email}?subject=Anfrage über mi-werk.de&body=Hallo ${profil.name},%0D%0A%0D%0Aich bin über mi-werk.de auf dein Profil gestoßen.`}
+            <a href={`mailto:${profil.email}?subject=Anfrage über mi-werk.de`}
               style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'#c8956c', color:'#fff', textDecoration:'none', borderRadius:10, fontSize:14, fontWeight:500 }}>
               ✉️ E-Mail senden
             </a>
-            <p style={{ fontSize:11, color:'#5A5550', textAlign:'center', marginTop:10, marginBottom:0 }}>Deine Nachricht geht direkt an {profil.name?.split(' ')[0]}</p>
           </div>
         )}
         <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:16, padding:'24px' }}>
