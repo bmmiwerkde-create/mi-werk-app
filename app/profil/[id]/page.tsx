@@ -15,7 +15,7 @@ export default function ProfilSeite({ params }: { params: { id: string } }) {
         .from('dienstleister')
         .select('*')
         .eq('id', params.id)
-        .eq('abo_aktiv', true)
+        .eq('abo_aktiv', 'true')
         .single()
       setProfil(data)
       setLoading(false)
