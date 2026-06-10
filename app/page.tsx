@@ -347,7 +347,7 @@ export default function Home() {
         </div>
         <div className="dl-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:14 }}>
           {gefiltert.map((d: any) => (
-            borderRadius:12, padding:'20px', cursor:'pointer' }} onClick={() => window.location.href = `/profil/${d.id}`}
+            borderRadius:12, padding:'20px', cursor:'pointer' } onClick={() => window.location.href = `/profil/${d.id}`}
               onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.35)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'}
             >
