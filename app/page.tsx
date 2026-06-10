@@ -4,64 +4,165 @@ import { useEffect, useState } from 'react'
 import { supabase } from './Lib/supabase'
 import { useRouter } from 'next/navigation'
 
-const kategorien = [
-  // Bau & Ausbau
-  { emoji: '🧱', name: 'Maurer' },
-  { emoji: '🪵', name: 'Zimmerer' },
-  { emoji: '🏠', name: 'Dachdecker' },
-  { emoji: '🪜', name: 'Gerüstbauer' },
-  { emoji: '🏗️', name: 'Trockenbauer' },
-  { emoji: '🪨', name: 'Estrichleger' },
-  { emoji: '🔲', name: 'Fliesenleger' },
-  { emoji: '🎨', name: 'Maler' },
-  { emoji: '🪣', name: 'Putzer' },
-  { emoji: '🪟', name: 'Fensterbauer' },
-  { emoji: '🚪', name: 'Türenbau' },
-  // Installation & Technik
-  { emoji: '⚡', name: 'Elektriker' },
-  { emoji: '🔧', name: 'Sanitär' },
-  { emoji: '🔥', name: 'Heizungsbau' },
-  { emoji: '❄️', name: 'Klimatechnik' },
-  { emoji: '☀️', name: 'Solartechnik' },
-  { emoji: '💨', name: 'Lüftungsbau' },
-  { emoji: '🛁', name: 'Badinstallation' },
-  // Holz & Metall
-  { emoji: '🪚', name: 'Schreiner' },
-  { emoji: '🪑', name: 'Tischler' },
-  { emoji: '🔩', name: 'Schlosser' },
-  { emoji: '⚙️', name: 'Metallbauer' },
-  { emoji: '🔨', name: 'Schweißer' },
-  // Garten & Außen
-  { emoji: '🌿', name: 'Gartenbau' },
-  { emoji: '🌳', name: 'Baumfällung' },
-  { emoji: '🧱', name: 'Pflasterer' },
-  { emoji: '🪴', name: 'Landschaftspflege' },
-  { emoji: '🌱', name: 'Rasenpflege' },
-  { emoji: '🏡', name: 'Zaunbau' },
-  { emoji: '🌊', name: 'Teichbau' },
-  // Reinigung & Service
-  { emoji: '🧹', name: 'Gebäudereinigung' },
-  { emoji: '🪟', name: 'Fensterreinigung' },
-  { emoji: '🏠', name: 'Hausmeisterservice' },
-  { emoji: '🧺', name: 'Teppichreinigung' },
-  { emoji: '🪣', name: 'Rohrreinigung' },
-  // Transport & Logistik
-  { emoji: '🚛', name: 'Umzugsservice' },
-  { emoji: '🗑️', name: 'Entrümpelung' },
-  { emoji: '📦', name: 'Möbelmontage' },
-  // Sonstiges
-  { emoji: '🔑', name: 'Schlüsseldienst' },
-  { emoji: '🧰', name: 'Reparaturservice' },
-  { emoji: '🛡️', name: 'Schornsteinfeger' },
-  { emoji: '🛗', name: 'Aufzugstechnik' },
-  { emoji: '📡', name: 'Antennenbau' },
-  { emoji: '🖥️', name: 'IT-Service' },
+const hauptkategorien = [
+  {
+    emoji: '🔨', name: 'Handwerk & Bau',
+    gewerke: [
+      { emoji: '🧱', name: 'Maurer' },
+      { emoji: '🪵', name: 'Zimmerer' },
+      { emoji: '🏠', name: 'Dachdecker' },
+      { emoji: '🪜', name: 'Gerüstbauer' },
+      { emoji: '🏗️', name: 'Trockenbauer' },
+      { emoji: '🪨', name: 'Estrichleger' },
+      { emoji: '🔲', name: 'Fliesenleger' },
+      { emoji: '🎨', name: 'Maler' },
+      { emoji: '🪣', name: 'Putzer' },
+      { emoji: '🪟', name: 'Fensterbauer' },
+      { emoji: '🚪', name: 'Türenbau' },
+      { emoji: '⚡', name: 'Elektriker' },
+      { emoji: '🔧', name: 'Sanitär' },
+      { emoji: '🔥', name: 'Heizungsbau' },
+      { emoji: '❄️', name: 'Klimatechnik' },
+      { emoji: '☀️', name: 'Solartechnik' },
+      { emoji: '💨', name: 'Lüftungsbau' },
+      { emoji: '🛁', name: 'Badinstallation' },
+      { emoji: '🪚', name: 'Schreiner' },
+      { emoji: '🪑', name: 'Tischler' },
+      { emoji: '🔩', name: 'Schlosser' },
+      { emoji: '⚙️', name: 'Metallbauer' },
+      { emoji: '🔨', name: 'Schweißer' },
+    ]
+  },
+  {
+    emoji: '🌿', name: 'Garten & Außen',
+    gewerke: [
+      { emoji: '🌿', name: 'Gartenbau' },
+      { emoji: '🌳', name: 'Baumfällung' },
+      { emoji: '🧱', name: 'Pflasterer' },
+      { emoji: '🪴', name: 'Landschaftspflege' },
+      { emoji: '🌱', name: 'Rasenpflege' },
+      { emoji: '🏡', name: 'Zaunbau' },
+      { emoji: '🌊', name: 'Teichbau' },
+    ]
+  },
+  {
+    emoji: '🧹', name: 'Reinigung & Hausservice',
+    gewerke: [
+      { emoji: '🧹', name: 'Gebäudereinigung' },
+      { emoji: '🪟', name: 'Fensterreinigung' },
+      { emoji: '🏠', name: 'Hausmeisterservice' },
+      { emoji: '🧺', name: 'Teppichreinigung' },
+      { emoji: '🪣', name: 'Rohrreinigung' },
+      { emoji: '🔑', name: 'Schlüsseldienst' },
+      { emoji: '🧰', name: 'Reparaturservice' },
+    ]
+  },
+  {
+    emoji: '🚛', name: 'Transport & Logistik',
+    gewerke: [
+      { emoji: '🚛', name: 'Umzugsservice' },
+      { emoji: '🗑️', name: 'Entrümpelung' },
+      { emoji: '📦', name: 'Möbelmontage' },
+      { emoji: '🏋️', name: 'Schwertransport' },
+    ]
+  },
+  {
+    emoji: '🍽️', name: 'Catering & Essen',
+    gewerke: [
+      { emoji: '🍽️', name: 'Catering' },
+      { emoji: '🎉', name: 'Partyservice' },
+      { emoji: '🚚', name: 'Foodtruck' },
+      { emoji: '👨‍🍳', name: 'Kochservice' },
+      { emoji: '🥗', name: 'Meal Prep' },
+      { emoji: '🔥', name: 'Grillservice' },
+      { emoji: '🥤', name: 'Getränkeservice' },
+    ]
+  },
+  {
+    emoji: '💪', name: 'Fitness & Sport',
+    gewerke: [
+      { emoji: '💪', name: 'Personal Trainer' },
+      { emoji: '🧘', name: 'Yoga' },
+      { emoji: '🏋️', name: 'Pilates' },
+      { emoji: '🥋', name: 'Kampfsport' },
+      { emoji: '🏊', name: 'Schwimmtrainer' },
+      { emoji: '🥦', name: 'Ernährungsberatung' },
+      { emoji: '🦴', name: 'Physiotherapie' },
+    ]
+  },
+  {
+    emoji: '🏥', name: 'Gesundheit & Medizin',
+    gewerke: [
+      { emoji: '🌿', name: 'Heilpraktiker' },
+      { emoji: '💆', name: 'Masseur' },
+      { emoji: '🦴', name: 'Osteopath' },
+      { emoji: '🏥', name: 'Pflegedienst' },
+      { emoji: '🐾', name: 'Tierarzt' },
+      { emoji: '👓', name: 'Optiker' },
+      { emoji: '👂', name: 'Hörgeräteakustiker' },
+    ]
+  },
+  {
+    emoji: '✂️', name: 'Beauty & Pflege',
+    gewerke: [
+      { emoji: '✂️', name: 'Friseur' },
+      { emoji: '💄', name: 'Kosmetik' },
+      { emoji: '💅', name: 'Nagelpflege' },
+      { emoji: '👁️', name: 'Wimpern' },
+      { emoji: '💋', name: 'Permanent Make-up' },
+      { emoji: '💆', name: 'Massage' },
+      { emoji: '🦶', name: 'Fußpflege' },
+    ]
+  },
+  {
+    emoji: '💻', name: 'IT & Technik',
+    gewerke: [
+      { emoji: '🖥️', name: 'IT-Service' },
+      { emoji: '🌐', name: 'Webdesign' },
+      { emoji: '🔧', name: 'Reparatur' },
+      { emoji: '🏠', name: 'Smart Home' },
+      { emoji: '🛡️', name: 'Sicherheitstechnik' },
+      { emoji: '🚁', name: 'Drohnenservice' },
+      { emoji: '📡', name: 'Antennenbau' },
+    ]
+  },
+  {
+    emoji: '🎓', name: 'Bildung & Coaching',
+    gewerke: [
+      { emoji: '📚', name: 'Nachhilfe' },
+      { emoji: '🗣️', name: 'Sprachkurs' },
+      { emoji: '🎵', name: 'Musikunterricht' },
+      { emoji: '🧠', name: 'Life Coach' },
+      { emoji: '📄', name: 'Bewerbungscoaching' },
+    ]
+  },
+  {
+    emoji: '📸', name: 'Kreativ & Events',
+    gewerke: [
+      { emoji: '📸', name: 'Fotograf' },
+      { emoji: '🎬', name: 'Videograf' },
+      { emoji: '🎧', name: 'DJ' },
+      { emoji: '🎪', name: 'Eventplanung' },
+      { emoji: '🎀', name: 'Dekoservice' },
+      { emoji: '🎤', name: 'Moderator' },
+    ]
+  },
+  {
+    emoji: '🐾', name: 'Tiere',
+    gewerke: [
+      { emoji: '🐕', name: 'Hundesitter' },
+      { emoji: '🎾', name: 'Tiertrainer' },
+      { emoji: '🐩', name: 'Tierpflege' },
+      { emoji: '✂️', name: 'Hundefriseur' },
+    ]
+  },
 ]
 
 export default function Home() {
   const [dienstleister, setDienstleister] = useState<any[]>([])
   const [gefiltert, setGefiltert] = useState<any[]>([])
   const [suche, setSuche] = useState('')
+  const [aktiveKategorie, setAktiveKategorie] = useState<string | null>(null)
   const [selectedGewerk, setSelectedGewerk] = useState('')
   const [user, setUser] = useState<any>(null)
   const router = useRouter()
@@ -80,6 +181,7 @@ export default function Home() {
 
   function filtern(wert: string) {
     setSuche(wert)
+    setAktiveKategorie(null)
     setSelectedGewerk('')
     if (!wert) { setGefiltert(dienstleister); return }
     const q = wert.toLowerCase()
@@ -92,25 +194,26 @@ export default function Home() {
   }
 
   function filterGewerk(gewerk: string) {
-    if (selectedGewerk === gewerk) {
-      setSelectedGewerk('')
-      setSuche('')
-      setGefiltert(dienstleister)
-      return
-    }
     setSelectedGewerk(gewerk)
     setSuche(gewerk)
     setGefiltert(dienstleister.filter(d => d.gewerk?.toLowerCase().includes(gewerk.toLowerCase())))
   }
 
-  const gewerke = [...new Set(dienstleister.map(d => d.gewerk).filter(Boolean))]
+  function resetAlles() {
+    setSuche('')
+    setAktiveKategorie(null)
+    setSelectedGewerk('')
+    setGefiltert(dienstleister)
+  }
+
+  const aktiveKatData = hauptkategorien.find(k => k.name === aktiveKategorie)
 
   return (
     <div style={{ minHeight:'100vh', background:'#0A0A0A', color:'#E8DDD4', fontFamily:'system-ui' }}>
 
       {/* NAV */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 32px', height:56, background:'#111', borderBottom:'1px solid rgba(200,149,108,0.18)', position:'sticky', top:0, zIndex:100 }}>
-        <div style={{ fontFamily:'Georgia,serif', fontSize:20, fontWeight:700, cursor:'pointer' }} onClick={() => { setSuche(''); setSelectedGewerk(''); setGefiltert(dienstleister) }}>
+        <div style={{ fontFamily:'Georgia,serif', fontSize:20, fontWeight:700, cursor:'pointer' }} onClick={resetAlles}>
           Mi-<span style={{ color:'#c8956c' }}>Werk</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:16 }}>
@@ -139,31 +242,22 @@ export default function Home() {
         <div style={{ fontSize:16, color:'#9A8878', marginBottom:40, maxWidth:480, margin:'0 auto 40px' }}>
           Finde Dienstleister in deiner Region — schnell, einfach, direkt.
         </div>
-
-        {/* SUCHLEISTE */}
         <div style={{ maxWidth:560, margin:'0 auto', position:'relative' }}>
           <input
             value={suche}
             onChange={e => filtern(e.target.value)}
             placeholder="Name, Gewerk oder Ort suchen…"
-            style={{
-              width:'100%', padding:'16px 60px 16px 20px',
-              background:'#181818', border:'1px solid rgba(200,149,108,0.3)',
-              borderRadius:12, fontSize:15, color:'#E8DDD4',
-              fontFamily:'inherit', outline:'none',
-            }}
+            style={{ width:'100%', padding:'16px 60px 16px 20px', background:'#181818', border:'1px solid rgba(200,149,108,0.3)', borderRadius:12, fontSize:15, color:'#E8DDD4', fontFamily:'inherit', outline:'none' }}
           />
           <div style={{ position:'absolute', right:18, top:'50%', transform:'translateY(-50%)', color:'#c8956c', fontSize:18 }}>🔍</div>
         </div>
-
-        {/* STATS */}
         <div style={{ display:'flex', gap:40, justifyContent:'center', marginTop:48 }}>
           {[
             [dienstleister.length + '+', 'Dienstleister'],
-            [gewerke.length + '+', 'Gewerke'],
+            [hauptkategorien.length + '', 'Kategorien'],
             ['100%', 'Kostenlos'],
           ].map(([zahl, label]) => (
-            <div key={label} style={{ textAlign:'center' }}>
+            <div key={label as string} style={{ textAlign:'center' }}>
               <div style={{ fontFamily:'Georgia,serif', fontSize:28, fontWeight:700, color:'#c8956c' }}>{zahl}</div>
               <div style={{ fontSize:12, color:'#5A5550', marginTop:2 }}>{label}</div>
             </div>
@@ -171,55 +265,56 @@ export default function Home() {
         </div>
       </div>
 
-      {/* KATEGORIE GRID */}
+      {/* KATEGORIEN */}
       {!suche && (
         <div style={{ maxWidth:1000, margin:'0 auto', padding:'48px 24px 0' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:20 }}>
-            <div>
-              <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:6 }}>Nach Gewerk suchen</div>
-              <div style={{ fontSize:22, fontWeight:700, fontFamily:'Georgia,serif' }}>Alle Kategorien</div>
-            </div>
-            {selectedGewerk && (
-              <button onClick={() => { setSelectedGewerk(''); setSuche(''); setGefiltert(dienstleister) }} style={{ fontSize:12, color:'#c8956c', background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
-                Filter zurücksetzen ✕
-              </button>
-            )}
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(6, 1fr)', gap:10 }}>
-            {kategorien.map(kat => (
-              <button
-                key={kat.name}
-                onClick={() => filterGewerk(kat.name)}
-                style={{
-                  display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
-                  padding:'16px 8px', borderRadius:12, cursor:'pointer', fontFamily:'inherit',
-                  border: selectedGewerk === kat.name
-                    ? '1px solid #c8956c'
-                    : '1px solid rgba(255,255,255,0.06)',
-                  background: selectedGewerk === kat.name
-                    ? 'rgba(200,149,108,0.12)'
-                    : '#111',
-                  color: selectedGewerk === kat.name ? '#c8956c' : '#9A8878',
-                  transition:'all 0.15s',
-                }}
-                onMouseEnter={e => {
-                  if (selectedGewerk !== kat.name) {
-                    e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'
-                    e.currentTarget.style.color = '#c8956c'
-                  }
-                }}
-                onMouseLeave={e => {
-                  if (selectedGewerk !== kat.name) {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
-                    e.currentTarget.style.color = '#9A8878'
-                  }
-                }}
-              >
-                <span style={{ fontSize:28, marginBottom:8 }}>{kat.emoji}</span>
-                <span style={{ fontSize:11, textAlign:'center', lineHeight:1.3 }}>{kat.name}</span>
-              </button>
-            ))}
-          </div>
+          {!aktiveKategorie && (
+            <>
+              <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:6 }}>Kategorie wählen</div>
+              <div style={{ fontSize:22, fontWeight:700, fontFamily:'Georgia,serif', marginBottom:24 }}>Was suchst du?</div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12 }}>
+                {hauptkategorien.map(kat => (
+                  <button
+                    key={kat.name}
+                    onClick={() => setAktiveKategorie(kat.name)}
+                    style={{ display:'flex', alignItems:'center', gap:14, padding:'18px 20px', borderRadius:12, cursor:'pointer', fontFamily:'inherit', textAlign:'left', border:'1px solid rgba(255,255,255,0.06)', background:'#111', color:'#9A8878', transition:'all 0.15s' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'; e.currentTarget.style.color = '#c8956c'; e.currentTarget.style.background = 'rgba(200,149,108,0.06)' }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#9A8878'; e.currentTarget.style.background = '#111' }}
+                  >
+                    <span style={{ fontSize:28 }}>{kat.emoji}</span>
+                    <div>
+                      <div style={{ fontSize:13, fontWeight:500, color:'#E8DDD4' }}>{kat.name}</div>
+                      <div style={{ fontSize:11, color:'#5A5550', marginTop:2 }}>{kat.gewerke.length} Gewerke</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+          {aktiveKategorie && aktiveKatData && (
+            <>
+              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24 }}>
+                <button onClick={() => { setAktiveKategorie(null); setSelectedGewerk('') }} style={{ fontSize:12, color:'#c8956c', background:'none', border:'1px solid rgba(200,149,108,0.3)', borderRadius:8, padding:'6px 14px', cursor:'pointer', fontFamily:'inherit' }}>
+                  ← Zurück
+                </button>
+                <span style={{ fontSize:22, fontWeight:700, fontFamily:'Georgia,serif' }}>{aktiveKatData.emoji} {aktiveKatData.name}</span>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(6, 1fr)', gap:10 }}>
+                {aktiveKatData.gewerke.map(kat => (
+                  <button
+                    key={kat.name}
+                    onClick={() => filterGewerk(kat.name)}
+                    style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'16px 8px', borderRadius:12, cursor:'pointer', fontFamily:'inherit', border: selectedGewerk === kat.name ? '1px solid #c8956c' : '1px solid rgba(255,255,255,0.06)', background: selectedGewerk === kat.name ? 'rgba(200,149,108,0.12)' : '#111', color: selectedGewerk === kat.name ? '#c8956c' : '#9A8878', transition:'all 0.15s' }}
+                    onMouseEnter={e => { if (selectedGewerk !== kat.name) { e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'; e.currentTarget.style.color = '#c8956c' } }}
+                    onMouseLeave={e => { if (selectedGewerk !== kat.name) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#9A8878' } }}
+                  >
+                    <span style={{ fontSize:28, marginBottom:8 }}>{kat.emoji}</span>
+                    <span style={{ fontSize:11, textAlign:'center', lineHeight:1.3 }}>{kat.name}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -230,18 +325,14 @@ export default function Home() {
             {suche ? `${gefiltert.length} Ergebnisse für "${suche}"` : 'Alle Dienstleister'}
           </div>
           {suche && (
-            <button onClick={() => { setSuche(''); setSelectedGewerk(''); setGefiltert(dienstleister) }} style={{ fontSize:11, color:'#c8956c', background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
+            <button onClick={resetAlles} style={{ fontSize:11, color:'#c8956c', background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
               Filter zurücksetzen ✕
             </button>
           )}
         </div>
-
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:14 }}>
           {gefiltert.map((d: any) => (
-            <div key={d.id} style={{
-              background:'#111', border:'1px solid rgba(255,255,255,0.06)',
-              borderRadius:12, padding:'20px', cursor:'pointer',
-            }}
+            <div key={d.id} style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:12, padding:'20px', cursor:'pointer' }}
               onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.35)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'}
             >
@@ -271,7 +362,6 @@ export default function Home() {
             </div>
           ))}
         </div>
-
         {gefiltert.length === 0 && (
           <div style={{ textAlign:'center', padding:'60px 0', color:'#5A5550', fontSize:14 }}>
             Keine Dienstleister gefunden für "{suche}"
@@ -290,7 +380,7 @@ export default function Home() {
               ['👁️', 'Vergleichen', 'Profile, Beschreibungen und Verfügbarkeit vergleichen.'],
               ['✉️', 'Kontaktieren', 'Direkt per E-Mail Kontakt aufnehmen — kostenlos und einfach.'],
             ].map(([icon, titel, text]) => (
-              <div key={titel} style={{ textAlign:'center' }}>
+              <div key={titel as string} style={{ textAlign:'center' }}>
                 <div style={{ fontSize:32, marginBottom:14 }}>{icon}</div>
                 <div style={{ fontSize:15, fontWeight:500, marginBottom:8, color:'#c8956c' }}>{titel}</div>
                 <div style={{ fontSize:13, color:'#5A5550', lineHeight:1.7 }}>{text}</div>
