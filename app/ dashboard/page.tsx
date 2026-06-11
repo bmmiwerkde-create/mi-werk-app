@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession, signIn, signOut } from 'next-auth/react'
 import { supabase } from '../Lib/supabase'
 
 type Dienstleister = {
@@ -44,6 +45,17 @@ export default function DashboardPage() {
   const [message, setMessage] = useState('')
   const [bildLaden, setBildLaden] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { data: googleSession } = useSession()
+  const [kalenderEvents, setKalenderEvents] = useState<any[]>([])
+  const [kalenderLaden, setKalenderLaden] = useState(false)
+
+  async function kalenderAbrufen() {
+    setKalenderLaden(true)
+    const res = await fetch('/api/kalender')
+    const data = await res.json()
+    if (data.events) setKalenderEvents(data.events)
+    setKalenderLaden(false)
+  }
 
   useEffect(() => { checkUser() }, [])
 
@@ -222,6 +234,39 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* GOOGLE KALENDER */}
+        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
+          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>Google Kalender</div>
+          {!googleSession ? (
+            <div>
+              <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>Verbinde deinen Google Kalender — Kunden sehen automatisch wann du verfügbar bist.</div>
+              <button onClick={() => signIn('google')} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#fff', color:'#333', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
+                <span style={{ fontSize:16 }}>📅</span> Mit Google verbinden
+              </button>
+            </div>
+          ) : (
+            <div>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
+                <div style={{ fontSize:13, color:C.green }}>✓ Google Kalender verbunden ({googleSession.user?.email})</div>
+                <button onClick={() => signOut()} style={{ fontSize:11, color:C.textDim, background:'none', border:'1px solid ' + C.border, borderRadius:6, padding:'4px 10px', cursor:'pointer', fontFamily:'inherit' }}>Trennen</button>
+              </div>
+              <button onClick={kalenderAbrufen} disabled={kalenderLaden} style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background:C.copper, color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit', marginBottom:12 }}>
+                {kalenderLaden ? 'Lädt…' : 'Termine abrufen'}
+              </button>
+              {kalenderEvents.length > 0 && (
+                <div>
+                  <div style={{ fontSize:11, color:C.textDim, marginBottom:8 }}>Nächste Termine (werden als belegt angezeigt):</div>
+                  {kalenderEvents.slice(0, 5).map((e, i) => (
+                    <div key={i} style={{ fontSize:12, color:C.textMid, padding:'6px 0', borderBottom:'1px solid ' + C.border }}>
+                      {e.title || 'Termin'} — {new Date(e.start).toLocaleDateString('de-DE')}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* KONTO */}

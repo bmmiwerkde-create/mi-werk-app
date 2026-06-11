@@ -4,6 +4,7 @@ import "./globals.css";
 import Footer from '@/components/Footer'
 import CookieBanner from '@/components/CookieBanner'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
+import SessionWrapper from '@/components/SessionWrapper'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <GoogleAnalytics />
-        {children}
+        <SessionWrapper>
+          {children}
+        </SessionWrapper>
         <Footer />
         <CookieBanner />
       </body>
