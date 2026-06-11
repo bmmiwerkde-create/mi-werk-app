@@ -237,6 +237,53 @@ export default function Home() {
     setDatumFilter(wert)
   }
 
+  const [kiLaden, setKiLaden] = useState(false)
+
+  async function kiSuche() {
+    if (!suche.trim()) { suchAusfuehren(); return }
+    setKiLaden(true)
+    try {
+      const alleGewerke = hauptkategorien.flatMap(k => k.gewerke.map(g => g.name)).join(', ')
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 100,
+          messages: [{
+            role: 'user',
+            content: `Du bist ein Assistent für eine Dienstleister-Plattform. Der Nutzer sucht: "${suche}". Welche der folgenden Gewerke passen am besten dazu? Antworte NUR mit einer kommaseparierten Liste der passenden Gewerke (maximal 5), keine Erklärung. Verfügbare Gewerke: ${alleGewerke}`
+          }]
+        })
+      })
+      const data = await response.json()
+      const gewerkeText = data.content?.[0]?.text || ''
+      const gewerkeList = gewerkeText.split(',').map((g: string) => g.trim().toLowerCase())
+      let result = dienstleister
+      if (stadtFilter) result = result.filter(d => d.ort?.toLowerCase().includes(stadtFilter.toLowerCase()))
+      if (plzFilter) result = result.filter(d => d.postleitzahl?.toString().startsWith(plzFilter))
+      if (datumFilter.length === 10) {
+        const parts = datumFilter.split('.')
+        if (parts.length === 3) {
+          const iso = parts[2] + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0')
+          result = result.filter(d => !d.verfuegbar_ab || d.verfuegbar_ab <= iso)
+        }
+      }
+      result = result.filter(d => gewerkeList.some((g: string) =>
+        d.gewerk?.toLowerCase().includes(g) ||
+        d.beschreibung?.toLowerCase().includes(g) ||
+        d.name?.toLowerCase().includes(g)
+      ))
+      if (result.length === 0) anwenden(suche, stadtFilter, plzFilter, datumFilter)
+      else setGefiltert(result)
+      setAktiveKategorie(null)
+      setSelectedGewerk('')
+    } catch {
+      anwenden(suche, stadtFilter, plzFilter, datumFilter)
+    }
+    setKiLaden(false)
+  }
+
   function suchAusfuehren() {
     setAktiveKategorie(null)
     setSelectedGewerk('')
@@ -353,12 +400,13 @@ export default function Home() {
         {/* SUCHEN BUTTON */}
         <div style={{ maxWidth:560, margin:'12px auto 0' }}>
           <button
-            onClick={suchAusfuehren}
-            style={{ width:'100%', padding:'14px', background:'#c8956c', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:600, cursor:'pointer', fontFamily:'inherit', letterSpacing:0.5 }}
-            onMouseEnter={e => e.currentTarget.style.background = '#b8845c'}
-            onMouseLeave={e => e.currentTarget.style.background = '#c8956c'}
+            onClick={kiSuche}
+            disabled={kiLaden}
+            style={{ width:'100%', padding:'14px', background: kiLaden ? '#8a6644' : '#c8956c', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:600, cursor: kiLaden ? 'wait' : 'pointer', fontFamily:'inherit', letterSpacing:0.5, transition:'background 0.2s' }}
+            onMouseEnter={e => { if (!kiLaden) e.currentTarget.style.background = '#b8845c' }}
+            onMouseLeave={e => { if (!kiLaden) e.currentTarget.style.background = '#c8956c' }}
           >
-            Suchen
+            {kiLaden ? '🔍 KI sucht…' : '🔍 Suchen'}
           </button>
         </div>
 
