@@ -498,7 +498,12 @@ export default function Home() {
               onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'}
             >
               <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:12 }}>
-                <div style={{ fontSize:28 }}>{d.emoji || '🔧'}</div>
+                <div style={{ width:44, height:44, borderRadius:'50%', overflow:'hidden', background:'#181818', border:'1px solid rgba(200,149,108,0.2)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  {d.profilbild
+                    ? <img src={d.profilbild} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                    : <span style={{ fontSize:22 }}>{d.emoji || '🔧'}</span>
+                  }
+                </div>
                 <div>
                   <div style={{ fontSize:14, fontWeight:500 }}>{d.name}</div>
                   <div style={{ fontSize:11, color:'#9A8878', marginTop:2 }}>{d.gewerk}{d.ort ? ' · ' + d.ort : ''}{d.postleitzahl ? ' ' + d.postleitzahl : ''}</div>
