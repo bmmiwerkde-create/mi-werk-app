@@ -223,24 +223,24 @@ export default function Home() {
 
   function filtern(wert: string) {
     setSuche(wert)
-    setAktiveKategorie(null)
-    setSelectedGewerk('')
-    anwenden(wert, stadtFilter, plzFilter, datumFilter)
   }
 
   function filterStadt(wert: string) {
     setStadtFilter(wert)
-    anwenden(suche, wert, plzFilter, datumFilter)
   }
 
   function filterPlz(wert: string) {
     setPlzFilter(wert)
-    anwenden(suche, stadtFilter, wert, datumFilter)
   }
 
   function filterDatum(wert: string) {
     setDatumFilter(wert)
-    anwenden(suche, stadtFilter, plzFilter, wert)
+  }
+
+  function suchAusfuehren() {
+    setAktiveKategorie(null)
+    setSelectedGewerk('')
+    anwenden(suche, stadtFilter, plzFilter, datumFilter)
   }
 
   function filterGewerk(gewerk: string) {
@@ -340,14 +340,26 @@ export default function Home() {
         {/* DATUM FILTER */}
         <div style={{ maxWidth:560, margin:'10px auto 0' }}>
           <input
-            type="date"
             value={datumFilter}
             onChange={e => filterDatum(e.target.value)}
-            style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color: datumFilter ? '#E8DDD4' : '#5A5550', fontFamily:'inherit', outline:'none', boxSizing:'border-box', colorScheme:'dark' }}
+            placeholder="📅 Verfügbar ab z.B. 15.06.2026"
+            style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
             onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
             onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
+            onKeyDown={e => e.key === 'Enter' && suchAusfuehren()}
           />
-          {!datumFilter && <div style={{ position:'relative', pointerEvents:'none', marginTop:-38, paddingLeft:16, fontSize:14, color:'#5A5550' }}>📅 Verfügbar ab Datum…</div>}
+        </div>
+
+        {/* SUCHEN BUTTON */}
+        <div style={{ maxWidth:560, margin:'12px auto 0' }}>
+          <button
+            onClick={suchAusfuehren}
+            style={{ width:'100%', padding:'14px', background:'#c8956c', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:600, cursor:'pointer', fontFamily:'inherit', letterSpacing:0.5 }}
+            onMouseEnter={e => e.currentTarget.style.background = '#b8845c'}
+            onMouseLeave={e => e.currentTarget.style.background = '#c8956c'}
+          >
+            Suchen
+          </button>
         </div>
 
         <div className="stats-row" style={{ display:'flex', gap:40, justifyContent:'center', marginTop:48 }}>
