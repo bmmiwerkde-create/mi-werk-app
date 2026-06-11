@@ -1,32 +1,47 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../Lib/supabase'
 
-interface Profil {
-  id?: string
-  email?: string
-  name?: string
-  gewerk?: string
-  ort?: string
-  beschreibung?: string
-  preis?: string
-  emoji?: string
-  umkreis?: string
-  verfuegbar_ab?: string
+type Dienstleister = {
+  id: string
+  name: string
+  gewerk: string
+  ort: string
+  beschreibung: string
+  preis: string
+  emoji: string
+  profilbild?: string
   user_id?: string
+}
+
+const C = {
+  copper:     '#c8956c',
+  copperDim:  'rgba(200,149,108,0.12)',
+  copperBord: 'rgba(200,149,108,0.22)',
+  bg:         '#0A0A0A',
+  bg2:        '#111111',
+  bg3:        '#181818',
+  border:     'rgba(255,255,255,0.06)',
+  text:       '#E8DDD4',
+  textMid:    '#9A8878',
+  textDim:    '#5A5550',
+  green:      '#27AE60',
+  red:        '#C0392B',
 }
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [profil, setProfil] = useState<Profil | null>(null)
+  const [user, setUser]     = useState<any>(null)
+  const [profil, setProfil] = useState<Dienstleister | null>(null)
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const [saving, setSaving]   = useState(false)
   const [editMode, setEditMode] = useState(false)
-  const [form, setForm] = useState<Profil>({})
+  const [form, setForm]     = useState<Partial<Dienstleister>>({})
   const [message, setMessage] = useState('')
+  const [bildLaden, setBildLaden] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { checkUser() }, [])
 
@@ -47,11 +62,41 @@ export default function DashboardPage() {
     if (data) { setProfil(data); setForm(data) }
   }
 
+  async function bildHochladen(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+    setBildLaden(true)
+    setMessage('')
+    const ext = file.name.split('.').pop()
+    const pfad = `${user.id}.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from('profilbilder')
+      .upload(pfad, file, { upsert: true })
+    if (uploadError) {
+      setMessage('Fehler beim Upload: ' + uploadError.message)
+      setBildLaden(false)
+      return
+    }
+    const { data: urlData } = supabase.storage.from('profilbilder').getPublicUrl(pfad)
+    const bildUrl = urlData.publicUrl + '?t=' + Date.now()
+    const { error: updateError } = await supabase
+      .from('dienstleister')
+      .update({ profilbild: bildUrl })
+      .eq('user_id', user.id)
+    if (updateError) {
+      setMessage('Fehler beim Speichern: ' + updateError.message)
+    } else {
+      setMessage('Profilbild gespeichert ✓')
+      await loadProfil(user.id)
+    }
+    setBildLaden(false)
+  }
+
   async function saveProfil() {
     if (!user) return
     setSaving(true)
     setMessage('')
-    const payload = { ...form, user_id: user.id, abo_aktiv: true, erstellt_am: new Date().toISOString() }
+    const payload = { ...form, user_id: user.id }
     const { error } = profil?.id
       ? await supabase.from('dienstleister').update(payload).eq('id', profil.id)
       : await supabase.from('dienstleister').insert(payload)
@@ -70,133 +115,179 @@ export default function DashboardPage() {
     router.push('/')
   }
 
-  const firstName = profil?.name?.split(' ')[0] || user?.email?.split('@')[0] || ''
+  const firstName = profil?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'dort'
 
   if (loading) return (
-    <div style={{ minHeight:'100vh', background:'#0A0A0A', display:'flex', alignItems:'center', justifyContent:'center' }}>
-      <span style={{ color:'#c8956c' }}>Laden…</span>
+    <div style={{ minHeight:'100vh', background:C.bg, display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <span style={{ color:C.copper, fontSize:14 }}>Laden…</span>
     </div>
   )
 
   return (
-    <div style={{ minHeight:'100vh', background:'#0A0A0A', color:'#E8DDD4', fontFamily:'system-ui' }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px', height:52, background:'#111', borderBottom:'1px solid rgba(200,149,108,0.2)', position:'sticky', top:0, zIndex:100 }}>
-        <div style={{ fontFamily:'Georgia,serif', fontSize:19, fontWeight:700 }}>Mi-<span style={{ color:'#c8956c' }}>Werk</span></div>
+    <div style={{ minHeight:'100vh', background:C.bg, color:C.text, fontFamily:"'DM Sans', system-ui, sans-serif" }}>
+
+      {/* TOPBAR */}
+      <div style={{
+        display:'flex', alignItems:'center', justifyContent:'space-between',
+        padding:'0 24px', height:52,
+        background:C.bg2, borderBottom:`1px solid ${C.copperBord}`,
+        position:'sticky', top:0, zIndex:100,
+      }}>
+        <div style={{ fontFamily:'Georgia,serif', fontSize:19, fontWeight:700, letterSpacing:-0.5 }}>
+          Mi-<span style={{ color:C.copper }}>Werk</span>
+        </div>
         <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-          <span style={{ fontSize:12, color:'#9A8878' }}>{user?.email}</span>
-          <button onClick={logout} style={{ fontSize:11, color:'#5A5550', cursor:'pointer', padding:'5px 12px', borderRadius:6, border:'1px solid rgba(255,255,255,0.06)', background:'none' }}>Abmelden</button>
+          <span style={{ fontSize:12, color:C.textMid }}>{user?.email}</span>
+          <button onClick={logout} style={{
+            fontSize:11, color:C.textDim, cursor:'pointer',
+            padding:'5px 12px', borderRadius:6,
+            border:`1px solid ${C.border}`, background:'none', fontFamily:'inherit',
+          }}>Abmelden</button>
         </div>
       </div>
 
       <div style={{ maxWidth:660, margin:'0 auto', padding:'28px 20px', display:'flex', flexDirection:'column', gap:14 }}>
 
-        <div>
-          <div style={{ fontSize:22, fontWeight:500, marginBottom:4 }}>Willkommen, <span style={{ color:'#c8956c' }}>{firstName}</span></div>
-          <div style={{ fontSize:12, color:'#5A5550' }}>{profil ? 'Hier kannst du dein Profil verwalten.' : 'Leg dein Profil an — so finden dich Kunden auf mi-werk.de.'}</div>
+        {/* BEGRÜSSUNG */}
+        <div style={{ marginBottom:4 }}>
+          <div style={{ fontSize:22, fontWeight:500, marginBottom:4 }}>
+            Willkommen, <span style={{ color:C.copper }}>{firstName}</span>
+          </div>
+          <div style={{ fontSize:12, color:C.textDim }}>
+            {profil ? 'Hier kannst du dein Profil verwalten.' : 'Leg dein Profil an — so finden dich Kunden auf mi-werk.de.'}
+          </div>
         </div>
 
-        <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:12, overflow:'hidden' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
-            <div>
-              <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:2 }}>Öffentliches Profil</div>
-              <div style={{ fontSize:12, color:'#5A5550' }}>So sehen dich Kunden auf mi-werk.de</div>
+        {/* PROFILBILD CARD */}
+        <div style={{ background:C.bg2, border:`1px solid ${C.border}`, borderRadius:12, padding:20 }}>
+          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>Profilbild</div>
+          <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+            <div style={{ width:80, height:80, borderRadius:'50%', overflow:'hidden', background:C.bg3, border:`2px solid ${C.copperBord}`, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              {profil?.profilbild ? (
+                <img src={profil.profilbild} alt="Profilbild" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+              ) : (
+                <span style={{ fontSize:32 }}>{profil?.emoji || '🔧'}</span>
+              )}
             </div>
-            {!editMode && <button onClick={() => setEditMode(true)} style={{ fontSize:12, padding:'7px 16px', borderRadius:7, border:'1px solid rgba(255,255,255,0.06)', background:'transparent', color:'#9A8878', cursor:'pointer' }}>Bearbeiten</button>}
+            <div>
+              <div style={{ fontSize:13, color:C.textMid, marginBottom:10 }}>
+                {profil?.profilbild ? 'Profilbild hochgeladen' : 'Noch kein Profilbild'}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={bildHochladen}
+                style={{ display:'none' }}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={bildLaden}
+                style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background: bildLaden ? C.bg3 : C.copper, color:'#fff', border:'none', cursor: bildLaden ? 'wait' : 'pointer', fontFamily:'inherit' }}
+              >
+                {bildLaden ? 'Wird hochgeladen…' : profil?.profilbild ? 'Bild ändern' : 'Bild hochladen'}
+              </button>
+              <div style={{ fontSize:11, color:C.textDim, marginTop:6 }}>JPG, PNG · max. 5 MB</div>
+            </div>
+          </div>
+        </div>
+
+        {/* PROFIL CARD */}
+        <div style={{ background:C.bg2, border:`1px solid ${C.border}`, borderRadius:12, overflow:'hidden' }}>
+          <div style={{
+            display:'flex', alignItems:'center', justifyContent:'space-between',
+            padding:'16px 20px', borderBottom:`1px solid ${C.border}`,
+          }}>
+            <div>
+              <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:2 }}>
+                Öffentliches Profil
+              </div>
+              <div style={{ fontSize:12, color:C.textDim }}>So sehen dich Kunden auf mi-werk.de</div>
+            </div>
+            {!editMode && (
+              <button onClick={() => setEditMode(true)} style={{
+                fontSize:12, padding:'7px 16px', borderRadius:7,
+                border:`1px solid ${C.border}`, background:'transparent',
+                color:C.textMid, cursor:'pointer', fontFamily:'inherit',
+              }}>Bearbeiten</button>
+            )}
           </div>
 
-          <div style={{ padding:'20px', display:'flex', flexDirection:'column', gap:14 }}>
-
-            <Field label="E-Mail" value={form.email || user?.email || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, email: v }))} />
-
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
-              <Field label="Name" value={form.name || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, name: v }))} />
-              <Field label="Gewerk" value={form.gewerk || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, gewerk: v }))} />
+          <div style={{ padding:'20px' }}>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:14 }}>
+              <Field label="Name"               value={form.name || ''}    edit={editMode} onChange={v => setForm(f=>({...f,name:v}))} />
+              <Field label="Gewerk / Kategorie" value={form.gewerk || ''}  edit={editMode} onChange={v => setForm(f=>({...f,gewerk:v}))} />
+              <Field label="Ort"                value={form.ort || ''}     edit={editMode} onChange={v => setForm(f=>({...f,ort:v}))} />
+              <Field label="Preis"              value={form.preis || ''}   edit={editMode} onChange={v => setForm(f=>({...f,preis:v}))} placeholder="z.B. ab 50 €/Std." />
+              <Field label="Emoji"              value={form.emoji || ''}   edit={editMode} onChange={v => setForm(f=>({...f,emoji:v}))} placeholder="z.B. 🔧" />
             </div>
 
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
-              <Field label="Ort" value={form.ort || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, ort: v }))} />
-              <div>
-                <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase', letterSpacing:'0.8px', color:'#5A5550', marginBottom:5 }}>Umkreis</div>
-                {editMode ? (
-                  <select value={form.umkreis || ''} onChange={e => setForm(f => ({ ...f, umkreis: e.target.value }))}
-                    style={{ width:'100%', background:'#181818', border:'1px solid rgba(255,255,255,0.06)', borderRadius:8, padding:'9px 12px', fontSize:13, color:'#E8DDD4', fontFamily:'inherit', outline:'none' }}>
-                    <option value="">Bitte wählen</option>
-                    <option value="10km">10 km</option>
-                    <option value="25km">25 km</option>
-                    <option value="50km">50 km</option>
-                    <option value="100km">100 km</option>
-                  </select>
-                ) : (
-                  <div style={{ fontSize:14, color: form.umkreis ? '#E8DDD4' : '#5A5550', padding:'8px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>{form.umkreis || '—'}</div>
-                )}
-              </div>
-            </div>
-
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
-              <Field label="Preis" value={form.preis || ''} edit={editMode} onChange={v => setForm(f => ({ ...f, preis: v }))} placeholder="z.B. ab 50 €/Std." />
-              <div>
-                <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase', letterSpacing:'0.8px', color:'#5A5550', marginBottom:5 }}>Verfügbar ab</div>
-                {editMode ? (
-                  <input type="date" value={form.verfuegbar_ab || ''} onChange={e => setForm(f => ({ ...f, verfuegbar_ab: e.target.value }))}
-                    style={{ width:'100%', background:'#181818', border:'1px solid rgba(255,255,255,0.06)', borderRadius:8, padding:'9px 12px', fontSize:13, color:'#E8DDD4', fontFamily:'inherit', outline:'none' }} />
-                ) : (
-                  <div style={{ fontSize:14, color: form.verfuegbar_ab ? '#E8DDD4' : '#5A5550', padding:'8px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
-                    {form.verfuegbar_ab ? new Date(form.verfuegbar_ab).toLocaleDateString('de-DE') : '—'}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase', letterSpacing:'0.8px', color:'#5A5550', marginBottom:5 }}>Beschreibung</div>
+            <div style={{ marginBottom:4 }}>
+              <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase' as const, letterSpacing:'0.8px', color:C.textDim, marginBottom:6 }}>Beschreibung</div>
               {editMode ? (
-                <textarea value={form.beschreibung || ''} onChange={e => setForm(f => ({ ...f, beschreibung: e.target.value }))} placeholder="Was bietest du an?"
-                  style={{ width:'100%', background:'#181818', border:'1px solid rgba(255,255,255,0.06)', borderRadius:8, padding:'9px 12px', fontSize:13, color:'#E8DDD4', fontFamily:'inherit', outline:'none', resize:'vertical', minHeight:90 }} />
+                <textarea
+                  value={form.beschreibung || ''}
+                  onChange={e => setForm(f=>({...f,beschreibung:e.target.value}))}
+                  placeholder="Was bietest du an?"
+                  style={{ width:'100%', background:C.bg3, border:`1px solid ${C.border}`, borderRadius:8, padding:'9px 12px', fontSize:13, color:C.text, fontFamily:'inherit', outline:'none', resize:'vertical', minHeight:90 }}
+                />
               ) : (
-                <div style={{ fontSize:13, color: form.beschreibung ? '#E8DDD4' : '#5A5550', lineHeight:1.7 }}>{form.beschreibung || 'Noch keine Beschreibung'}</div>
+                <div style={{ fontSize:13, color: form.beschreibung ? C.text : C.textDim, lineHeight:1.7 }}>
+                  {form.beschreibung || 'Noch keine Beschreibung'}
+                </div>
               )}
             </div>
 
             {!editMode && profil && (
-              <div style={{ paddingTop:16, borderTop:'1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:10 }}>Vorschau</div>
-                <div style={{ display:'flex', alignItems:'center', gap:14, background:'#181818', border:'1px solid rgba(200,149,108,0.2)', borderRadius:10, padding:'14px 16px' }}>
-                  <div style={{ fontSize:30 }}>{profil.emoji || '🔧'}</div>
+              <div style={{ marginTop:20, paddingTop:18, borderTop:`1px solid ${C.border}` }}>
+                <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:10 }}>Vorschau — Kunden-Karte</div>
+                <div style={{ display:'flex', alignItems:'center', gap:14, background:C.bg3, border:`1px solid ${C.copperBord}`, borderRadius:10, padding:'14px 16px' }}>
+                  <div style={{ width:48, height:48, borderRadius:'50%', overflow:'hidden', background:C.bg2, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    {profil.profilbild ? (
+                      <img src={profil.profilbild} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                    ) : (
+                      <span style={{ fontSize:24 }}>{profil.emoji || '🔧'}</span>
+                    )}
+                  </div>
                   <div>
                     <div style={{ fontSize:15, fontWeight:500, marginBottom:3 }}>{profil.name}</div>
-                    <div style={{ fontSize:12, color:'#9A8878', marginBottom:2 }}>{profil.gewerk} · {profil.ort}{profil.umkreis ? ' (+' + profil.umkreis + ')' : ''}</div>
-                    <div style={{ fontSize:12, color:'#c8956c' }}>{profil.preis}</div>
-                    {profil.verfuegbar_ab && <div style={{ fontSize:11, color:'#5A5550', marginTop:2 }}>Verfügbar ab {new Date(profil.verfuegbar_ab).toLocaleDateString('de-DE')}</div>}
+                    <div style={{ fontSize:12, color:C.textMid, marginBottom:2 }}>{profil.gewerk} · {profil.ort}</div>
+                    <div style={{ fontSize:12, color:C.copper }}>{profil.preis}</div>
                   </div>
                 </div>
               </div>
             )}
 
             {editMode && (
-              <div style={{ display:'flex', gap:10 }}>
-                <button onClick={saveProfil} disabled={saving} style={{ padding:'10px 22px', borderRadius:8, background:'#c8956c', color:'#fff', fontSize:13, fontWeight:500, border:'none', cursor:'pointer', opacity: saving ? 0.7 : 1 }}>
+              <div style={{ display:'flex', gap:10, marginTop:20 }}>
+                <button onClick={saveProfil} disabled={saving} style={{ padding:'10px 22px', borderRadius:8, background:C.copper, color:'#fff', fontSize:13, fontWeight:500, border:'none', cursor:'pointer', fontFamily:'inherit', opacity: saving ? 0.7 : 1 }}>
                   {saving ? 'Speichern…' : 'Speichern →'}
                 </button>
-                <button onClick={() => { setEditMode(false); setForm(profil || {}) }} style={{ padding:'10px 16px', borderRadius:8, background:'transparent', color:'#9A8878', fontSize:13, border:'1px solid rgba(255,255,255,0.06)', cursor:'pointer' }}>
+                <button onClick={() => { setEditMode(false); setForm(profil || {}) }} style={{ padding:'10px 16px', borderRadius:8, background:'transparent', color:C.textMid, fontSize:13, border:`1px solid ${C.border}`, cursor:'pointer', fontFamily:'inherit' }}>
                   Abbrechen
                 </button>
               </div>
             )}
 
             {message && (
-              <div style={{ fontSize:13, padding:'8px 12px', borderRadius:7, background:'rgba(255,255,255,0.04)', color: message.startsWith('Fehler') ? '#C0392B' : '#27AE60' }}>
+              <div style={{ marginTop:12, fontSize:13, padding:'8px 12px', borderRadius:7, background:'rgba(255,255,255,0.04)', color: message.startsWith('Fehler') ? C.red : C.green }}>
                 {message}
               </div>
             )}
           </div>
         </div>
 
-        <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:12, padding:20 }}>
-          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:14 }}>Konto</div>
-          {([['E-Mail', user?.email], ['Mitglied seit', user?.created_at ? new Date(user.created_at).toLocaleDateString('de-DE') : '—']] as [string,string][]).map(([k, v]) => (
-            <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid rgba(255,255,255,0.05)', fontSize:13 }}>
-              <span style={{ color:'#5A5550', fontSize:12 }}>{k}</span>
-              <span>{v}</span>
+        {/* KONTO CARD */}
+        <div style={{ background:C.bg2, border:`1px solid ${C.border}`, borderRadius:12, padding:20 }}>
+          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:14 }}>Konto</div>
+          {[
+            ['E-Mail',        user?.email],
+            ['Mitglied seit', user?.created_at ? new Date(user.created_at).toLocaleDateString('de-DE') : '—'],
+            ['Konto-ID',      user?.id],
+          ].map(([k, v]) => (
+            <div key={k} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 0', borderBottom:`1px solid ${C.border}`, fontSize:13 }}>
+              <span style={{ color:C.textDim, fontSize:12 }}>{k}</span>
+              <span style={{ color: k === 'Konto-ID' ? C.textDim : C.text, fontSize: k === 'Konto-ID' ? 11 : 13 }}>{v}</span>
             </div>
           ))}
         </div>
@@ -206,7 +297,10 @@ export default function DashboardPage() {
   )
 }
 
-function Field({ label, value, edit, onChange, placeholder }: { label: string; value: string; edit: boolean; onChange: (v: string) => void; placeholder?: string }) {
+function Field({ label, value, edit, onChange, placeholder }: {
+  label: string; value: string; edit: boolean
+  onChange: (v: string) => void; placeholder?: string
+}) {
   return (
     <div>
       <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase' as const, letterSpacing:'0.8px', color:'#5A5550', marginBottom:5 }}>{label}</div>
@@ -214,11 +308,10 @@ function Field({ label, value, edit, onChange, placeholder }: { label: string; v
         <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder || label}
           style={{ width:'100%', background:'#181818', border:'1px solid rgba(255,255,255,0.06)', borderRadius:8, padding:'9px 12px', fontSize:13, color:'#E8DDD4', fontFamily:'inherit', outline:'none' }} />
       ) : (
-        <div style={{ fontSize:14, color: value ? '#E8DDD4' : '#5A5550', padding:'8px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>{value || '—'}</div>
+        <div style={{ fontSize:14, color: value ? '#E8DDD4' : '#5A5550', padding:'8px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+          {value || '—'}
+        </div>
       )}
     </div>
   )
 }
-
-
-

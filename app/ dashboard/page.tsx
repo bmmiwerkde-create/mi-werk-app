@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../Lib/supabase'
 
@@ -12,6 +12,7 @@ type Dienstleister = {
   beschreibung: string
   preis: string
   emoji: string
+  profilbild?: string
   user_id?: string
 }
 
@@ -39,6 +40,8 @@ export default function DashboardPage() {
   const [editMode, setEditMode] = useState(false)
   const [form, setForm]     = useState<Partial<Dienstleister>>({})
   const [message, setMessage] = useState('')
+  const [bildLaden, setBildLaden] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { checkUser() }, [])
 
@@ -57,6 +60,36 @@ export default function DashboardPage() {
       .eq('user_id', userId)
       .single()
     if (data) { setProfil(data); setForm(data) }
+  }
+
+  async function bildHochladen(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+    setBildLaden(true)
+    setMessage('')
+    const ext = file.name.split('.').pop()
+    const pfad = `${user.id}.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from('profilbilder')
+      .upload(pfad, file, { upsert: true })
+    if (uploadError) {
+      setMessage('Fehler beim Upload: ' + uploadError.message)
+      setBildLaden(false)
+      return
+    }
+    const { data: urlData } = supabase.storage.from('profilbilder').getPublicUrl(pfad)
+    const bildUrl = urlData.publicUrl + '?t=' + Date.now()
+    const { error: updateError } = await supabase
+      .from('dienstleister')
+      .update({ profilbild: bildUrl })
+      .eq('user_id', user.id)
+    if (updateError) {
+      setMessage('Fehler beim Speichern: ' + updateError.message)
+    } else {
+      setMessage('Profilbild gespeichert ✓')
+      await loadProfil(user.id)
+    }
+    setBildLaden(false)
   }
 
   async function saveProfil() {
@@ -125,6 +158,40 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* PROFILBILD CARD */}
+        <div style={{ background:C.bg2, border:`1px solid ${C.border}`, borderRadius:12, padding:20 }}>
+          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>Profilbild</div>
+          <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+            <div style={{ width:80, height:80, borderRadius:'50%', overflow:'hidden', background:C.bg3, border:`2px solid ${C.copperBord}`, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              {profil?.profilbild ? (
+                <img src={profil.profilbild} alt="Profilbild" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+              ) : (
+                <span style={{ fontSize:32 }}>{profil?.emoji || '🔧'}</span>
+              )}
+            </div>
+            <div>
+              <div style={{ fontSize:13, color:C.textMid, marginBottom:10 }}>
+                {profil?.profilbild ? 'Profilbild hochgeladen' : 'Noch kein Profilbild'}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={bildHochladen}
+                style={{ display:'none' }}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={bildLaden}
+                style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background: bildLaden ? C.bg3 : C.copper, color:'#fff', border:'none', cursor: bildLaden ? 'wait' : 'pointer', fontFamily:'inherit' }}
+              >
+                {bildLaden ? 'Wird hochgeladen…' : profil?.profilbild ? 'Bild ändern' : 'Bild hochladen'}
+              </button>
+              <div style={{ fontSize:11, color:C.textDim, marginTop:6 }}>JPG, PNG · max. 5 MB</div>
+            </div>
+          </div>
+        </div>
+
         {/* PROFIL CARD */}
         <div style={{ background:C.bg2, border:`1px solid ${C.border}`, borderRadius:12, overflow:'hidden' }}>
           <div style={{
@@ -156,7 +223,7 @@ export default function DashboardPage() {
             </div>
 
             <div style={{ marginBottom:4 }}>
-              <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase', letterSpacing:'0.8px', color:C.textDim, marginBottom:6 }}>Beschreibung</div>
+              <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase' as const, letterSpacing:'0.8px', color:C.textDim, marginBottom:6 }}>Beschreibung</div>
               {editMode ? (
                 <textarea
                   value={form.beschreibung || ''}
@@ -175,7 +242,13 @@ export default function DashboardPage() {
               <div style={{ marginTop:20, paddingTop:18, borderTop:`1px solid ${C.border}` }}>
                 <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:10 }}>Vorschau — Kunden-Karte</div>
                 <div style={{ display:'flex', alignItems:'center', gap:14, background:C.bg3, border:`1px solid ${C.copperBord}`, borderRadius:10, padding:'14px 16px' }}>
-                  <div style={{ fontSize:30 }}>{profil.emoji || '🔧'}</div>
+                  <div style={{ width:48, height:48, borderRadius:'50%', overflow:'hidden', background:C.bg2, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    {profil.profilbild ? (
+                      <img src={profil.profilbild} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                    ) : (
+                      <span style={{ fontSize:24 }}>{profil.emoji || '🔧'}</span>
+                    )}
+                  </div>
                   <div>
                     <div style={{ fontSize:15, fontWeight:500, marginBottom:3 }}>{profil.name}</div>
                     <div style={{ fontSize:12, color:C.textMid, marginBottom:2 }}>{profil.gewerk} · {profil.ort}</div>
