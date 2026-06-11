@@ -14,15 +14,46 @@ export default function ProfilSeite({ params }) {
   const router = useRouter()
   const [profil, setProfil] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [events, setEvents] = useState([])
+  const [kalenderMonat, setKalenderMonat] = useState(new Date())
 
   useEffect(() => {
     async function laden() {
       const { data } = await supabase.from('dienstleister').select('*').eq('id', Number(id)).single()
       setProfil(data)
+      if (data?.user_id) {
+        const { data: evs } = await supabase
+          .from('kalender_events')
+          .select('*')
+          .eq('user_id', data.user_id)
+        setEvents(evs || [])
+      }
       setLoading(false)
     }
     laden()
   }, [id])
+
+  function istBelegt(datum) {
+    return events.some(e => {
+      const start = new Date(e.start_zeit)
+      const end = new Date(e.end_zeit)
+      const d = new Date(datum)
+      d.setHours(12, 0, 0, 0)
+      return d >= start && d <= end
+    })
+  }
+
+  function kalenderTage() {
+    const jahr = kalenderMonat.getFullYear()
+    const monat = kalenderMonat.getMonth()
+    const ersterTag = new Date(jahr, monat, 1)
+    const letzterTag = new Date(jahr, monat + 1, 0)
+    const tage = []
+    const wochentag = ersterTag.getDay() === 0 ? 6 : ersterTag.getDay() - 1
+    for (let i = 0; i < wochentag; i++) tage.push(null)
+    for (let i = 1; i <= letzterTag.getDate(); i++) tage.push(new Date(jahr, monat, i))
+    return tage
+  }
 
   if (loading) return (
     <div style={{ minHeight:'100vh', background:'#0A0A0A', display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -40,6 +71,11 @@ export default function ProfilSeite({ params }) {
     </div>
   )
 
+  const heute = new Date()
+  heute.setHours(0, 0, 0, 0)
+  const tage = kalenderTage()
+  const wochentage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+
   return (
     <div style={{ minHeight:'100vh', background:'#0A0A0A', color:'#E8DDD4', fontFamily:'system-ui' }}>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px', height:52, background:'#111', borderBottom:'1px solid rgba(200,149,108,0.18)', position:'sticky', top:0, zIndex:100 }}>
@@ -51,7 +87,6 @@ export default function ProfilSeite({ params }) {
 
       <div style={{ maxWidth:700, margin:'0 auto', padding:'40px 20px 80px' }}>
 
-        {/* HAUPTKARTE */}
         <div style={{ background:'#111', border:'1px solid rgba(200,149,108,0.2)', borderRadius:16, padding:'32px', marginBottom:20 }}>
           <div style={{ display:'flex', alignItems:'flex-start', gap:20, marginBottom:24 }}>
             <div style={{ width:80, height:80, borderRadius:'50%', overflow:'hidden', background:'#181818', border:'2px solid rgba(200,149,108,0.3)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -67,14 +102,12 @@ export default function ProfilSeite({ params }) {
               </div>
             </div>
           </div>
-
           {profil.beschreibung && (
             <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:20 }}>
               <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:10 }}>Ueber mich</div>
               <p style={{ fontSize:14, color:'#9A8878', lineHeight:1.8, margin:0 }}>{profil.beschreibung}</p>
             </div>
           )}
-
           {profil.qualifikationen && (
             <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:20, marginTop:20 }}>
               <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:10 }}>Qualifikationen</div>
@@ -83,7 +116,53 @@ export default function ProfilSeite({ params }) {
           )}
         </div>
 
-        {/* KONTAKT */}
+        {/* VERFÜGBARKEIT KALENDER */}
+        <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:16, padding:'24px', marginBottom:20 }}>
+          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:16 }}>Verfuegbarkeit</div>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+            <button onClick={() => setKalenderMonat(new Date(kalenderMonat.getFullYear(), kalenderMonat.getMonth() - 1, 1))}
+              style={{ background:'none', border:'1px solid rgba(255,255,255,0.08)', borderRadius:6, color:'#9A8878', padding:'4px 10px', cursor:'pointer', fontSize:14 }}>←</button>
+            <div style={{ fontSize:14, fontWeight:500 }}>
+              {kalenderMonat.toLocaleDateString('de-DE', { month:'long', year:'numeric' })}
+            </div>
+            <button onClick={() => setKalenderMonat(new Date(kalenderMonat.getFullYear(), kalenderMonat.getMonth() + 1, 1))}
+              style={{ background:'none', border:'1px solid rgba(255,255,255,0.08)', borderRadius:6, color:'#9A8878', padding:'4px 10px', cursor:'pointer', fontSize:14 }}>→</button>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(7, 1fr)', gap:4, marginBottom:8 }}>
+            {wochentage.map(w => <div key={w} style={{ textAlign:'center', fontSize:11, color:'#5A5550', fontWeight:500 }}>{w}</div>)}
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(7, 1fr)', gap:4 }}>
+            {tage.map((tag, i) => {
+              if (!tag) return <div key={i} />
+              const vergangen = tag < heute
+              const belegt = istBelegt(tag)
+              const istHeute = tag.toDateString() === heute.toDateString()
+              return (
+                <div key={i} style={{
+                  textAlign:'center', padding:'6px 2px', borderRadius:6, fontSize:12,
+                  background: belegt ? 'rgba(192,57,43,0.15)' : vergangen ? 'transparent' : 'rgba(39,174,96,0.1)',
+                  color: belegt ? '#C0392B' : vergangen ? '#3A3530' : '#27AE60',
+                  border: istHeute ? '1px solid #c8956c' : '1px solid transparent',
+                  fontWeight: istHeute ? 600 : 400,
+                }}>
+                  {tag.getDate()}
+                </div>
+              )
+            })}
+          </div>
+          <div style={{ display:'flex', gap:16, marginTop:14 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:11, color:'#5A5550' }}>
+              <div style={{ width:10, height:10, borderRadius:2, background:'rgba(39,174,96,0.3)' }} /> Frei
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:11, color:'#5A5550' }}>
+              <div style={{ width:10, height:10, borderRadius:2, background:'rgba(192,57,43,0.3)' }} /> Belegt
+            </div>
+          </div>
+          {events.length === 0 && (
+            <div style={{ fontSize:12, color:'#5A5550', marginTop:12, textAlign:'center' }}>Kein Kalender verbunden</div>
+          )}
+        </div>
+
         <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:16, padding:'24px', marginBottom:20 }}>
           <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:16 }}>Kontakt aufnehmen</div>
           <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
@@ -108,7 +187,6 @@ export default function ProfilSeite({ params }) {
           </div>
         </div>
 
-        {/* DETAILS */}
         <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:16, padding:'24px' }}>
           <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:16 }}>Details</div>
           {[
