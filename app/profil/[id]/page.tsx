@@ -17,11 +17,7 @@ export default function ProfilSeite({ params }) {
 
   useEffect(() => {
     async function laden() {
-      const { data } = await supabase
-        .from('dienstleister')
-        .select('*')
-        .eq('id', Number(id))
-        .single()
+      const { data } = await supabase.from('dienstleister').select('*').eq('id', Number(id)).single()
       setProfil(data)
       setLoading(false)
     }
@@ -50,23 +46,17 @@ export default function ProfilSeite({ params }) {
         <div style={{ fontFamily:'Georgia,serif', fontSize:19, fontWeight:700, cursor:'pointer' }} onClick={() => router.push('/')}>
           Mi-<span style={{ color:'#c8956c' }}>Werk</span>
         </div>
-        <button onClick={() => router.back()} style={{ fontSize:12, color:'#9A8878', background:'none', border:'none', cursor:'pointer' }}>
-          Zurueck
-        </button>
+        <button onClick={() => router.back()} style={{ fontSize:12, color:'#9A8878', background:'none', border:'none', cursor:'pointer' }}>Zurueck</button>
       </div>
 
       <div style={{ maxWidth:700, margin:'0 auto', padding:'40px 20px 80px' }}>
+
+        {/* HAUPTKARTE */}
         <div style={{ background:'#111', border:'1px solid rgba(200,149,108,0.2)', borderRadius:16, padding:'32px', marginBottom:20 }}>
           <div style={{ display:'flex', alignItems:'flex-start', gap:20, marginBottom:24 }}>
-
-            {/* PROFILBILD oder EMOJI */}
             <div style={{ width:80, height:80, borderRadius:'50%', overflow:'hidden', background:'#181818', border:'2px solid rgba(200,149,108,0.3)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              {profil.profilbild
-                ? <img src={profil.profilbild} alt="Profilbild" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                : <span style={{ fontSize:36 }}>{profil.emoji || '🔧'}</span>
-              }
+              {profil.profilbild ? <img src={profil.profilbild} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <span style={{ fontSize:36 }}>{profil.emoji || '🔧'}</span>}
             </div>
-
             <div style={{ flex:1 }}>
               <h1 style={{ fontSize:26, fontWeight:700, fontFamily:'Georgia,serif', marginBottom:6 }}>{profil.name}</h1>
               <div style={{ fontSize:15, color:'#c8956c', fontWeight:500, marginBottom:8 }}>{profil.gewerk}</div>
@@ -84,18 +74,41 @@ export default function ProfilSeite({ params }) {
               <p style={{ fontSize:14, color:'#9A8878', lineHeight:1.8, margin:0 }}>{profil.beschreibung}</p>
             </div>
           )}
+
+          {profil.qualifikationen && (
+            <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:20, marginTop:20 }}>
+              <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:10 }}>Qualifikationen</div>
+              <p style={{ fontSize:14, color:'#9A8878', lineHeight:1.8, margin:0 }}>{profil.qualifikationen}</p>
+            </div>
+          )}
         </div>
 
-        {profil.email && (
-          <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:16, padding:'24px', marginBottom:20 }}>
-            <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:16 }}>Kontakt aufnehmen</div>
-            <a href={'mailto:' + profil.email + '?subject=Anfrage ueber mi-werk.de'}
-              style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'#c8956c', color:'#fff', textDecoration:'none', borderRadius:10, fontSize:14, fontWeight:500 }}>
-              ✉️ E-Mail senden
-            </a>
+        {/* KONTAKT */}
+        <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:16, padding:'24px', marginBottom:20 }}>
+          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:16 }}>Kontakt aufnehmen</div>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {profil.email && (
+              <a href={'mailto:' + profil.email + '?subject=Anfrage ueber mi-werk.de'}
+                style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'#c8956c', color:'#fff', textDecoration:'none', borderRadius:10, fontSize:14, fontWeight:500 }}>
+                ✉️ E-Mail senden
+              </a>
+            )}
+            {profil.telefon && (
+              <a href={'tel:' + profil.telefon}
+                style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'rgba(200,149,108,0.1)', color:'#c8956c', textDecoration:'none', borderRadius:10, fontSize:14, fontWeight:500, border:'1px solid rgba(200,149,108,0.3)' }}>
+                📞 {profil.telefon}
+              </a>
+            )}
+            {profil.website && (
+              <a href={profil.website.startsWith('http') ? profil.website : 'https://' + profil.website} target="_blank" rel="noopener noreferrer"
+                style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'rgba(255,255,255,0.04)', color:'#9A8878', textDecoration:'none', borderRadius:10, fontSize:14, border:'1px solid rgba(255,255,255,0.08)' }}>
+                🌐 {profil.website}
+              </a>
+            )}
           </div>
-        )}
+        </div>
 
+        {/* DETAILS */}
         <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:16, padding:'24px' }}>
           <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:16 }}>Details</div>
           {[
