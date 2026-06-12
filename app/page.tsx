@@ -282,12 +282,18 @@ export default function Home() {
       anwenden(suche, stadtFilter, plzFilter, datumFilter)
     }
     setKiLaden(false)
+    setTimeout(() => {
+      document.getElementById('ergebnisse')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
   }
 
   function suchAusfuehren() {
     setAktiveKategorie(null)
     setSelectedGewerk('')
     anwenden(suche, stadtFilter, plzFilter, datumFilter)
+    setTimeout(() => {
+      document.getElementById('ergebnisse')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
   }
 
   function filterGewerk(gewerk: string) {
@@ -478,7 +484,7 @@ export default function Home() {
       )}
 
       {/* DIENSTLEISTER GRID */}
-      <div style={{ maxWidth:1000, margin:'0 auto', padding:'32px 24px 48px' }}>
+      <div id="ergebnisse" style={{ maxWidth:1000, margin:'0 auto', padding:'32px 24px 48px' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
           <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550' }}>
             {hatFilter ? `${gefiltert.length} Ergebnisse` : 'Alle Dienstleister'}
