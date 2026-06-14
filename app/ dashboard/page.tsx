@@ -99,12 +99,24 @@ export default function DashboardPage() {
     if (!user) return
     setSaving(true)
     setMessage('')
+    const istNeu = !profil?.id
     const payload = { ...form, user_id: user.id }
-    const { error } = profil?.id
-      ? await supabase.from('dienstleister').update(payload).eq('id', profil.id)
-      : await supabase.from('dienstleister').insert(payload)
+    const { data: insertedData, error } = profil?.id
+      ? await supabase.from('dienstleister').update(payload).eq('id', profil.id).select().single()
+      : await supabase.from('dienstleister').insert(payload).select().single()
     if (error) { setMessage('Fehler: ' + error.message) }
-    else { setMessage('Gespeichert ✓'); setEditMode(false); await loadProfil(user.id) }
+    else {
+      setMessage('Gespeichert ✓')
+      setEditMode(false)
+      await loadProfil(user.id)
+      if (istNeu && insertedData) {
+        fetch('/api/neuer-dienstleister', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ record: insertedData })
+        }).catch(() => {})
+      }
+    }
     setSaving(false)
   }
 
