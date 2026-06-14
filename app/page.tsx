@@ -428,6 +428,17 @@ export default function Home() {
             </div>
           ))}
         </div>
+
+        {/* DIENSTLEISTER CTA BANNER */}
+        <div style={{ marginTop:40, background:'rgba(200,149,108,0.06)', border:'1px solid rgba(200,149,108,0.2)', borderRadius:14, padding:'20px 24px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
+          <div>
+            <div style={{ fontSize:15, fontWeight:600, color:'#E8DDD4', marginBottom:4 }}>Du bist Dienstleister?</div>
+            <div style={{ fontSize:13, color:'#9A8878' }}>Trag dich kostenlos ein und werde von Kunden in deiner Region gefunden.</div>
+          </div>
+          <button onClick={() => router.push('/login')} style={{ flexShrink:0, fontSize:13, fontWeight:600, padding:'12px 24px', borderRadius:9, background:'#c8956c', color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap' }}>
+            Jetzt kostenlos eintragen →
+          </button>
+        </div>
       </div>
 
       {/* KATEGORIEN */}

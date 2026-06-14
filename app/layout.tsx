@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Mi-Werk – Handwerker & Dienstleister finden",
-  description: "Finde lokale Handwerker und Dienstleister in deiner Nähe.",
+  description: "Finde geprüfte Handwerker, Reinigungskräfte, Personal Trainer und mehr in deiner Region. Kostenlos, direkt und ohne Vermittler kontaktieren.",
 };
 
 export default function RootLayout({
