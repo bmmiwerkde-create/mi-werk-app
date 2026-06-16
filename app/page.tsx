@@ -180,6 +180,7 @@ export default function Home() {
   const [stadtFilter, setStadtFilter] = useState('')
   const [plzFilter, setPlzFilter] = useState('')
   const [datumFilter, setDatumFilter] = useState('')
+  const [preisFilter, setPreisFilter] = useState('')
   const [aktiveKategorie, setAktiveKategorie] = useState<string | null>(null)
   const [selectedGewerk, setSelectedGewerk] = useState('')
   const [user, setUser] = useState<any>(null)
@@ -218,6 +219,14 @@ export default function Home() {
     }
     if (datum_) {
       result = result.filter(d => !d.verfuegbar_ab || d.verfuegbar_ab <= datum_)
+    }
+    if (preisFilter) {
+      const maxPreis = parseInt(preisFilter)
+      result = result.filter(d => {
+        if (!d.preis) return true
+        const zahl = parseInt(d.preis.replace(/[^0-9]/g, ''))
+        return isNaN(zahl) || zahl <= maxPreis
+      })
     }
     setGefiltert(result)
   }
@@ -311,13 +320,14 @@ export default function Home() {
     setStadtFilter('')
     setPlzFilter('')
     setDatumFilter('')
+    setPreisFilter('')
     setAktiveKategorie(null)
     setSelectedGewerk('')
     setGefiltert(dienstleister)
   }
 
   const aktiveKatData = hauptkategorien.find(k => k.name === aktiveKategorie)
-  const hatFilter = suche || stadtFilter || plzFilter || datumFilter
+  const hatFilter = suche || stadtFilter || plzFilter || datumFilter || preisFilter
 
   return (
     <div style={{ minHeight:'100vh', background:'#0A0A0A', color:'#E8DDD4', fontFamily:'system-ui' }}>
@@ -397,6 +407,19 @@ export default function Home() {
             value={datumFilter}
             onChange={e => filterDatum(e.target.value)}
             placeholder="📅 Verfügbar ab z.B. 15.06.2026"
+            style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
+            onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
+            onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
+            onKeyDown={e => e.key === 'Enter' && suchAusfuehren()}
+          />
+        </div>
+
+        {/* PREIS FILTER */}
+        <div style={{ maxWidth:560, margin:'10px auto 0' }}>
+          <input
+            value={preisFilter}
+            onChange={e => setPreisFilter(e.target.value.replace(/[^0-9]/g, ''))}
+            placeholder="💶 Max. Preis z.B. 80 (€/Std.)"
             style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
             onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
             onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
