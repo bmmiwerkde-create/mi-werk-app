@@ -183,6 +183,7 @@ export default function Home() {
   const [aktiveKategorie, setAktiveKategorie] = useState<string | null>(null)
   const [selectedGewerk, setSelectedGewerk] = useState('')
   const [user, setUser] = useState<any>(null)
+  const [karteAktiv, setKarteAktiv] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -502,13 +503,25 @@ export default function Home() {
             {stadtFilter && ` in ${stadtFilter}`}
             {plzFilter && ` · PLZ ${plzFilter}`}
           </div>
-          {hatFilter && (
-            <button onClick={resetAlles} style={{ fontSize:11, color:'#c8956c', background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
-              Filter zurücksetzen ✕
-            </button>
-          )}
+          <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+            {hatFilter && (
+              <button onClick={resetAlles} style={{ fontSize:11, color:'#c8956c', background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
+                Filter zurücksetzen ✕
+              </button>
+            )}
+          </div>
         </div>
-        <div className="dl-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:14 }}>
+
+        {/* ANSICHT UMSCHALTEN */}
+        <div style={{ display:'flex', gap:8, marginBottom:20 }}>
+          <button onClick={() => setKarteAktiv(false)} style={{ flex:1, padding:'10px', borderRadius:8, border:'1px solid ' + (!karteAktiv ? 'rgba(200,149,108,0.6)' : 'rgba(255,255,255,0.08)'), background: !karteAktiv ? 'rgba(200,149,108,0.12)' : 'transparent', color: !karteAktiv ? '#c8956c' : '#5A5550', cursor:'pointer', fontFamily:'inherit', fontSize:13, fontWeight: !karteAktiv ? 600 : 400 }}>
+            ☰ Listenansicht
+          </button>
+          <button onClick={() => setKarteAktiv(true)} style={{ flex:1, padding:'10px', borderRadius:8, border:'1px solid ' + (karteAktiv ? 'rgba(200,149,108,0.6)' : 'rgba(255,255,255,0.08)'), background: karteAktiv ? 'rgba(200,149,108,0.12)' : 'transparent', color: karteAktiv ? '#c8956c' : '#5A5550', cursor:'pointer', fontFamily:'inherit', fontSize:13, fontWeight: karteAktiv ? 600 : 400 }}>
+            🗺 Kartenansicht
+          </button>
+        </div>
+        <div className="dl-grid" style={{ display: karteAktiv ? 'none' : 'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:14 }}>
           {gefiltert.map((d: any) => (
             <div key={d.id} onClick={() => window.location.href = `/profil/${d.id}`} style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:12, padding:'20px', cursor:'pointer' }}
               onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.35)'}
@@ -545,12 +558,34 @@ export default function Home() {
             </div>
           ))}
         </div>
-        {gefiltert.length === 0 && (
+        {gefiltert.length === 0 && !karteAktiv && (
           <div style={{ textAlign:'center', padding:'60px 0', color:'#5A5550', fontSize:14 }}>
             Keine Dienstleister gefunden
             {stadtFilter && ` in "${stadtFilter}"`}
             {plzFilter && ` mit PLZ "${plzFilter}"`}
             {suche && ` für "${suche}"`}
+          </div>
+        )}
+
+        {/* KARTEN-ANSICHT */}
+        {karteAktiv && (
+          <div style={{ borderRadius:12, overflow:'hidden', border:'1px solid rgba(255,255,255,0.08)', marginBottom:20 }}>
+            <iframe
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=7.0%2C51.35%2C7.5%2C51.6&layer=mapnik&marker=${gefiltert.map(d => `${encodeURIComponent(d.ort || 'Bochum')}`).join('|')}`}
+              style={{ width:'100%', height:480, border:'none' }}
+              title="Dienstleister Karte"
+            />
+            <div style={{ padding:'16px', background:'#111' }}>
+              <div style={{ fontSize:12, color:'#5A5550', marginBottom:12 }}>Dienstleister in der Karte:</div>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                {gefiltert.map(d => (
+                  <div key={d.id} onClick={() => window.location.href = `/profil/${d.id}`}
+                    style={{ fontSize:12, padding:'4px 10px', borderRadius:20, background:'rgba(200,149,108,0.1)', border:'1px solid rgba(200,149,108,0.2)', color:'#c8956c', cursor:'pointer' }}>
+                    {d.name} · {d.ort}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
