@@ -197,15 +197,14 @@ export default function Home() {
       const parts = datum.split('.')
       if (parts.length === 3) isoDate = parts[2] + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0')
     }
-    const checkDate = new Date(isoDate + 'T' + uhrzeit + ':00+02:00')
-    const result = kalenderEvents.some(e => {
+    const [h, m] = uhrzeit.split(':').map(Number)
+    const checkMs = new Date(isoDate).getTime() + (h * 60 + m) * 60000
+    return kalenderEvents.some(e => {
       if (e.user_id !== userId) return false
-      const start = new Date(e.start_zeit)
-      const end = new Date(e.end_zeit)
-      console.log('CHECK:', userId, isoDate, uhrzeit, 'start:', start.toISOString(), 'end:', end.toISOString(), 'check:', checkDate.toISOString(), 'belegt:', checkDate >= start && checkDate < end)
-      return checkDate >= start && checkDate < end
+      const startMs = new Date(e.start_zeit).getTime() + 2 * 3600000
+      const endMs = new Date(e.end_zeit).getTime() + 2 * 3600000
+      return checkMs >= startMs && checkMs < endMs
     })
-    return result
   }
 
   function anwenden(suche_: string, stadt_: string, plz_: string, datum_: string, uhrzeit_: string = uhrzeitFilter) {
