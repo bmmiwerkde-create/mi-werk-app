@@ -232,7 +232,9 @@ export default function Home() {
     // Uhrzeitfilter: Dienstleister ausblenden die zu Datum+Uhrzeit belegt sind
     if (datum_ && uhrzeit_) {
       result = result.filter(d => {
-        if (!d.user_id) return true // kein Kalender = immer frei
+        if (!d.user_id) return true
+        const hatEvents = kalenderEvents.some(e => e.user_id === d.user_id)
+        if (!hatEvents) return true // kein Kalender = immer frei
         return !istBelegt(d.user_id, datum_, uhrzeit_)
       })
     }
