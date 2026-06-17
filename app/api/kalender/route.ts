@@ -60,5 +60,5 @@ export async function GET(req: NextRequest) {
       })))
   }
 
-  return NextResponse.json({ events })
+  return NextResponse.json({ events, debug: { tokenEmail: token.email, userId, userCount: users?.users?.length } })
 }
