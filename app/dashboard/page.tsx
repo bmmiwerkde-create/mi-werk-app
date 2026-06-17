@@ -37,7 +37,7 @@ export default function DashboardPage() {
 
   async function kalenderAbrufen() {
     setKalenderLaden(true)
-    const res = await fetch('/api/kalender')
+    const res = await fetch('/api/kalender?userId=' + user?.id)
     const data = await res.json()
     if (data.events) setKalenderEvents(data.events)
     setKalenderLaden(false)
@@ -124,18 +124,17 @@ export default function DashboardPage() {
             <div>
               <div style={{ fontSize:13, color:C.textMid, marginBottom:10 }}>{profil?.profilbild ? 'Profilbild hochgeladen' : 'Noch kein Profilbild'}</div>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={bildHochladen} style={{ display:'none' }} />
-              <button onClick={() => fileInputRef.current?.click()} disabled={bildLaden} style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background: bildLaden ? C.bg3 : C.copper, color:'#fff', border:'none', cursor: bildLaden ? 'wait' : 'pointer', fontFamily:'inherit' }}>
-                {bildLaden ? 'Wird hochgeladen...' : profil?.profilbild ? 'Bild aendern' : 'Bild hochladen'}
+              <button onClick={() => fileInputRef.current?.click()} disabled={bildLaden} style={{ fontSize:12, padding:'7px 16px', borderRadius:7, border:'1px solid ' + C.copperBord, background:'transparent', color:C.copper, cursor:'pointer', fontFamily:'inherit' }}>
+                {bildLaden ? 'Wird hochgeladen...' : 'Bild hochladen'}
               </button>
-              <div style={{ fontSize:11, color:C.textDim, marginTop:6 }}>JPG, PNG max. 5 MB</div>
             </div>
           </div>
         </div>
 
-        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, overflow:'hidden' }}>
+        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12 }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', borderBottom:'1px solid ' + C.border }}>
             <div>
-              <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:2 }}>Oeffentliches Profil</div>
+              <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:2 }}>Öffentliches Profil</div>
               <div style={{ fontSize:12, color:C.textDim }}>So sehen dich Kunden auf mi-werk.de</div>
             </div>
             {!editMode && <button onClick={() => setEditMode(true)} style={{ fontSize:12, padding:'7px 16px', borderRadius:7, border:'1px solid ' + C.border, background:'transparent', color:C.textMid, cursor:'pointer', fontFamily:'inherit' }}>Bearbeiten</button>}
@@ -143,7 +142,7 @@ export default function DashboardPage() {
           <div style={{ padding:'20px' }}>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:14 }}>
               <Field label="Name" value={form.name || ''} edit={editMode} onChange={v => setForm(f=>({...f,name:v}))} />
-              <Field label="Gewerk" value={form.gewerk || ''} edit={editMode} onChange={v => setForm(f=>({...f,gewerk:v}))} />
+              <Field label="Gewerk / Kategorie" value={form.gewerk || ''} edit={editMode} onChange={v => setForm(f=>({...f,gewerk:v}))} />
               <Field label="Ort" value={form.ort || ''} edit={editMode} onChange={v => setForm(f=>({...f,ort:v}))} />
               <Field label="Preis" value={form.preis || ''} edit={editMode} onChange={v => setForm(f=>({...f,preis:v}))} placeholder="z.B. ab 50 Euro/Std." />
               <Field label="Emoji" value={form.emoji || ''} edit={editMode} onChange={v => setForm(f=>({...f,emoji:v}))} placeholder="z.B. 🔧" />
@@ -210,7 +209,7 @@ export default function DashboardPage() {
           <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>Google Kalender</div>
           {!googleSession ? (
             <div>
-              <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>Verbinde deinen Google Kalender — Kunden sehen automatisch wann du verfuegbar bist.</div>
+              <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>Verbinde deinen Google Kalender — Kunden sehen automatisch wann du verfügbar bist.</div>
               <button onClick={() => signIn('google', { callbackUrl: 'https://mi-werk.de/dashboard' })} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#fff', color:'#333', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
                 <span style={{ fontSize:16 }}>📅</span> Mit Google verbinden
               </button>
@@ -222,20 +221,11 @@ export default function DashboardPage() {
                 <button onClick={() => signOut()} style={{ fontSize:11, color:C.textDim, background:'none', border:'1px solid ' + C.border, borderRadius:6, padding:'4px 10px', cursor:'pointer', fontFamily:'inherit' }}>Trennen</button>
               </div>
               <button onClick={kalenderAbrufen} disabled={kalenderLaden} style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background:C.copper, color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit', marginBottom:12 }}>
-                {kalenderLaden ? 'Laedt...' : 'Termine abrufen'}
+                {kalenderLaden ? 'Lädt...' : 'Termine abrufen'}
               </button>
               {kalenderEvents.length > 0 && (
-  <div style={{ fontSize:12, color:C.green, marginTop:8 }}>
-    ✓ {kalenderEvents.length} Termine synchronisiert — Kunden sehen nur frei/belegt.
-  </div>
-
-                <div>
-                  <div style={{ fontSize:11, color:C.textDim, marginBottom:8 }}>Naechste Termine:</div>
-                  {kalenderEvents.slice(0, 5).map((e, i) => (
-                    <div key={i} style={{ fontSize:12, color:C.textMid, padding:'6px 0', borderBottom:'1px solid ' + C.border }}>
-                      {e.title || 'Termin'} — {new Date(e.start).toLocaleDateString('de-DE')}
-                    </div>
-                  ))}
+                <div style={{ fontSize:12, color:C.green, marginTop:8 }}>
+                  ✓ {kalenderEvents.length} Termine synchronisiert — Kunden sehen nur frei/belegt.
                 </div>
               )}
             </div>
