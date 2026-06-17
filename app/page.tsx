@@ -192,13 +192,12 @@ export default function Home() {
 
   function istBelegt(userId: string, datum: string, uhrzeit: string): boolean {
     if (!datum || !uhrzeit) return false
-    // Datum aus DD.MM.YYYY oder YYYY-MM-DD parsen
     let isoDate = datum
     if (datum.includes('.')) {
       const parts = datum.split('.')
       if (parts.length === 3) isoDate = parts[2] + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0')
     }
-   const [checkH, checkM] = uhrzeit.split(':').map(Number)
+    const [checkH, checkM] = uhrzeit.split(':').map(Number)
     const checkMinutes = checkH * 60 + checkM
     return kalenderEvents.some(e => {
       if (e.user_id !== userId) return false
@@ -207,10 +206,10 @@ export default function Home() {
       const startIso = startDate.toISOString().slice(0, 10)
       const endIso = endDate.toISOString().slice(0, 10)
       if (isoDate < startIso || isoDate > endIso) return false
-      const startMinutes = startDate.getHours() * 60 + startDate.getMinutes()
-      const endMinutes = endDate.getHours() * 60 + endDate.getMinutes()
+      const startMinutes = (startDate.getUTCHours() + 2) * 60 + startDate.getUTCMinutes()
+      const endMinutes = (endDate.getUTCHours() + 2) * 60 + endDate.getUTCMinutes()
       return checkMinutes >= startMinutes && checkMinutes < endMinutes
-    }) })
+    })
   }
 
   function anwenden(suche_: string, stadt_: string, plz_: string, datum_: string, uhrzeit_: string = uhrzeitFilter) {
