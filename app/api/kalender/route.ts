@@ -1,6 +1,12 @@
 import { getToken } from 'next-auth/jwt'
 import { google } from 'googleapis'
 import { NextResponse, NextRequest } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function GET(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
@@ -9,9 +15,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Nicht eingeloggt' }, { status: 401 })
   }
 
+  // Supabase user_id aus Email ermitteln
+  const { data: users } = await supabaseAdmin.auth.admin.listUsers()
+  const supabaseUser = users?.users?.find(u => u.email === token.email)
+  const userId = supabaseUser?.id
+
   const auth = new google.auth.OAuth2()
   auth.setCredentials({ access_token: token.accessToken as string })
-
   const calendar = google.calendar({ version: 'v3', auth })
   
   const now = new Date()
@@ -32,6 +42,23 @@ export async function GET(req: NextRequest) {
     end: e.end?.dateTime || e.end?.date,
     title: e.summary,
   })) || []
+
+  // In Supabase speichern
+  if (userId && events.length > 0) {
+    await supabaseAdmin
+      .from('kalender_events')
+      .delete()
+      .eq('user_id', userId)
+
+    await supabaseAdmin
+      .from('kalender_events')
+      .insert(events.map(e => ({
+        user_id: userId,
+        titel: e.title || 'Termin',
+        start_zeit: e.start,
+        end_zeit: e.end,
+      })))
+  }
 
   return NextResponse.json({ events })
 }
