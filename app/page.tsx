@@ -79,78 +79,64 @@ const hauptkategorien = [
     ]
   },
   {
-    emoji: '🏥', name: 'Gesundheit & Medizin',
+    emoji: '🏠', name: 'Haus & Handwerk',
     gewerke: [
-      { emoji: '🌿', name: 'Heilpraktiker' },
-      { emoji: '👂', name: 'Hörgeräteakustiker' },
-      { emoji: '💆', name: 'Masseur' },
-      { emoji: '👓', name: 'Optiker' },
-      { emoji: '🦴', name: 'Osteopath' },
-      { emoji: '🏥', name: 'Pflegedienst' },
-      { emoji: '🐾', name: 'Tierarzt' },
-    ]
-  },
-  {
-    emoji: '🔨', name: 'Handwerk & Bau',
-    gewerke: [
-      { emoji: '🛁', name: 'Badinstallation' },
-      { emoji: '🏠', name: 'Dachdecker' },
-      { emoji: '⚡', name: 'Elektriker' },
-      { emoji: '🪨', name: 'Estrichleger' },
-      { emoji: '🪟', name: 'Fensterbauer' },
-      { emoji: '🔲', name: 'Fliesenleger' },
-      { emoji: '🪜', name: 'Gerüstbauer' },
-      { emoji: '🔥', name: 'Heizungsbau' },
-      { emoji: '❄️', name: 'Klimatechnik' },
-      { emoji: '💨', name: 'Lüftungsbau' },
+      { emoji: '🔌', name: 'Elektriker' },
+      { emoji: '🪟', name: 'Fensterbau' },
+      { emoji: '🪣', name: 'Klempner' },
       { emoji: '🎨', name: 'Maler' },
-      { emoji: '🧱', name: 'Maurer' },
-      { emoji: '⚙️', name: 'Metallbauer' },
-      { emoji: '🪣', name: 'Putzer' },
-      { emoji: '🔧', name: 'Sanitär' },
-      { emoji: '🪚', name: 'Schreiner' },
-      { emoji: '🔩', name: 'Schlosser' },
-      { emoji: '🔨', name: 'Schweißer' },
-      { emoji: '☀️', name: 'Solartechnik' },
-      { emoji: '🪑', name: 'Tischler' },
-      { emoji: '🏗️', name: 'Trockenbauer' },
-      { emoji: '🚪', name: 'Türenbau' },
-      { emoji: '🪵', name: 'Zimmerer' },
+      { emoji: '🔨', name: 'Schreiner' },
+      { emoji: '🧹', name: 'Reinigung' },
+      { emoji: '🏗️', name: 'Renovierung' },
     ]
   },
   {
-    emoji: '💻', name: 'IT & Technik',
+    emoji: '💻', name: 'IT & Digital',
     gewerke: [
-      { emoji: '📡', name: 'Antennenbau' },
-      { emoji: '🚁', name: 'Drohnenservice' },
-      { emoji: '🖥️', name: 'IT-Service' },
-      { emoji: '🔧', name: 'Reparatur' },
-      { emoji: '🛡️', name: 'Sicherheitstechnik' },
-      { emoji: '🏠', name: 'Smart Home' },
-      { emoji: '🌐', name: 'Webdesign' },
+      { emoji: '🎨', name: 'Grafikdesign' },
+      { emoji: '📸', name: 'Fotografie' },
+      { emoji: '💻', name: 'Webentwicklung' },
+      { emoji: '📱', name: 'App-Entwicklung' },
+      { emoji: '📊', name: 'SEO / Marketing' },
+      { emoji: '🎬', name: 'Videoproduktion' },
     ]
   },
   {
-    emoji: '📸', name: 'Kreativ & Events',
+    emoji: '📋', name: 'Büro & Verwaltung',
     gewerke: [
-      { emoji: '🎀', name: 'Dekoservice' },
-      { emoji: '🎧', name: 'DJ' },
+      { emoji: '📋', name: 'Buchhaltung' },
+      { emoji: '⚖️', name: 'Rechtsberatung' },
+      { emoji: '💼', name: 'Steuerberatung' },
+      { emoji: '📝', name: 'Übersetzung' },
+      { emoji: '🗂️', name: 'Virtuelle Assistenz' },
+    ]
+  },
+  {
+    emoji: '🎉', name: 'Events & Veranstaltung',
+    gewerke: [
+      { emoji: '🎸', name: 'DJ / Musik' },
       { emoji: '🎪', name: 'Eventplanung' },
-      { emoji: '📸', name: 'Fotograf' },
-      { emoji: '🎬', name: 'Videograf' },
-      { emoji: '🎤', name: 'Moderator' },
+      { emoji: '🎭', name: 'Moderation' },
+      { emoji: '🎩', name: 'Zauberer' },
+      { emoji: '📸', name: 'Hochzeitsfotograf' },
     ]
   },
   {
-    emoji: '🧹', name: 'Reinigung & Hausservice',
+    emoji: '🚗', name: 'Fahrzeuge & Mobilität',
     gewerke: [
-      { emoji: '🪟', name: 'Fensterreinigung' },
-      { emoji: '🧹', name: 'Gebäudereinigung' },
-      { emoji: '🏠', name: 'Hausmeisterservice' },
-      { emoji: '🔧', name: 'Reparaturservice' },
-      { emoji: '🪣', name: 'Rohrreinigung' },
-      { emoji: '🔑', name: 'Schlüsseldienst' },
-      { emoji: '🧺', name: 'Teppichreinigung' },
+      { emoji: '🔧', name: 'Kfz-Mechaniker' },
+      { emoji: '🚗', name: 'Fahrservice' },
+      { emoji: '🚕', name: 'Kurierdienst' },
+      { emoji: '🚐', name: 'Reisebegleitung' },
+    ]
+  },
+  {
+    emoji: '👶', name: 'Familie & Soziales',
+    gewerke: [
+      { emoji: '👶', name: 'Babysitter' },
+      { emoji: '👴', name: 'Seniorenbetreuung' },
+      { emoji: '🏫', name: 'Kinderbetreuung' },
+      { emoji: '♿', name: 'Pflegedienst' },
     ]
   },
   {
@@ -180,11 +166,13 @@ export default function Home() {
   const [stadtFilter, setStadtFilter] = useState('')
   const [plzFilter, setPlzFilter] = useState('')
   const [datumFilter, setDatumFilter] = useState('')
+  const [uhrzeitFilter, setUhrzeitFilter] = useState('')
   const [preisFilter, setPreisFilter] = useState('')
   const [aktiveKategorie, setAktiveKategorie] = useState<string | null>(null)
   const [selectedGewerk, setSelectedGewerk] = useState('')
   const [user, setUser] = useState<any>(null)
   const [karteAktiv, setKarteAktiv] = useState(false)
+  const [kalenderEvents, setKalenderEvents] = useState<any[]>([])
   const router = useRouter()
 
   useEffect(() => {
@@ -197,9 +185,29 @@ export default function Home() {
   async function laden() {
     const { data } = await supabase.from('dienstleister').select('*').eq('abo_aktiv', true)
     if (data) { setDienstleister(data); setGefiltert(data) }
+    // Alle kalender_events laden für Uhrzeitfilter
+    const { data: events } = await supabase.from('kalender_events').select('*')
+    if (events) setKalenderEvents(events)
   }
 
-  function anwenden(suche_: string, stadt_: string, plz_: string, datum_: string) {
+  function istBelegt(userId: string, datum: string, uhrzeit: string): boolean {
+    if (!datum || !uhrzeit) return false
+    // Datum aus DD.MM.YYYY oder YYYY-MM-DD parsen
+    let isoDate = datum
+    if (datum.includes('.')) {
+      const parts = datum.split('.')
+      if (parts.length === 3) isoDate = parts[2] + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0')
+    }
+    const checkZeit = new Date(isoDate + 'T' + uhrzeit + ':00')
+    return kalenderEvents.some(e => {
+      if (e.user_id !== userId) return false
+      const start = new Date(e.start_zeit)
+      const end = new Date(e.end_zeit)
+      return checkZeit >= start && checkZeit < end
+    })
+  }
+
+  function anwenden(suche_: string, stadt_: string, plz_: string, datum_: string, uhrzeit_: string = uhrzeitFilter) {
     let result = dienstleister
     if (suche_) {
       const q = suche_.toLowerCase()
@@ -220,6 +228,13 @@ export default function Home() {
     if (datum_) {
       result = result.filter(d => !d.verfuegbar_ab || d.verfuegbar_ab <= datum_)
     }
+    // Uhrzeitfilter: Dienstleister ausblenden die zu Datum+Uhrzeit belegt sind
+    if (datum_ && uhrzeit_) {
+      result = result.filter(d => {
+        if (!d.user_id) return true // kein Kalender = immer frei
+        return !istBelegt(d.user_id, datum_, uhrzeit_)
+      })
+    }
     if (preisFilter) {
       const maxPreis = parseInt(preisFilter)
       result = result.filter(d => {
@@ -231,20 +246,13 @@ export default function Home() {
     setGefiltert(result)
   }
 
-  function filtern(wert: string) {
-    setSuche(wert)
-  }
-
-  function filterStadt(wert: string) {
-    setStadtFilter(wert)
-  }
-
-  function filterPlz(wert: string) {
-    setPlzFilter(wert)
-  }
-
-  function filterDatum(wert: string) {
-    setDatumFilter(wert)
+  function filtern(wert: string) { setSuche(wert) }
+  function filterStadt(wert: string) { setStadtFilter(wert) }
+  function filterPlz(wert: string) { setPlzFilter(wert) }
+  function filterDatum(wert: string) { setDatumFilter(wert) }
+  function filterUhrzeit(wert: string) {
+    setUhrzeitFilter(wert)
+    anwenden(suche, stadtFilter, plzFilter, datumFilter, wert)
   }
 
   const [kiLaden, setKiLaden] = useState(false)
@@ -279,17 +287,23 @@ export default function Home() {
           result = result.filter(d => !d.verfuegbar_ab || d.verfuegbar_ab <= iso)
         }
       }
+      if (datumFilter && uhrzeitFilter) {
+        result = result.filter(d => {
+          if (!d.user_id) return true
+          return !istBelegt(d.user_id, datumFilter, uhrzeitFilter)
+        })
+      }
       result = result.filter(d => gewerkeList.some((g: string) =>
         d.gewerk?.toLowerCase().includes(g) ||
         d.beschreibung?.toLowerCase().includes(g) ||
         d.name?.toLowerCase().includes(g)
       ))
-      if (result.length === 0) anwenden(suche, stadtFilter, plzFilter, datumFilter)
+      if (result.length === 0) anwenden(suche, stadtFilter, plzFilter, datumFilter, uhrzeitFilter)
       else setGefiltert(result)
       setAktiveKategorie(null)
       setSelectedGewerk('')
     } catch {
-      anwenden(suche, stadtFilter, plzFilter, datumFilter)
+      anwenden(suche, stadtFilter, plzFilter, datumFilter, uhrzeitFilter)
     }
     setKiLaden(false)
     setTimeout(() => {
@@ -300,7 +314,7 @@ export default function Home() {
   function suchAusfuehren() {
     setAktiveKategorie(null)
     setSelectedGewerk('')
-    anwenden(suche, stadtFilter, plzFilter, datumFilter)
+    anwenden(suche, stadtFilter, plzFilter, datumFilter, uhrzeitFilter)
     setTimeout(() => {
       document.getElementById('ergebnisse')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 100)
@@ -312,6 +326,7 @@ export default function Home() {
     setStadtFilter('')
     setPlzFilter('')
     setDatumFilter('')
+    setUhrzeitFilter('')
     setGefiltert(dienstleister.filter(d => d.gewerk?.toLowerCase().includes(gewerk.toLowerCase())))
   }
 
@@ -320,6 +335,7 @@ export default function Home() {
     setStadtFilter('')
     setPlzFilter('')
     setDatumFilter('')
+    setUhrzeitFilter('')
     setPreisFilter('')
     setAktiveKategorie(null)
     setSelectedGewerk('')
@@ -327,7 +343,7 @@ export default function Home() {
   }
 
   const aktiveKatData = hauptkategorien.find(k => k.name === aktiveKategorie)
-  const hatFilter = suche || stadtFilter || plzFilter || datumFilter || preisFilter
+  const hatFilter = suche || stadtFilter || plzFilter || datumFilter || uhrzeitFilter || preisFilter
 
   return (
     <div style={{ minHeight:'100vh', background:'#0A0A0A', color:'#E8DDD4', fontFamily:'system-ui' }}>
@@ -348,7 +364,7 @@ export default function Home() {
               <button onClick={() => router.push('/login')} style={{ fontSize:12, color:'#9A8878', background:'transparent', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
                 Anmelden
               </button>
-              <button onClick={() => router.push('/login')} style={{ fontSize:12, fontWeight:500, padding:'7px 18px', borderRadius:6, background:'transparent', color:'#c8956c', border:'1px solid #c8956c', cursor:'pointer', fontFamily:'inherit' }}>
+              <button onClick={() => router.push('/login')} style={{ fontSize:12, fontWeight:500, padding:'7px 18px', borderRadius:6, background:'#c8956c', color:'#fff', border:'1px solid #c8956c', cursor:'pointer', fontFamily:'inherit' }}>
                 Registrieren
               </button>
             </>
@@ -378,7 +394,7 @@ export default function Home() {
 
         {/* STADT + PLZ FILTER */}
         <div className="filter-row" style={{ maxWidth:560, margin:'12px auto 0', display:'flex', gap:10 }}>
-          <div style={{ flex:1, position:'relative' }}>
+          <div style={{ flex:1 }}>
             <input
               value={stadtFilter}
               onChange={e => filterStadt(e.target.value)}
@@ -388,7 +404,7 @@ export default function Home() {
               onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
             />
           </div>
-          <div style={{ flex:1, position:'relative' }}>
+          <div style={{ flex:1 }}>
             <input
               value={plzFilter}
               onChange={e => filterPlz(e.target.value)}
@@ -401,18 +417,35 @@ export default function Home() {
           </div>
         </div>
 
-        {/* DATUM FILTER */}
-        <div style={{ maxWidth:560, margin:'10px auto 0' }}>
-          <input
-            value={datumFilter}
-            onChange={e => filterDatum(e.target.value)}
-            placeholder="📅 Verfügbar ab z.B. 15.06.2026"
-            style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
-            onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
-            onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
-            onKeyDown={e => e.key === 'Enter' && suchAusfuehren()}
-          />
+        {/* DATUM + UHRZEIT FILTER */}
+        <div className="filter-row" style={{ maxWidth:560, margin:'10px auto 0', display:'flex', gap:10 }}>
+          <div style={{ flex:2 }}>
+            <input
+              value={datumFilter}
+              onChange={e => filterDatum(e.target.value)}
+              placeholder="📅 Datum z.B. 15.06.2026"
+              style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
+              onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
+              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
+              onKeyDown={e => e.key === 'Enter' && suchAusfuehren()}
+            />
+          </div>
+          <div style={{ flex:1 }}>
+            <input
+              type="time"
+              value={uhrzeitFilter}
+              onChange={e => filterUhrzeit(e.target.value)}
+              style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color: uhrzeitFilter ? '#E8DDD4' : '#5A5550', fontFamily:'inherit', outline:'none', boxSizing:'border-box', colorScheme:'dark' }}
+              onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
+              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
+            />
+          </div>
         </div>
+        {datumFilter && uhrzeitFilter && (
+          <div style={{ maxWidth:560, margin:'6px auto 0', fontSize:11, color:'#9A8878', textAlign:'left', paddingLeft:4 }}>
+            ⏰ Zeigt nur Dienstleister die am {datumFilter} um {uhrzeitFilter} Uhr verfügbar sind
+          </div>
+        )}
 
         {/* PREIS FILTER */}
         <div style={{ maxWidth:560, margin:'10px auto 0' }}>
@@ -525,6 +558,7 @@ export default function Home() {
             {hatFilter ? `${gefiltert.length} Ergebnisse` : 'Alle Dienstleister'}
             {stadtFilter && ` in ${stadtFilter}`}
             {plzFilter && ` · PLZ ${plzFilter}`}
+            {datumFilter && uhrzeitFilter && ` · ${datumFilter} ${uhrzeitFilter} Uhr`}
           </div>
           <div style={{ display:'flex', gap:8, alignItems:'center' }}>
             {hatFilter && (
@@ -544,6 +578,7 @@ export default function Home() {
             🗺 Kartenansicht
           </button>
         </div>
+
         <div className="dl-grid" style={{ display: karteAktiv ? 'none' : 'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:14 }}>
           {gefiltert.map((d: any) => (
             <div key={d.id} onClick={() => window.location.href = `/profil/${d.id}`} style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:12, padding:'20px', cursor:'pointer' }}
@@ -581,12 +616,14 @@ export default function Home() {
             </div>
           ))}
         </div>
+
         {gefiltert.length === 0 && !karteAktiv && (
           <div style={{ textAlign:'center', padding:'60px 0', color:'#5A5550', fontSize:14 }}>
             Keine Dienstleister gefunden
             {stadtFilter && ` in "${stadtFilter}"`}
             {plzFilter && ` mit PLZ "${plzFilter}"`}
             {suche && ` für "${suche}"`}
+            {datumFilter && uhrzeitFilter && ` · am ${datumFilter} um ${uhrzeitFilter} Uhr verfügbar`}
           </div>
         )}
 
@@ -594,7 +631,7 @@ export default function Home() {
         {karteAktiv && (
           <div style={{ borderRadius:12, overflow:'hidden', border:'1px solid rgba(255,255,255,0.08)', marginBottom:20 }}>
             <iframe
-              src={`https://www.openstreetmap.org/export/embed.html?bbox=7.0%2C51.35%2C7.5%2C51.6&layer=mapnik&marker=${gefiltert.map(d => `${encodeURIComponent(d.ort || 'Bochum')}`).join('|')}`}
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=7.0%2C51.35%2C7.5%2C51.6&layer=mapnik`}
               style={{ width:'100%', height:480, border:'none' }}
               title="Dienstleister Karte"
             />
