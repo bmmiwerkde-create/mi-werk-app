@@ -228,7 +228,7 @@ export default function DashboardPage() {
   <div style={{ fontSize:12, color:C.green, marginTop:8 }}>
     ✓ {kalenderEvents.length} Termine synchronisiert — Kunden sehen nur frei/belegt.
   </div>
-)}
+
                 <div>
                   <div style={{ fontSize:11, color:C.textDim, marginBottom:8 }}>Naechste Termine:</div>
                   {kalenderEvents.slice(0, 5).map((e, i) => (
