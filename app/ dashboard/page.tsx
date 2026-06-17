@@ -254,7 +254,7 @@ export default function DashboardPage() {
           {!googleSession ? (
             <div>
               <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>Verbinde deinen Google Kalender — Kunden sehen automatisch wann du verfügbar bist.</div>
-              <button onClick={() => signIn('google')} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#fff', color:'#333', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
+<button onClick={() => signIn('google', { callbackUrl: 'https://mi-werk.de/dashboard'  
                 <span style={{ fontSize:16 }}>📅</span> Mit Google verbinden
               </button>
             </div>
