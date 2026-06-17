@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
       .from('kalender_events')
       .insert(events.map(e => ({
         user_id: userId,
-        titel: e.title || 'Termin',
+        titel: 'Belegt',
         start_zeit: e.start,
         end_zeit: e.end,
       })))
