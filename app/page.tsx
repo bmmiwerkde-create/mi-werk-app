@@ -21,154 +21,154 @@ import { useRouter } from 'next/navigation'
 
 const hauptkategorien = [
   {
-    emoji: '🔨', name: 'Handwerk & Bau',
+    emoji: '✂️', name: 'Beauty & Pflege',
     gewerke: [
-      { emoji: '🧱', name: 'Maurer' },
-      { emoji: '🪵', name: 'Zimmerer' },
-      { emoji: '🏠', name: 'Dachdecker' },
-      { emoji: '🪜', name: 'Gerüstbauer' },
-      { emoji: '🏗️', name: 'Trockenbauer' },
-      { emoji: '🪨', name: 'Estrichleger' },
-      { emoji: '🔲', name: 'Fliesenleger' },
-      { emoji: '🎨', name: 'Maler' },
-      { emoji: '🪣', name: 'Putzer' },
-      { emoji: '🪟', name: 'Fensterbauer' },
-      { emoji: '🚪', name: 'Türenbau' },
-      { emoji: '⚡', name: 'Elektriker' },
-      { emoji: '🔧', name: 'Sanitär' },
-      { emoji: '🔥', name: 'Heizungsbau' },
-      { emoji: '❄️', name: 'Klimatechnik' },
-      { emoji: '☀️', name: 'Solartechnik' },
-      { emoji: '💨', name: 'Lüftungsbau' },
-      { emoji: '🛁', name: 'Badinstallation' },
-      { emoji: '🪚', name: 'Schreiner' },
-      { emoji: '🪑', name: 'Tischler' },
-      { emoji: '🔩', name: 'Schlosser' },
-      { emoji: '⚙️', name: 'Metallbauer' },
-      { emoji: '🔨', name: 'Schweißer' },
+      { emoji: '🦶', name: 'Fußpflege' },
+      { emoji: '✂️', name: 'Friseur' },
+      { emoji: '💄', name: 'Kosmetik' },
+      { emoji: '💆', name: 'Massage' },
+      { emoji: '💅', name: 'Nagelpflege' },
+      { emoji: '💋', name: 'Permanent Make-up' },
+      { emoji: '👁️', name: 'Wimpern' },
     ]
   },
   {
-    emoji: '🌿', name: 'Garten & Außen',
+    emoji: '🎓', name: 'Bildung & Coaching',
     gewerke: [
-      { emoji: '🌿', name: 'Gartenbau' },
-      { emoji: '🌳', name: 'Baumfällung' },
-      { emoji: '🧱', name: 'Pflasterer' },
-      { emoji: '🪴', name: 'Landschaftspflege' },
-      { emoji: '🌱', name: 'Rasenpflege' },
-      { emoji: '🏡', name: 'Zaunbau' },
-      { emoji: '🌊', name: 'Teichbau' },
-    ]
-  },
-  {
-    emoji: '🧹', name: 'Reinigung & Hausservice',
-    gewerke: [
-      { emoji: '🧹', name: 'Gebäudereinigung' },
-      { emoji: '🪟', name: 'Fensterreinigung' },
-      { emoji: '🏠', name: 'Hausmeisterservice' },
-      { emoji: '🧺', name: 'Teppichreinigung' },
-      { emoji: '🪣', name: 'Rohrreinigung' },
-      { emoji: '🔑', name: 'Schlüsseldienst' },
-      { emoji: '🧰', name: 'Reparaturservice' },
-    ]
-  },
-  {
-    emoji: '🚛', name: 'Transport & Logistik',
-    gewerke: [
-      { emoji: '🚛', name: 'Umzugsservice' },
-      { emoji: '🗑️', name: 'Entrümpelung' },
-      { emoji: '📦', name: 'Möbelmontage' },
-      { emoji: '🏋️', name: 'Schwertransport' },
+      { emoji: '📄', name: 'Bewerbungscoaching' },
+      { emoji: '🧠', name: 'Life Coach' },
+      { emoji: '🎵', name: 'Musikunterricht' },
+      { emoji: '📚', name: 'Nachhilfe' },
+      { emoji: '🗣️', name: 'Sprachkurs' },
     ]
   },
   {
     emoji: '🍽️', name: 'Catering & Essen',
     gewerke: [
       { emoji: '🍽️', name: 'Catering' },
-      { emoji: '🎉', name: 'Partyservice' },
       { emoji: '🚚', name: 'Foodtruck' },
+      { emoji: '🥤', name: 'Getränkeservice' },
+      { emoji: '🔥', name: 'Grillservice' },
       { emoji: '👨‍🍳', name: 'Kochservice' },
       { emoji: '🥗', name: 'Meal Prep' },
-      { emoji: '🔥', name: 'Grillservice' },
-      { emoji: '🥤', name: 'Getränkeservice' },
+      { emoji: '🎉', name: 'Partyservice' },
     ]
   },
   {
     emoji: '💪', name: 'Fitness & Sport',
     gewerke: [
-      { emoji: '💪', name: 'Personal Trainer' },
-      { emoji: '🧘', name: 'Yoga' },
-      { emoji: '🏋️', name: 'Pilates' },
-      { emoji: '🥋', name: 'Kampfsport' },
-      { emoji: '🏊', name: 'Schwimmtrainer' },
       { emoji: '🥦', name: 'Ernährungsberatung' },
+      { emoji: '🥋', name: 'Kampfsport' },
+      { emoji: '💪', name: 'Personal Trainer' },
       { emoji: '🦴', name: 'Physiotherapie' },
+      { emoji: '🏋️', name: 'Pilates' },
+      { emoji: '🏊', name: 'Schwimmtrainer' },
+      { emoji: '🧘', name: 'Yoga' },
+    ]
+  },
+  {
+    emoji: '🌿', name: 'Garten & Außen',
+    gewerke: [
+      { emoji: '🌳', name: 'Baumfällung' },
+      { emoji: '🌿', name: 'Gartenbau' },
+      { emoji: '🌱', name: 'Rasenpflege' },
+      { emoji: '🪴', name: 'Landschaftspflege' },
+      { emoji: '🧱', name: 'Pflasterer' },
+      { emoji: '🌊', name: 'Teichbau' },
+      { emoji: '🏡', name: 'Zaunbau' },
     ]
   },
   {
     emoji: '🏥', name: 'Gesundheit & Medizin',
     gewerke: [
       { emoji: '🌿', name: 'Heilpraktiker' },
+      { emoji: '👂', name: 'Hörgeräteakustiker' },
       { emoji: '💆', name: 'Masseur' },
+      { emoji: '👓', name: 'Optiker' },
       { emoji: '🦴', name: 'Osteopath' },
       { emoji: '🏥', name: 'Pflegedienst' },
       { emoji: '🐾', name: 'Tierarzt' },
-      { emoji: '👓', name: 'Optiker' },
-      { emoji: '👂', name: 'Hörgeräteakustiker' },
     ]
   },
   {
-    emoji: '✂️', name: 'Beauty & Pflege',
+    emoji: '🔨', name: 'Handwerk & Bau',
     gewerke: [
-      { emoji: '✂️', name: 'Friseur' },
-      { emoji: '💄', name: 'Kosmetik' },
-      { emoji: '💅', name: 'Nagelpflege' },
-      { emoji: '👁️', name: 'Wimpern' },
-      { emoji: '💋', name: 'Permanent Make-up' },
-      { emoji: '💆', name: 'Massage' },
-      { emoji: '🦶', name: 'Fußpflege' },
+      { emoji: '🛁', name: 'Badinstallation' },
+      { emoji: '🏠', name: 'Dachdecker' },
+      { emoji: '⚡', name: 'Elektriker' },
+      { emoji: '🪨', name: 'Estrichleger' },
+      { emoji: '🪟', name: 'Fensterbauer' },
+      { emoji: '🔲', name: 'Fliesenleger' },
+      { emoji: '🪜', name: 'Gerüstbauer' },
+      { emoji: '🔥', name: 'Heizungsbau' },
+      { emoji: '❄️', name: 'Klimatechnik' },
+      { emoji: '💨', name: 'Lüftungsbau' },
+      { emoji: '🎨', name: 'Maler' },
+      { emoji: '🧱', name: 'Maurer' },
+      { emoji: '⚙️', name: 'Metallbauer' },
+      { emoji: '🪣', name: 'Putzer' },
+      { emoji: '🔧', name: 'Sanitär' },
+      { emoji: '🪚', name: 'Schreiner' },
+      { emoji: '🔩', name: 'Schlosser' },
+      { emoji: '🔨', name: 'Schweißer' },
+      { emoji: '☀️', name: 'Solartechnik' },
+      { emoji: '🪑', name: 'Tischler' },
+      { emoji: '🏗️', name: 'Trockenbauer' },
+      { emoji: '🚪', name: 'Türenbau' },
+      { emoji: '🪵', name: 'Zimmerer' },
     ]
   },
   {
     emoji: '💻', name: 'IT & Technik',
     gewerke: [
-      { emoji: '🖥️', name: 'IT-Service' },
-      { emoji: '🌐', name: 'Webdesign' },
-      { emoji: '🔧', name: 'Reparatur' },
-      { emoji: '🏠', name: 'Smart Home' },
-      { emoji: '🛡️', name: 'Sicherheitstechnik' },
-      { emoji: '🚁', name: 'Drohnenservice' },
       { emoji: '📡', name: 'Antennenbau' },
-    ]
-  },
-  {
-    emoji: '🎓', name: 'Bildung & Coaching',
-    gewerke: [
-      { emoji: '📚', name: 'Nachhilfe' },
-      { emoji: '🗣️', name: 'Sprachkurs' },
-      { emoji: '🎵', name: 'Musikunterricht' },
-      { emoji: '🧠', name: 'Life Coach' },
-      { emoji: '📄', name: 'Bewerbungscoaching' },
+      { emoji: '🚁', name: 'Drohnenservice' },
+      { emoji: '🖥️', name: 'IT-Service' },
+      { emoji: '🔧', name: 'Reparatur' },
+      { emoji: '🛡️', name: 'Sicherheitstechnik' },
+      { emoji: '🏠', name: 'Smart Home' },
+      { emoji: '🌐', name: 'Webdesign' },
     ]
   },
   {
     emoji: '📸', name: 'Kreativ & Events',
     gewerke: [
-      { emoji: '📸', name: 'Fotograf' },
-      { emoji: '🎬', name: 'Videograf' },
+      { emoji: '🎀', name: 'Dekoservice' },
       { emoji: '🎧', name: 'DJ' },
       { emoji: '🎪', name: 'Eventplanung' },
-      { emoji: '🎀', name: 'Dekoservice' },
+      { emoji: '📸', name: 'Fotograf' },
+      { emoji: '🎬', name: 'Videograf' },
       { emoji: '🎤', name: 'Moderator' },
+    ]
+  },
+  {
+    emoji: '🧹', name: 'Reinigung & Hausservice',
+    gewerke: [
+      { emoji: '🪟', name: 'Fensterreinigung' },
+      { emoji: '🧹', name: 'Gebäudereinigung' },
+      { emoji: '🏠', name: 'Hausmeisterservice' },
+      { emoji: '🔧', name: 'Reparaturservice' },
+      { emoji: '🪣', name: 'Rohrreinigung' },
+      { emoji: '🔑', name: 'Schlüsseldienst' },
+      { emoji: '🧺', name: 'Teppichreinigung' },
     ]
   },
   {
     emoji: '🐾', name: 'Tiere',
     gewerke: [
-      { emoji: '🐕', name: 'Hundesitter' },
-      { emoji: '🎾', name: 'Tiertrainer' },
-      { emoji: '🐩', name: 'Tierpflege' },
       { emoji: '✂️', name: 'Hundefriseur' },
+      { emoji: '🐕', name: 'Hundesitter' },
+      { emoji: '🐩', name: 'Tierpflege' },
+      { emoji: '🎾', name: 'Tiertrainer' },
+    ]
+  },
+  {
+    emoji: '🚛', name: 'Transport & Logistik',
+    gewerke: [
+      { emoji: '🗑️', name: 'Entrümpelung' },
+      { emoji: '📦', name: 'Möbelmontage' },
+      { emoji: '🏋️', name: 'Schwertransport' },
+      { emoji: '🚛', name: 'Umzugsservice' },
     ]
   },
 ]
