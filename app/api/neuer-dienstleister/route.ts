@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   const record = body.record
 
   await resend.emails.send({
-    from: 'Mi-Werk <onboarding@resend.dev>',
+    from: 'Mi-Werk <noreply@mi-werk.de>',
     to: 'middeldorfben@gmail.com',
     subject: 'Neuer Dienstleister registriert: ' + (record.name || 'Unbekannt'),
     html: `
