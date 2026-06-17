@@ -197,18 +197,12 @@ export default function Home() {
       const parts = datum.split('.')
       if (parts.length === 3) isoDate = parts[2] + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0')
     }
-    const [checkH, checkM] = uhrzeit.split(':').map(Number)
-    const checkMinutes = checkH * 60 + checkM
+    const checkDate = new Date(isoDate + 'T' + uhrzeit + ':00+02:00')
     return kalenderEvents.some(e => {
       if (e.user_id !== userId) return false
-      const startDate = new Date(e.start_zeit)
-      const endDate = new Date(e.end_zeit)
-      const startIso = startDate.toISOString().slice(0, 10)
-      const endIso = endDate.toISOString().slice(0, 10)
-      if (isoDate < startIso || isoDate > endIso) return false
-      const startMinutes = (startDate.getUTCHours() + 2) * 60 + startDate.getUTCMinutes()
-      const endMinutes = (endDate.getUTCHours() + 2) * 60 + endDate.getUTCMinutes()
-      return checkMinutes >= startMinutes && checkMinutes < endMinutes
+      const start = new Date(e.start_zeit)
+      const end = new Date(e.end_zeit)
+      return checkDate >= start && checkDate < end
     })
   }
 
