@@ -232,9 +232,16 @@ export default function Home() {
     if (datum_ && uhrzeit_) {
       result = result.filter(d => {
         if (!d.user_id) return true
-        const hatEvents = kalenderEvents.some(e => e.user_id === d.user_id)
-        if (!hatEvents) return true // kein Kalender = immer frei
-        return !istBelegt(d.user_id, datum_, uhrzeit_)
+        const meineEvents = kalenderEvents.filter(e => e.user_id === d.user_id)
+        if (meineEvents.length === 0) return true
+        const [h, m] = uhrzeit_.split(':').map(Number)
+        const checkMs = new Date(isoDate_).getTime() + (h * 60 + m) * 60000
+        const belegt = meineEvents.some(e => {
+          const startMs = new Date(e.start_zeit).getTime()
+          const endMs = new Date(e.end_zeit).getTime()
+          return checkMs >= startMs && checkMs < endMs
+        })
+        return !belegt
       })
     }
     if (preisFilter) {
