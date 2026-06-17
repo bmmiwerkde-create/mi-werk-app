@@ -15,10 +15,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Nicht eingeloggt' }, { status: 401 })
   }
 
-  // Supabase user_id aus Email ermitteln
-  const { data: users } = await supabaseAdmin.auth.admin.listUsers()
-  const supabaseUser = users?.users?.find(u => u.email === token.email)
-  const userId = supabaseUser?.id
+  const userId = req.nextUrl.searchParams.get('userId')
 
   const auth = new google.auth.OAuth2()
   auth.setCredentials({ access_token: token.accessToken as string })
@@ -43,7 +40,6 @@ export async function GET(req: NextRequest) {
     title: e.summary,
   })) || []
 
-  // In Supabase speichern
   if (userId && events.length > 0) {
     await supabaseAdmin
       .from('kalender_events')
@@ -60,5 +56,5 @@ export async function GET(req: NextRequest) {
       })))
   }
 
-  return NextResponse.json({ events, debug: { tokenEmail: token.email, userId, userCount: users?.users?.length } })
+  return NextResponse.json({ events })
 }
