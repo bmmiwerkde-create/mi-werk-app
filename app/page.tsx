@@ -198,13 +198,19 @@ export default function Home() {
       const parts = datum.split('.')
       if (parts.length === 3) isoDate = parts[2] + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0')
     }
-    const checkZeit = new Date(isoDate + 'T' + uhrzeit + ':00')
+   const [checkH, checkM] = uhrzeit.split(':').map(Number)
+    const checkMinutes = checkH * 60 + checkM
     return kalenderEvents.some(e => {
       if (e.user_id !== userId) return false
-      const start = new Date(e.start_zeit)
-      const end = new Date(e.end_zeit)
-      return checkZeit >= start && checkZeit < end
-    })
+      const startDate = new Date(e.start_zeit)
+      const endDate = new Date(e.end_zeit)
+      const startIso = startDate.toISOString().slice(0, 10)
+      const endIso = endDate.toISOString().slice(0, 10)
+      if (isoDate < startIso || isoDate > endIso) return false
+      const startMinutes = startDate.getHours() * 60 + startDate.getMinutes()
+      const endMinutes = endDate.getHours() * 60 + endDate.getMinutes()
+      return checkMinutes >= startMinutes && checkMinutes < endMinutes
+    }) })
   }
 
   function anwenden(suche_: string, stadt_: string, plz_: string, datum_: string, uhrzeit_: string = uhrzeitFilter) {
