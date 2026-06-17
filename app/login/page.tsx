@@ -106,7 +106,7 @@ export default function Login() {
               placeholder="deine@email.de"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+              onKeyDown={e => e.key === 'Enter' && handleSubmit()} minLength={6}
               style={{
                 width: '100%',
                 background: C.bg3,
@@ -131,7 +131,7 @@ export default function Login() {
               placeholder="••••••••"
               value={passwort}
               onChange={e => setPasswort(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+              onKeyDown={e => e.key === 'Enter' && handleSubmit()} minLength={6}
               style={{
                 width: '100%',
                 background: C.bg3,
