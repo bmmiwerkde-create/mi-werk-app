@@ -191,20 +191,7 @@ export default function Home() {
   }
 
   function istBelegt(userId: string, datum: string, uhrzeit: string): boolean {
-    if (!datum || !uhrzeit) return false
-    let isoDate = datum
-    if (datum.includes('.')) {
-      const parts = datum.split('.')
-      if (parts.length === 3) isoDate = parts[2] + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0')
-    }
-    const [h, m] = uhrzeit.split(':').map(Number)
-    const checkMs = new Date(isoDate).getTime() + (h * 60 + m) * 60000
-    return kalenderEvents.some(e => {
-      if (e.user_id !== userId) return false
-      const startMs = new Date(e.start_zeit).getTime() + 2 * 3600000
-      const endMs = new Date(e.end_zeit).getTime() + 2 * 3600000
-      return checkMs >= startMs && checkMs < endMs
-    })
+    return false
   }
 
   function anwenden(suche_: string, stadt_: string, plz_: string, datum_: string, uhrzeit_: string = uhrzeitFilter) {
@@ -230,16 +217,20 @@ export default function Home() {
     }
     // Uhrzeitfilter: Dienstleister ausblenden die zu Datum+Uhrzeit belegt sind
     if (datum_ && uhrzeit_) {
+      let isoD = datum_
+      if (datum_.includes('.')) {
+        const p = datum_.split('.')
+        if (p.length === 3) isoD = p[2] + '-' + p[1].padStart(2,'0') + '-' + p[0].padStart(2,'0')
+      }
+      const checkStr = isoD + 'T' + uhrzeit_
       result = result.filter(d => {
         if (!d.user_id) return true
         const meineEvents = kalenderEvents.filter(e => e.user_id === d.user_id)
         if (meineEvents.length === 0) return true
-        const [h, m] = uhrzeit_.split(':').map(Number)
-        const checkMs = new Date(isoDate_).getTime() + (h * 60 + m) * 60000
         const belegt = meineEvents.some(e => {
-          const startMs = new Date(e.start_zeit).getTime()
-          const endMs = new Date(e.end_zeit).getTime()
-          return checkMs >= startMs && checkMs < endMs
+          const startStr = e.start_zeit.slice(0, 16).replace(' ', 'T')
+          const endStr = e.end_zeit.slice(0, 16).replace(' ', 'T')
+          return checkStr >= startStr && checkStr < endStr
         })
         return !belegt
       })
