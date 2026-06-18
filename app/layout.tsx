@@ -19,6 +19,22 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Mi-Werk – Handwerker & Dienstleister finden",
   description: "Finde geprüfte Handwerker, Reinigungskräfte, Personal Trainer und mehr in deiner Region. Kostenlos, direkt und ohne Vermittler kontaktieren.",
+  keywords: ["Handwerker finden", "Dienstleister", "Elektriker", "Reinigung", "Personal Trainer", "Babysitter", "Nachhilfe", "Heimservice", "lokal", "Deutschland"],
+  openGraph: {
+    title: "Mi-Werk – Handwerker & Dienstleister finden",
+    description: "Finde Dienstleister in deiner Region – schnell, einfach, direkt.",
+    url: "https://mi-werk.de",
+    siteName: "Mi-Werk",
+    locale: "de_DE",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "https://mi-werk.de",
+  },
 };
 
 export default function RootLayout({
