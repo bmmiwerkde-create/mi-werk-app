@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
   await resend.emails.send({
     from: 'Mi-Werk <noreply@mi-werk.de>',
-    to: 'middeldorfben@gmail.com',
+    to: 'bm.miwerk.de@gmail.com',
     subject: 'Neuer Dienstleister registriert: ' + (record.name || 'Unbekannt'),
     html: `
       <h2>Neuer Dienstleister auf mi-werk.de</h2>
