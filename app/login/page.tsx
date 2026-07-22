@@ -39,7 +39,20 @@ export default function Login() {
     setLaden(false)
   }
 
+  const [resetModus, setResetModus] = useState(false)
   const istFehler = meldung.startsWith('Fehler')
+
+  async function handleReset() {
+    if (!email) { setMeldung('Fehler: Bitte E-Mail eingeben'); return }
+    setLaden(true)
+    setMeldung('')
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://mi-werk.de/reset-passwort',
+    })
+    if (error) setMeldung('Fehler: ' + error.message)
+    else setMeldung('Reset-Link wurde gesendet — bitte prüfe dein Postfach.')
+    setLaden(false)
+  }
 
   return (
     <main style={{
@@ -167,6 +180,25 @@ export default function Login() {
             {laden ? 'Bitte warten…' : modus === 'login' ? 'Einloggen →' : 'Konto erstellen →'}
           </button>
 
+          {modus === 'login' && !resetModus && (
+            <p onClick={() => { setResetModus(true); setMeldung('') }}
+              style={{ cursor:'pointer', color:C.textDim, fontSize:12, textAlign:'center', marginTop:8 }}>
+              Passwort vergessen?
+            </p>
+          )}
+          {resetModus && (
+            <div style={{ marginTop:12 }}>
+              <p style={{ fontSize:12, color:C.textMid, marginBottom:10 }}>Reset-Link wird an deine E-Mail gesendet.</p>
+              <button onClick={handleReset} disabled={laden || !email}
+                style={{ width:'100%', padding:'10px', background: laden || !email ? C.textDim : C.copper, color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor: laden || !email ? 'not-allowed' : 'pointer', fontFamily:'inherit' }}>
+                {laden ? 'Bitte warten…' : 'Reset-Link senden'}
+              </button>
+              <p onClick={() => { setResetModus(false); setMeldung('') }}
+                style={{ cursor:'pointer', color:C.textDim, fontSize:12, textAlign:'center', marginTop:8 }}>
+                ← Zurück zum Login
+              </p>
+            </div>
+          )}
           {meldung && (
             <div style={{
               marginTop: 14,
