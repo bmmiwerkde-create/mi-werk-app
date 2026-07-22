@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
-import MicrosoftEntraID from 'next-auth/providers/microsoft-entra-id'
+import AzureADProvider from 'next-auth/providers/azure-ad'
 
 const handler = NextAuth({
   providers: [
@@ -15,10 +15,10 @@ const handler = NextAuth({
         }
       }
     }),
-    MicrosoftEntraID({
+    AzureADProvider({
       clientId: process.env.MICROSOFT_CLIENT_ID!,
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
-      tenantId: process.env.MICROSOFT_TENANT_ID!,
+      tenantId: process.env.MICROSOFT_TENANT_ID,
       authorization: {
         params: {
           scope: 'openid email profile offline_access Calendars.Read',
