@@ -233,6 +233,22 @@ export default function DashboardPage() {
         </div>
 
         <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
+          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>Outlook Kalender</div>
+          {!googleSession || googleSession.provider !== 'microsoft-entra-id' ? (
+            <div>
+              <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>Verbinde deinen Outlook Kalender.</div>
+              <button onClick={() => signIn('microsoft-entra-id', { callbackUrl: 'https://mi-werk.de/dashboard' })} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#0078D4', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
+                <span style={{ fontSize:16 }}>📧</span> Mit Outlook verbinden
+              </button>
+            </div>
+          ) : (
+            <div>
+              <div style={{ fontSize:13, color:C.green, marginBottom:12 }}>✓ Outlook verbunden ({googleSession.user?.email})</div>
+            </div>
+          )}
+        </div>
+
+        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
           <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:14 }}>Konto</div>
           {[['E-Mail', user?.email], ['Mitglied seit', user?.created_at ? new Date(user.created_at).toLocaleDateString('de-DE') : '-'], ['Konto-ID', user?.id]].map(([k, v]) => (
             <div key={k} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 0', borderBottom:'1px solid ' + C.border, fontSize:13 }}>
