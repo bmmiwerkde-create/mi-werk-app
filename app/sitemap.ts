@@ -27,6 +27,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
+      url: 'https://mi-werk.de/suche',
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
       url: 'https://mi-werk.de/login',
       lastModified: new Date(),
       changeFrequency: 'monthly',

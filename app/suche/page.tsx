@@ -16,7 +16,7 @@ const mobileStyle = `
 `
 
 import { useEffect, useState } from 'react'
-import { supabase } from './Lib/supabase'
+import { supabase } from '../Lib/supabase'
 import { useRouter } from 'next/navigation'
 
 const hauptkategorien = [
