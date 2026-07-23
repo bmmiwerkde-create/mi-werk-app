@@ -24,16 +24,24 @@ export async function POST(req: NextRequest) {
     const session = event.data.object as Stripe.Checkout.Session;
     const userId = session.metadata?.userId;
     if (userId) {
-      await supabase.from("dienstleister").update({ abo_aktiv: true }).eq("user_id", userId);
+      const { error } = await supabase.from("dienstleister").update({
+        abo_aktiv: true,
+        stripe_customer_id: session.customer as string,
+        stripe_subscription_id: session.subscription as string,
+      }).eq("user_id", userId);
+      if (error) console.error(`Webhook: dienstleister-Update fehlgeschlagen (checkout.session.completed, userId=${userId}):`, error);
+    } else {
+      console.error("Webhook: checkout.session.completed ohne userId in metadata", session.id);
     }
   }
 
   if (event.type === "customer.subscription.deleted") {
     const subscription = event.data.object as Stripe.Subscription;
-    const userId = (subscription.metadata as any)?.userId;
-    if (userId) {
-      await supabase.from("dienstleister").update({ abo_aktiv: false }).eq("user_id", userId);
-    }
+    const { error } = await supabase.from("dienstleister").update({
+      abo_aktiv: false,
+      stripe_subscription_id: null,
+    }).eq("stripe_subscription_id", subscription.id);
+    if (error) console.error(`Webhook: dienstleister-Update fehlgeschlagen (customer.subscription.deleted, subscriptionId=${subscription.id}):`, error);
   }
 
   return NextResponse.json({ received: true });
