@@ -293,7 +293,7 @@ export default function ProfilSeite({ params }) {
                 />
                 {!freigeschaltet && guthaben === 0 && (
                   <button onClick={() => statusPruefen(email)} disabled={!email || pruefLaden}
-                    style={{ padding:'12px 24px', borderRadius:10, background:'transparent', border:'1px solid rgba(200,149,108,0.3)', color:'#c8956c', fontSize:13, fontWeight:500, cursor: email ? 'pointer' : 'not-allowed', opacity: pruefLaden ? 0.7 : 1 }}>
+                    style={{ padding:'12px 24px', borderRadius:10, background:'transparent', border:'1px solid rgba(200,149,108,0.3)', color:'#c8956c', fontSize:13, fontWeight:500, cursor: email ? 'pointer' : 'not-allowed', opacity: !email || pruefLaden ? 0.5 : 1 }}>
                     {pruefLaden ? 'Prüfe...' : 'Schon freigeschaltet? Prüfen'}
                   </button>
                 )}
@@ -307,7 +307,7 @@ export default function ProfilSeite({ params }) {
                   <div style={{ display:'flex', flexDirection:'column', gap:8, marginTop:6 }}>
                     {(Object.entries(KONTAKT_PAKETE)).map(([key, info]) => (
                       <button key={key} onClick={() => kaufen(key)} disabled={!email || !!checkoutLaden}
-                        style={{ padding:'14px 24px', borderRadius:10, background: key === '1er' ? '#c8956c' : 'rgba(200,149,108,0.1)', color: key === '1er' ? '#fff' : '#c8956c', border: key === '1er' ? 'none' : '1px solid rgba(200,149,108,0.3)', fontSize:14, fontWeight:600, cursor: email ? 'pointer' : 'not-allowed', opacity: checkoutLaden ? 0.7 : 1 }}>
+                        style={{ padding:'14px 24px', borderRadius:10, background: key === '1er' ? '#c8956c' : 'rgba(200,149,108,0.1)', color: key === '1er' ? '#fff' : '#c8956c', border: key === '1er' ? 'none' : '1px solid rgba(200,149,108,0.3)', fontSize:14, fontWeight:600, cursor: email ? 'pointer' : 'not-allowed', opacity: !email || checkoutLaden ? 0.5 : 1 }}>
                         {checkoutLaden === key ? 'Öffnet...' : `${info.label} – ${info.preis}€`}
                       </button>
                     ))}
