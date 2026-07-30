@@ -17,7 +17,8 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session
-    const { dienstleisterId, käuferEmail, paket } = session.metadata || {}
+    const { dienstleisterId, paket } = session.metadata || {}
+    const käuferEmail = session.customer_details?.email || session.customer_email
 
     if (dienstleisterId && käuferEmail && paket && paket in KONTAKT_PAKETE) {
       const gekauftesGuthaben = KONTAKT_PAKETE[paket as PaketKey].guthaben
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
       })
       if (error) console.error(`Webhook: freischaltungen-Insert fehlgeschlagen (session=${session.id}):`, error)
     } else {
-      console.error("Webhook: checkout.session.completed ohne vollständige Kontakt-Metadata", session.id, session.metadata)
+      console.error("Webhook: checkout.session.completed ohne vollständige Kontakt-Daten", session.id, session.metadata, käuferEmail)
     }
   }
 

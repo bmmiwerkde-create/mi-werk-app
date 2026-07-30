@@ -79,17 +79,23 @@ export default function ProfilSeite({ params }) {
 
   useEffect(() => {
     const erfolg = searchParams.get('freischaltung') === 'success'
-    const emailParam = searchParams.get('email')
-    if (erfolg && emailParam) {
-      setEmail(emailParam)
-      let versuche = 0
-      const intervall = setInterval(async () => {
-        versuche++
-        await statusPruefen(emailParam)
-        if (versuche >= 5) clearInterval(intervall)
-      }, 1500)
-      statusPruefen(emailParam)
-      return () => clearInterval(intervall)
+    const sessionId = searchParams.get('session_id')
+    if (erfolg && sessionId) {
+      async function nachKaufPruefen() {
+        const res = await fetch('/api/checkout-session?sessionId=' + encodeURIComponent(sessionId))
+        const data = await res.json()
+        const gekaufteEmail = data.email
+        if (!gekaufteEmail) return
+        setEmail(gekaufteEmail)
+        let versuche = 0
+        const intervall = setInterval(async () => {
+          versuche++
+          await statusPruefen(gekaufteEmail)
+          if (versuche >= 5) clearInterval(intervall)
+        }, 1500)
+        statusPruefen(gekaufteEmail)
+      }
+      nachKaufPruefen()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
@@ -284,19 +290,6 @@ export default function ProfilSeite({ params }) {
                 <div style={{ fontSize:13, color:'#9A8878', marginBottom:4 }}>
                   E-Mail und Telefon sind geschützt. Schalte den Kontakt frei, um {profil.name} direkt zu erreichen.
                 </div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="deine@email.de"
-                  style={{ width:'100%', background:'#181818', border:'1px solid rgba(255,255,255,0.1)', borderRadius:8, padding:'12px 14px', fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
-                />
-                {!freigeschaltet && guthaben === 0 && (
-                  <button onClick={() => statusPruefen(email)} disabled={!email || pruefLaden}
-                    style={{ padding:'12px 24px', borderRadius:10, background:'transparent', border:'1px solid rgba(200,149,108,0.3)', color:'#c8956c', fontSize:13, fontWeight:500, cursor: email ? 'pointer' : 'not-allowed', opacity: !email || pruefLaden ? 0.5 : 1 }}>
-                    {pruefLaden ? 'Prüfe...' : 'Schon freigeschaltet? Prüfen'}
-                  </button>
-                )}
                 {guthaben > 0 && !freigeschaltet && (
                   <button onClick={einloesen} disabled={einloesenLaden}
                     style={{ padding:'14px 24px', borderRadius:10, background:'#c8956c', color:'#fff', border:'none', fontSize:14, fontWeight:600, cursor:'pointer', opacity: einloesenLaden ? 0.7 : 1 }}>
@@ -304,14 +297,32 @@ export default function ProfilSeite({ params }) {
                   </button>
                 )}
                 {!freigeschaltet && guthaben === 0 && (
-                  <div style={{ display:'flex', flexDirection:'column', gap:8, marginTop:6 }}>
+                  <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
                     {(Object.entries(KONTAKT_PAKETE)).map(([key, info]) => (
-                      <button key={key} onClick={() => kaufen(key)} disabled={!email || !!checkoutLaden}
-                        style={{ padding:'14px 24px', borderRadius:10, background: key === '1er' ? '#c8956c' : 'rgba(200,149,108,0.1)', color: key === '1er' ? '#fff' : '#c8956c', border: key === '1er' ? 'none' : '1px solid rgba(200,149,108,0.3)', fontSize:14, fontWeight:600, cursor: email ? 'pointer' : 'not-allowed', opacity: !email || checkoutLaden ? 0.5 : 1 }}>
+                      <button key={key} onClick={() => kaufen(key)} disabled={!!checkoutLaden}
+                        style={{ padding:'14px 24px', borderRadius:10, background: key === '1er' ? '#c8956c' : 'rgba(200,149,108,0.1)', color: key === '1er' ? '#fff' : '#c8956c', border: key === '1er' ? 'none' : '1px solid rgba(200,149,108,0.3)', fontSize:14, fontWeight:600, cursor:'pointer', opacity: checkoutLaden ? 0.5 : 1 }}>
                         {checkoutLaden === key ? 'Öffnet...' : `${info.label} – ${info.preis}€`}
                       </button>
                     ))}
                   </div>
+                )}
+                {!freigeschaltet && guthaben === 0 && (
+                  <details style={{ marginTop:4 }}>
+                    <summary style={{ fontSize:12, color:'#5A5550', cursor:'pointer' }}>Schon einmal freigeschaltet?</summary>
+                    <div style={{ display:'flex', flexDirection:'column', gap:8, marginTop:8 }}>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        placeholder="deine@email.de"
+                        style={{ width:'100%', background:'#181818', border:'1px solid rgba(255,255,255,0.1)', borderRadius:8, padding:'12px 14px', fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
+                      />
+                      <button onClick={() => statusPruefen(email)} disabled={!email || pruefLaden}
+                        style={{ padding:'12px 24px', borderRadius:10, background:'transparent', border:'1px solid rgba(200,149,108,0.3)', color:'#c8956c', fontSize:13, fontWeight:500, cursor: email ? 'pointer' : 'not-allowed', opacity: !email || pruefLaden ? 0.5 : 1 }}>
+                        {pruefLaden ? 'Prüfe...' : 'Prüfen'}
+                      </button>
+                    </div>
+                  </details>
                 )}
                 {kontaktFehler && (
                   <div style={{ fontSize:13, color:'#C0392B', marginTop:4 }}>{kontaktFehler}</div>

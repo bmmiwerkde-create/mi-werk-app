@@ -5,8 +5,8 @@ import { KONTAKT_PAKETE, PaketKey } from "../../Lib/kontaktPakete"
 export async function POST(req: Request) {
   const { dienstleisterId, käuferEmail, paket } = await req.json()
 
-  if (!dienstleisterId || !käuferEmail || !paket || !(paket in KONTAKT_PAKETE)) {
-    return NextResponse.json({ error: "dienstleisterId, käuferEmail und ein gültiges paket sind erforderlich" }, { status: 400 })
+  if (!dienstleisterId || !paket || !(paket in KONTAKT_PAKETE)) {
+    return NextResponse.json({ error: "dienstleisterId und ein gültiges paket sind erforderlich" }, { status: 400 })
   }
 
   const info = KONTAKT_PAKETE[paket as PaketKey]
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      customer_email: käuferEmail,
+      customer_email: käuferEmail || undefined,
       line_items: [
         {
           price_data: {
@@ -26,8 +26,8 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      metadata: { dienstleisterId: String(dienstleisterId), käuferEmail, paket },
-      success_url: `${baseUrl}/profil/${dienstleisterId}?freischaltung=success&email=${encodeURIComponent(käuferEmail)}`,
+      metadata: { dienstleisterId: String(dienstleisterId), paket },
+      success_url: `${baseUrl}/profil/${dienstleisterId}?freischaltung=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/profil/${dienstleisterId}?freischaltung=canceled`,
     })
     return NextResponse.json({ url: session.url })
