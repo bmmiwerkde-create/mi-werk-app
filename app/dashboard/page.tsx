@@ -280,12 +280,21 @@ export default function DashboardPage() {
                 {portalLaden ? 'Öffnet...' : 'Abo verwalten'}
               </button>
             </div>
-          ) : (
+          ) : profil ? (
             <div style={{ fontSize:13, color:C.textMid }}>
               Du bist aktuell in der kostenlosen Phase. Sobald du ein Abo abgeschlossen hast, kannst du hier Zahlungsmethode und Kündigung verwalten.
               <div style={{ marginTop:12 }}>
                 <button onClick={() => router.push('/abo')} style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background:'transparent', border:'1px solid ' + C.copperBord, color:C.copper, cursor:'pointer', fontFamily:'inherit' }}>
                   Abo abschließen
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ fontSize:13, color:C.textMid }}>
+              Bitte lege zuerst dein Profil an, bevor du ein Abo abschließt.
+              <div style={{ marginTop:12 }}>
+                <button onClick={() => setEditMode(true)} style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background:'transparent', border:'1px solid ' + C.border, color:C.textDim, cursor:'pointer', fontFamily:'inherit' }}>
+                  Profil anlegen
                 </button>
               </div>
             </div>
