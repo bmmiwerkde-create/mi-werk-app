@@ -183,10 +183,7 @@ export default function Home() {
   }, [])
 
   async function laden() {
-    const { data } = await supabase
-      .from('dienstleister')
-      .select('id, user_id, name, gewerk, ort, postleitzahl, umkreis, verfuegbar_ab, preis, beschreibung, qualifikationen, profilbild, emoji, website')
-      .eq('abo_aktiv', true)
+    const { data } = await supabase.from('dienstleister').select('*').eq('abo_aktiv', true)
     if (data) { setDienstleister(data); setGefiltert(data) }
     // Alle kalender_events laden für Uhrzeitfilter
     const { data: events } = await supabase.from('kalender_events').select('*')
@@ -611,9 +608,11 @@ export default function Home() {
                   <div style={{ fontSize:10, color:'#5A5550' }}>ab {new Date(d.verfuegbar_ab).toLocaleDateString('de-DE')}</div>
                 )}
               </div>
-              <div style={{ display:'block', marginTop:12, fontSize:12, color:'#c8956c', padding:'7px 0', borderTop:'1px solid rgba(255,255,255,0.05)', textAlign:'center' }}>
-                Kontakt aufnehmen →
-              </div>
+              {d.email && (
+                <a href={'mailto:' + d.email} onClick={e => e.stopPropagation()} style={{ display:'block', marginTop:12, fontSize:12, color:'#c8956c', textDecoration:'none', padding:'7px 0', borderTop:'1px solid rgba(255,255,255,0.05)', textAlign:'center' }}>
+                  Kontakt aufnehmen →
+                </a>
+              )}
             </div>
           ))}
         </div>

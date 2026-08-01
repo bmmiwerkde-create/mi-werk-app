@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useState, use } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
-import { KONTAKT_PAKETE } from '../../Lib/kontaktPakete'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -13,27 +12,14 @@ const supabase = createClient(
 export default function ProfilSeite({ params }) {
   const { id } = use(params)
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [profil, setProfil] = useState(null)
   const [loading, setLoading] = useState(true)
   const [events, setEvents] = useState([])
   const [kalenderMonat, setKalenderMonat] = useState(new Date())
 
-  const [email, setEmail] = useState('')
-  const [freigeschaltet, setFreigeschaltet] = useState(false)
-  const [guthaben, setGuthaben] = useState(0)
-  const [kontaktDaten, setKontaktDaten] = useState(null)
-  const [pruefLaden, setPruefLaden] = useState(false)
-  const [einloesenLaden, setEinloesenLaden] = useState(false)
-  const [checkoutLaden, setCheckoutLaden] = useState(null)
-  const [kontaktFehler, setKontaktFehler] = useState('')
-
   useEffect(() => {
     async function laden() {
-      const { data } = await supabase
-        .from('dienstleister')
-        .select('id, user_id, name, gewerk, ort, umkreis, verfuegbar_ab, preis, beschreibung, qualifikationen, profilbild, emoji, website')
-        .eq('id', Number(id)).single()
+      const { data } = await supabase.from('dienstleister').select('*').eq('id', Number(id)).single()
       setProfil(data)
       if (data?.user_id) {
         const { data: evs } = await supabase
@@ -46,96 +32,6 @@ export default function ProfilSeite({ params }) {
     }
     laden()
   }, [id])
-
-  async function kontaktDatenLaden(kaeuferEmail) {
-    const res = await fetch('/api/kontakt-daten', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dienstleisterId: Number(id), käuferEmail: kaeuferEmail }),
-    })
-    const data = await res.json()
-    if (res.ok) setKontaktDaten(data)
-  }
-
-  async function statusPruefen(kaeuferEmail) {
-    setPruefLaden(true)
-    setKontaktFehler('')
-    try {
-      const res = await fetch('/api/kontakt-status', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dienstleisterId: Number(id), käuferEmail: kaeuferEmail }),
-      })
-      const data = await res.json()
-      if (!res.ok) { setKontaktFehler(data.error || 'Prüfung fehlgeschlagen'); setPruefLaden(false); return }
-      setFreigeschaltet(data.freigeschaltet)
-      setGuthaben(data.guthaben)
-      if (data.freigeschaltet) await kontaktDatenLaden(kaeuferEmail)
-    } catch {
-      setKontaktFehler('Prüfung fehlgeschlagen')
-    }
-    setPruefLaden(false)
-  }
-
-  useEffect(() => {
-    const erfolg = searchParams.get('freischaltung') === 'success'
-    const sessionId = searchParams.get('session_id')
-    if (erfolg && sessionId) {
-      async function nachKaufPruefen() {
-        const res = await fetch('/api/checkout-session?sessionId=' + encodeURIComponent(sessionId))
-        const data = await res.json()
-        const gekaufteEmail = data.email
-        if (!gekaufteEmail) return
-        setEmail(gekaufteEmail)
-        let versuche = 0
-        const intervall = setInterval(async () => {
-          versuche++
-          await statusPruefen(gekaufteEmail)
-          if (versuche >= 5) clearInterval(intervall)
-        }, 1500)
-        statusPruefen(gekaufteEmail)
-      }
-      nachKaufPruefen()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
-
-  async function einloesen() {
-    setEinloesenLaden(true)
-    setKontaktFehler('')
-    try {
-      const res = await fetch('/api/kontakt-einloesen', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dienstleisterId: Number(id), käuferEmail: email }),
-      })
-      const data = await res.json()
-      if (!res.ok) { setKontaktFehler(data.error || 'Einlösen fehlgeschlagen'); setEinloesenLaden(false); return }
-      setFreigeschaltet(true)
-      await kontaktDatenLaden(email)
-    } catch {
-      setKontaktFehler('Einlösen fehlgeschlagen')
-    }
-    setEinloesenLaden(false)
-  }
-
-  async function kaufen(paketKey) {
-    setCheckoutLaden(paketKey)
-    setKontaktFehler('')
-    try {
-      const res = await fetch('/api/checkout-kontakt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dienstleisterId: Number(id), käuferEmail: email, paket: paketKey }),
-      })
-      const data = await res.json()
-      if (data.url) window.location.href = data.url
-      else { setKontaktFehler(data.error || 'Checkout fehlgeschlagen'); setCheckoutLaden(null) }
-    } catch {
-      setKontaktFehler('Checkout fehlgeschlagen')
-      setCheckoutLaden(null)
-    }
-  }
 
   function istBelegt(datum) {
     return events.some(e => {
@@ -270,64 +166,17 @@ export default function ProfilSeite({ params }) {
         <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:16, padding:'24px', marginBottom:20 }}>
           <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:16 }}>Kontakt aufnehmen</div>
           <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-            {kontaktDaten ? (
-              <>
-                {kontaktDaten.email && (
-                  <a href={'mailto:' + kontaktDaten.email + '?subject=Anfrage ueber mi-werk.de'}
-                    style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'#c8956c', color:'#fff', textDecoration:'none', borderRadius:10, fontSize:14, fontWeight:500 }}>
-                    ✉️ {kontaktDaten.email}
-                  </a>
-                )}
-                {kontaktDaten.telefon && (
-                  <a href={'tel:' + kontaktDaten.telefon}
-                    style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'rgba(200,149,108,0.1)', color:'#c8956c', textDecoration:'none', borderRadius:10, fontSize:14, fontWeight:500, border:'1px solid rgba(200,149,108,0.3)' }}>
-                    📞 {kontaktDaten.telefon}
-                  </a>
-                )}
-              </>
-            ) : (
-              <>
-                <div style={{ fontSize:13, color:'#9A8878', marginBottom:4 }}>
-                  E-Mail und Telefon sind geschützt. Schalte den Kontakt frei, um {profil.name} direkt zu erreichen.
-                </div>
-                {guthaben > 0 && !freigeschaltet && (
-                  <button onClick={einloesen} disabled={einloesenLaden}
-                    style={{ padding:'14px 24px', borderRadius:10, background:'#c8956c', color:'#fff', border:'none', fontSize:14, fontWeight:600, cursor:'pointer', opacity: einloesenLaden ? 0.7 : 1 }}>
-                    {einloesenLaden ? 'Löse ein...' : `Mit Guthaben freischalten (noch ${guthaben} übrig)`}
-                  </button>
-                )}
-                {!freigeschaltet && guthaben === 0 && (
-                  <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-                    {(Object.entries(KONTAKT_PAKETE)).map(([key, info]) => (
-                      <button key={key} onClick={() => kaufen(key)} disabled={!!checkoutLaden}
-                        style={{ padding:'14px 24px', borderRadius:10, background: key === '1er' ? '#c8956c' : 'rgba(200,149,108,0.1)', color: key === '1er' ? '#fff' : '#c8956c', border: key === '1er' ? 'none' : '1px solid rgba(200,149,108,0.3)', fontSize:14, fontWeight:600, cursor:'pointer', opacity: checkoutLaden ? 0.5 : 1 }}>
-                        {checkoutLaden === key ? 'Öffnet...' : `${info.label} – ${info.preis}€`}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {!freigeschaltet && guthaben === 0 && (
-                  <details style={{ marginTop:4 }}>
-                    <summary style={{ fontSize:12, color:'#5A5550', cursor:'pointer' }}>Schon einmal freigeschaltet?</summary>
-                    <div style={{ display:'flex', flexDirection:'column', gap:8, marginTop:8 }}>
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        placeholder="deine@email.de"
-                        style={{ width:'100%', background:'#181818', border:'1px solid rgba(255,255,255,0.1)', borderRadius:8, padding:'12px 14px', fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
-                      />
-                      <button onClick={() => statusPruefen(email)} disabled={!email || pruefLaden}
-                        style={{ padding:'12px 24px', borderRadius:10, background:'transparent', border:'1px solid rgba(200,149,108,0.3)', color:'#c8956c', fontSize:13, fontWeight:500, cursor: email ? 'pointer' : 'not-allowed', opacity: !email || pruefLaden ? 0.5 : 1 }}>
-                        {pruefLaden ? 'Prüfe...' : 'Prüfen'}
-                      </button>
-                    </div>
-                  </details>
-                )}
-                {kontaktFehler && (
-                  <div style={{ fontSize:13, color:'#C0392B', marginTop:4 }}>{kontaktFehler}</div>
-                )}
-              </>
+            {profil.email && (
+              <a href={'mailto:' + profil.email + '?subject=Anfrage ueber mi-werk.de'}
+                style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'#c8956c', color:'#fff', textDecoration:'none', borderRadius:10, fontSize:14, fontWeight:500 }}>
+                ✉️ E-Mail senden
+              </a>
+            )}
+            {profil.telefon && (
+              <a href={'tel:' + profil.telefon}
+                style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'rgba(200,149,108,0.1)', color:'#c8956c', textDecoration:'none', borderRadius:10, fontSize:14, fontWeight:500, border:'1px solid rgba(200,149,108,0.3)' }}>
+                📞 {profil.telefon}
+              </a>
             )}
             {profil.website && (
               <a href={profil.website.startsWith('http') ? profil.website : 'https://' + profil.website} target="_blank" rel="noopener noreferrer"

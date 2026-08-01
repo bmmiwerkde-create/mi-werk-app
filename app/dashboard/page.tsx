@@ -10,6 +10,7 @@ type Dienstleister = {
   beschreibung: string; preis: string; emoji: string
   profilbild?: string; telefon?: string; website?: string
   qualifikationen?: string; user_id?: string
+  abo_aktiv?: boolean; stripe_customer_id?: string | null
 }
 
 const C = {
@@ -34,6 +35,8 @@ export default function DashboardPage() {
   const { data: googleSession } = useSession()
   const [kalenderEvents, setKalenderEvents] = useState<any[]>([])
   const [kalenderLaden, setKalenderLaden] = useState(false)
+  const [portalLaden, setPortalLaden] = useState(false)
+  const [portalFehler, setPortalFehler] = useState('')
 
   async function kalenderAbrufen() {
     setKalenderLaden(true)
@@ -41,6 +44,24 @@ export default function DashboardPage() {
     const data = await res.json()
     if (data.events) setKalenderEvents(data.events)
     setKalenderLaden(false)
+  }
+
+  async function aboVerwalten() {
+    setPortalLaden(true)
+    setPortalFehler('')
+    try {
+      const res = await fetch('/api/stripe-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user?.id }),
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+      else setPortalFehler(data.error || 'Portal konnte nicht geöffnet werden')
+    } catch (err) {
+      setPortalFehler('Portal konnte nicht geöffnet werden')
+    }
+    setPortalLaden(false)
   }
 
   useEffect(() => { checkUser() }, [])
@@ -249,8 +270,31 @@ export default function DashboardPage() {
         </div>
 
         <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
-          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:12 }}>Profil-Status</div>
-          <div style={{ fontSize:13, color:C.green }}>✓ Dein Profil ist kostenlos und dauerhaft aktiv.</div>
+          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>Abo verwalten</div>
+          {profil?.stripe_customer_id ? (
+            <div>
+              <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>
+                Zahlungsmethode ändern oder Abo kündigen — verwaltest du direkt bei Stripe.
+              </div>
+              <button onClick={aboVerwalten} disabled={portalLaden} style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background:C.copper, color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit', opacity: portalLaden ? 0.7 : 1 }}>
+                {portalLaden ? 'Öffnet...' : 'Abo verwalten'}
+              </button>
+            </div>
+          ) : (
+            <div style={{ fontSize:13, color:C.textMid }}>
+              Du bist aktuell in der kostenlosen Phase. Sobald du ein Abo abgeschlossen hast, kannst du hier Zahlungsmethode und Kündigung verwalten.
+              <div style={{ marginTop:12 }}>
+                <button onClick={() => router.push('/abo')} style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background:'transparent', border:'1px solid ' + C.copperBord, color:C.copper, cursor:'pointer', fontFamily:'inherit' }}>
+                  Abo abschließen
+                </button>
+              </div>
+            </div>
+          )}
+          {portalFehler && (
+            <div style={{ marginTop:12, fontSize:13, padding:'8px 12px', borderRadius:7, background:'rgba(255,255,255,0.04)', color:C.red }}>
+              {portalFehler}
+            </div>
+          )}
         </div>
 
         <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
