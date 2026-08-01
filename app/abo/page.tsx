@@ -1,27 +1,41 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "../Lib/supabase";
 import { KATEGORIEN } from "../Lib/kategorien";
 
 export default function AboPage() {
+  const router = useRouter();
+  const [pruefeLogin, setPruefeLogin] = useState(true);
   const [loading, setLoading] = useState(null);
   const [user, setUser] = useState(null);
   const [userKategorie, setUserKategorie] = useState(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
-      if (data.user) {
-        setUser(data.user);
-        const { data: profil } = await supabase
-          .from("dienstleister")
-          .select("gewerk")
-          .eq("user_id", data.user.id)
-          .single();
-        if (profil?.gewerk) setUserKategorie(profil.gewerk.toLowerCase());
+      if (!data.user) {
+        router.push("/login");
+        return;
       }
+      setUser(data.user);
+      const { data: profil } = await supabase
+        .from("dienstleister")
+        .select("gewerk")
+        .eq("user_id", data.user.id)
+        .single();
+      if (profil?.gewerk) setUserKategorie(profil.gewerk.toLowerCase());
+      setPruefeLogin(false);
     });
-  }, []);
+  }, [router]);
+
+  if (pruefeLogin) {
+    return (
+      <main style={{ backgroundColor: "#0a0a0a", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <span style={{ color: "#b87333" }}>Laden...</span>
+      </main>
+    );
+  }
 
   const handleCheckout = async (kategorie, typ) => {
     setLoading(`${kategorie}-${typ}`);
