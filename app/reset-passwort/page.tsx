@@ -12,6 +12,7 @@ const C = {
 export default function ResetPasswort() {
   const [passwort, setPasswort] = useState('')
   const [bestaetigung, setBestaetigung] = useState('')
+  const [passwortSichtbar, setPasswortSichtbar] = useState(false)
   const [meldung, setMeldung] = useState('')
   const [laden, setLaden] = useState(false)
   const router = useRouter()
@@ -46,12 +47,28 @@ export default function ResetPasswort() {
         <div style={{ padding:'24px' }}>
           <div style={{ marginBottom:12 }}>
             <label style={{ display:'block', fontSize:10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.8px', color:C.textDim, marginBottom:6 }}>Neues Passwort</label>
-            <input type="password" placeholder="••••••••" value={passwort} onChange={e => setPasswort(e.target.value)}
-              style={{ width:'100%', background:C.bg3, border:'1px solid ' + C.border, borderRadius:8, padding:'10px 13px', fontSize:14, color:C.text, fontFamily:'inherit', outline:'none', boxSizing:'border-box' as const }} />
+            <div style={{ position:'relative' }}>
+              <input type={passwortSichtbar ? 'text' : 'password'} placeholder="••••••••" value={passwort} onChange={e => setPasswort(e.target.value)}
+                style={{ width:'100%', background:C.bg3, border:'1px solid ' + C.border, borderRadius:8, padding:'10px 40px 10px 13px', fontSize:14, color:C.text, fontFamily:'inherit', outline:'none', boxSizing:'border-box' as const }} />
+              <button type="button" onClick={() => setPasswortSichtbar(v => !v)} aria-label={passwortSichtbar ? 'Passwort verbergen' : 'Passwort anzeigen'}
+                style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', padding:4, display:'flex', color:C.textDim }}>
+                {passwortSichtbar ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
           <div style={{ marginBottom:20 }}>
             <label style={{ display:'block', fontSize:10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.8px', color:C.textDim, marginBottom:6 }}>Passwort bestätigen</label>
-            <input type="password" placeholder="••••••••" value={bestaetigung} onChange={e => setBestaetigung(e.target.value)}
+            <input type={passwortSichtbar ? 'text' : 'password'} placeholder="••••••••" value={bestaetigung} onChange={e => setBestaetigung(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleReset()}
               style={{ width:'100%', background:C.bg3, border:'1px solid ' + C.border, borderRadius:8, padding:'10px 13px', fontSize:14, color:C.text, fontFamily:'inherit', outline:'none', boxSizing:'border-box' as const }} />
           </div>
