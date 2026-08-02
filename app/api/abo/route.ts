@@ -4,8 +4,6 @@ import { createAboCheckoutSession } from '../../Lib/stripeCheckout'
 import { findKategorie } from '../../Lib/kategorien'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 function windowAround(monthsAgo: number) {
   const center = new Date()
   center.setMonth(center.getMonth() - monthsAgo)
@@ -64,6 +62,7 @@ export async function GET(request: Request) {
         email: d.email,
       })
 
+      const resend = new Resend(process.env.RESEND_API_KEY)
       await resend.emails.send({
         from: 'mi-werk <noreply@mi-werk.de>',
         to: d.email,

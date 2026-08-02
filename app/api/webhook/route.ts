@@ -11,8 +11,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY as string
 );
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature") as string;
@@ -46,6 +44,7 @@ export async function POST(req: NextRequest) {
 
         if (empfaenger) {
           try {
+            const resend = new Resend(process.env.RESEND_API_KEY);
             await resend.emails.send({
               from: "mi-werk <noreply@mi-werk.de>",
               to: empfaenger,

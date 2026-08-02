@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server'
 import { supabase } from '../../Lib/supabase'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -46,6 +44,7 @@ export async function GET(request: Request) {
 
   for (const d of fuenfMonateEmpfaenger) {
     try {
+      const resend = new Resend(process.env.RESEND_API_KEY)
       await resend.emails.send({
         from: 'mi-werk <noreply@mi-werk.de>',
         to: d.email,
@@ -99,6 +98,7 @@ export async function GET(request: Request) {
 
   for (const d of einMonatEmpfaenger) {
     try {
+      const resend = new Resend(process.env.RESEND_API_KEY)
       await resend.emails.send({
         from: 'mi-werk <noreply@mi-werk.de>',
         to: d.email,
