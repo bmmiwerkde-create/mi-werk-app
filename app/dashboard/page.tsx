@@ -9,7 +9,7 @@ type Dienstleister = {
   id: string; name: string; gewerk: string; ort: string
   beschreibung: string; preis: string; emoji: string
   profilbild?: string; telefon?: string; website?: string
-  qualifikationen?: string; user_id?: string
+  qualifikationen?: string; user_id?: string; postleitzahl?: string
   abo_aktiv?: boolean; stripe_customer_id?: string | null
 }
 
@@ -101,11 +101,20 @@ export default function DashboardPage() {
     setSaving(true)
     setMessage('')
     const payload = { ...form, user_id: user.id }
-    const { error } = profil?.id
-      ? await supabase.from('dienstleister').update(payload).eq('id', profil.id)
-      : await supabase.from('dienstleister').insert(payload)
+    const { data: gespeichert, error } = profil?.id
+      ? await supabase.from('dienstleister').update(payload).eq('id', profil.id).select('id').single()
+      : await supabase.from('dienstleister').insert(payload).select('id').single()
     if (error) { setMessage('Fehler: ' + error.message) }
-    else { setMessage('Gespeichert'); setEditMode(false); await loadProfil(user.id) }
+    else {
+      setMessage('Gespeichert'); setEditMode(false); await loadProfil(user.id)
+      if (gespeichert?.id && form.ort) {
+        fetch('/api/geocode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dienstleisterId: gespeichert.id, ort: form.ort, postleitzahl: form.postleitzahl }),
+        }).catch(() => {})
+      }
+    }
     setSaving(false)
   }
 
@@ -165,6 +174,7 @@ export default function DashboardPage() {
               <Field label="Name" value={form.name || ''} edit={editMode} onChange={v => setForm(f=>({...f,name:v}))} />
               <Field label="Gewerk / Kategorie" value={form.gewerk || ''} edit={editMode} onChange={v => setForm(f=>({...f,gewerk:v}))} />
               <Field label="Ort" value={form.ort || ''} edit={editMode} onChange={v => setForm(f=>({...f,ort:v}))} />
+              <Field label="PLZ" value={form.postleitzahl || ''} edit={editMode} onChange={v => setForm(f=>({...f,postleitzahl:v}))} placeholder="z.B. 50667" />
               <Field label="Preis" value={form.preis || ''} edit={editMode} onChange={v => setForm(f=>({...f,preis:v}))} placeholder="z.B. ab 50 Euro/Std." />
               <Field label="Emoji" value={form.emoji || ''} edit={editMode} onChange={v => setForm(f=>({...f,emoji:v}))} placeholder="z.B. 🔧" />
             </div>

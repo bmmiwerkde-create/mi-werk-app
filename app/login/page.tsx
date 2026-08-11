@@ -41,7 +41,11 @@ export default function Login() {
       if (error) setMeldung('Fehler: ' + error.message)
       else window.location.href = '/dashboard'
     } else {
-      const { error } = await supabase.auth.signUp({ email, password: passwort })
+      const { error } = await supabase.auth.signUp({
+        email,
+        password: passwort,
+        options: { emailRedirectTo: 'https://mi-werk.de/onboarding' },
+      })
       if (error) setMeldung('Fehler: ' + error.message)
       else setMeldung('Bestätigungs-E-Mail wurde gesendet — bitte prüfe dein Postfach.')
     }

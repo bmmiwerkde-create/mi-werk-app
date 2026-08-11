@@ -16,8 +16,11 @@ const mobileStyle = `
 `
 
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { supabase } from '../Lib/supabase'
 import { useRouter } from 'next/navigation'
+
+const DienstleisterKarte = dynamic(() => import('../components/DienstleisterKarte'), { ssr: false })
 
 const hauptkategorien = [
   {
@@ -630,22 +633,7 @@ export default function Home() {
         {/* KARTEN-ANSICHT */}
         {karteAktiv && (
           <div style={{ borderRadius:12, overflow:'hidden', border:'1px solid rgba(255,255,255,0.08)', marginBottom:20 }}>
-            <iframe
-              src={`https://www.openstreetmap.org/export/embed.html?bbox=7.0%2C51.35%2C7.5%2C51.6&layer=mapnik`}
-              style={{ width:'100%', height:480, border:'none' }}
-              title="Dienstleister Karte"
-            />
-            <div style={{ padding:'16px', background:'#111' }}>
-              <div style={{ fontSize:12, color:'#5A5550', marginBottom:12 }}>Dienstleister in der Karte:</div>
-              <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
-                {gefiltert.map(d => (
-                  <div key={d.id} onClick={() => window.location.href = `/profil/${d.id}`}
-                    style={{ fontSize:12, padding:'4px 10px', borderRadius:20, background:'rgba(200,149,108,0.1)', border:'1px solid rgba(200,149,108,0.2)', color:'#c8956c', cursor:'pointer' }}>
-                    {d.name} · {d.ort}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <DienstleisterKarte eintraege={gefiltert.map((d: any) => ({ id: d.id, name: d.name, ort: d.ort, lat: d.lat, lng: d.lng }))} />
           </div>
         )}
       </div>
