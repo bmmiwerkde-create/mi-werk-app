@@ -107,6 +107,8 @@ const hauptkategorien = [
   {
     emoji: '📋', name: 'Büro & Verwaltung',
     gewerke: [
+      { emoji: '🧑‍⚖️', name: 'Anwälte' },
+      { emoji: '📜', name: 'Arbeitsrecht' },
       { emoji: '📋', name: 'Buchhaltung' },
       { emoji: '⚖️', name: 'Rechtsberatung' },
       { emoji: '💼', name: 'Steuerberatung' },
