@@ -162,6 +162,17 @@ const hauptkategorien = [
       { emoji: '🚛', name: 'Umzugsservice' },
     ]
   },
+  {
+    emoji: '🧑‍💼', name: 'Personal',
+    gewerke: [
+      { emoji: '🧑‍💼', name: 'Personalvermittlung' },
+      { emoji: '💰', name: 'Lohnabrechnung' },
+      { emoji: '📊', name: 'Vergütungsberatung' },
+      { emoji: '🩺', name: 'Fehlzeitenmanagement' },
+      { emoji: '🎁', name: 'Mitarbeiterbenefits' },
+      { emoji: '📁', name: 'HR-Digitalisierung' },
+    ]
+  },
 ]
 
 export default function Home() {
