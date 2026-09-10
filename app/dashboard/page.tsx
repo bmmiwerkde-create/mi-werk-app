@@ -103,7 +103,7 @@ export default function DashboardPage() {
     const payload = { ...form, user_id: user.id }
     const { data: gespeichert, error } = profil?.id
       ? await supabase.from('dienstleister').update(payload).eq('id', profil.id).select('id').single()
-      : await supabase.from('dienstleister').insert(payload).select('id').single()
+      : await supabase.from('dienstleister').insert({ ...payload, abo_aktiv: true }).select('id').single()
     if (error) { setMessage('Fehler: ' + error.message) }
     else {
       setMessage('Gespeichert'); setEditMode(false); await loadProfil(user.id)

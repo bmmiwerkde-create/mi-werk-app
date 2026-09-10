@@ -53,7 +53,7 @@ export default function Onboarding() {
     const { data: bestehend } = await supabase.from('dienstleister').select('id').eq('user_id', user.id).single()
     const { data: gespeichert, error } = bestehend
       ? await supabase.from('dienstleister').update(payload).eq('id', bestehend.id).select('id').single()
-      : await supabase.from('dienstleister').insert(payload).select('id').single()
+      : await supabase.from('dienstleister').insert({ ...payload, abo_aktiv: true }).select('id').single()
     setSpeichern(false)
     if (error) { setFehler('Fehler: ' + error.message); return }
 
