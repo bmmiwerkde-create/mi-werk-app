@@ -5,6 +5,7 @@ export const KATEGORIEN = [
   { key: "handwerk", label: "Handwerk", emoji: "🔨", beschreibung: "Elektriker, Klempner, Maler, Schreiner, Reinigung", einfuehrung: 19.99, regulaer: 34.99 },
   { key: "auto", label: "Auto", emoji: "🚗", beschreibung: "KFZ-Werkstätten, Pannenhilfe, Umzugshelfer, Fahrdienste", einfuehrung: 19.99, regulaer: 34.99 },
   { key: "gesundheit", label: "Gesundheit", emoji: "🏥", beschreibung: "Ärzte, Zahnärzte, Physiotherapeuten, Psychologen, Heilpraktiker", einfuehrung: 29.99, regulaer: 44.99 },
+  { key: "it", label: "IT & Digital", emoji: "💻", beschreibung: "Webentwicklung, App-Entwicklung, Grafikdesign, SEO/Marketing, Videoproduktion", einfuehrung: 29.99, regulaer: 44.99 },
 ] as const
 
 export type KategorieKey = typeof KATEGORIEN[number]["key"]
