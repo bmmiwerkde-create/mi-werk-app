@@ -173,6 +173,15 @@ const hauptkategorien = [
       { emoji: '📁', name: 'HR-Digitalisierung' },
     ]
   },
+  {
+    emoji: '🏥', name: 'Gesundheit',
+    gewerke: [
+      { emoji: '👨‍⚕️', name: 'Ärzte' },
+      { emoji: '🦷', name: 'Zahnärzte' },
+      { emoji: '🧠', name: 'Psychologen' },
+      { emoji: '🌿', name: 'Heilpraktiker' },
+    ]
+  },
 ]
 
 export default function Home() {
