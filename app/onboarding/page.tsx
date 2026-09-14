@@ -67,6 +67,14 @@ export default function Onboarding() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dienstleisterId: gespeichert.id, ort, postleitzahl }),
       }).catch(() => {})
+
+      if (!bestehend) {
+        fetch('/api/neuer-dienstleister', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ record: { id: gespeichert.id, name, gewerk, ort, beschreibung: '' } }),
+        }).catch(() => {})
+      }
     }
 
     setSchritt(2)
