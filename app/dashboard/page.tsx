@@ -10,7 +10,7 @@ type Dienstleister = {
   beschreibung: string; preis: string; emoji: string
   profilbild?: string; telefon?: string; website?: string
   qualifikationen?: string; user_id?: string; postleitzahl?: string
-  abo_aktiv?: boolean; stripe_customer_id?: string | null
+  abo_aktiv?: boolean; stripe_customer_id?: string | null; ics_url?: string | null
 }
 
 const C = {
@@ -35,6 +35,10 @@ export default function DashboardPage() {
   const { data: googleSession } = useSession()
   const [kalenderEvents, setKalenderEvents] = useState<any[]>([])
   const [kalenderLaden, setKalenderLaden] = useState(false)
+  const [icsUrlInput, setIcsUrlInput] = useState('')
+  const [icsSpeichern, setIcsSpeichern] = useState(false)
+  const [icsEvents, setIcsEvents] = useState<any[]>([])
+  const [icsFehler, setIcsFehler] = useState('')
   const [portalLaden, setPortalLaden] = useState(false)
   const [portalFehler, setPortalFehler] = useState('')
 
@@ -76,7 +80,20 @@ export default function DashboardPage() {
 
   async function loadProfil(userId: string) {
     const { data } = await supabase.from('dienstleister').select('*').eq('user_id', userId).single()
-    if (data) { setProfil(data); setForm(data) }
+    if (data) { setProfil(data); setForm(data); setIcsUrlInput(data.ics_url || '') }
+  }
+
+  async function icsVerbinden() {
+    if (!icsUrlInput || !user) return
+    setIcsSpeichern(true)
+    setIcsFehler('')
+    const { error } = await supabase.from('dienstleister').update({ ics_url: icsUrlInput }).eq('user_id', user.id)
+    if (error) { setIcsFehler('Fehler: ' + error.message); setIcsSpeichern(false); return }
+    const res = await fetch('/api/kalender-ics?userId=' + user.id)
+    const data = await res.json()
+    if (data.events) setIcsEvents(data.events)
+    else setIcsFehler(data.error || 'Kalender konnte nicht abgerufen werden')
+    setIcsSpeichern(false)
   }
 
   async function bildHochladen(e: React.ChangeEvent<HTMLInputElement>) {
@@ -276,6 +293,29 @@ export default function DashboardPage() {
             <div>
               <div style={{ fontSize:13, color:C.green, marginBottom:12 }}>✓ Outlook verbunden ({googleSession.user?.email})</div>
             </div>
+          )}
+        </div>
+
+        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
+          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>iPhone / Apple-Kalender</div>
+          <div style={{ fontSize:13, color:C.textMid, marginBottom:12, lineHeight:1.6 }}>
+            Nutzt du den Apple-Kalender auf dem iPhone (kein Google- oder Outlook-Konto)? Dann verbinde ihn per Link:
+          </div>
+          <div style={{ fontSize:12, color:C.copper, background:'rgba(200,149,108,0.08)', border:'1px solid ' + C.copperBord, borderRadius:8, padding:'10px 13px', marginBottom:14, lineHeight:1.6 }}>
+            📱 Auf dem iPhone: <strong>Kalender-App → Kalender → dein Kalender → „Kalender freigeben" → „Öffentlicher Kalender" aktivieren → Link kopieren</strong> und hier einfügen.
+          </div>
+          <div style={{ display:'flex', gap:8, marginBottom:10 }}>
+            <input value={icsUrlInput} onChange={e => setIcsUrlInput(e.target.value)} placeholder="webcal://... oder https://..."
+              style={{ flex:1, background:C.bg3, border:'1px solid ' + C.border, borderRadius:8, padding:'10px 13px', fontSize:13, color:C.text, fontFamily:'inherit', outline:'none' }} />
+            <button onClick={icsVerbinden} disabled={icsSpeichern || !icsUrlInput} style={{ fontSize:12, padding:'0 16px', borderRadius:8, background:C.copper, color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit', opacity: icsSpeichern ? 0.7 : 1 }}>
+              {icsSpeichern ? 'Verbinde...' : 'Verbinden'}
+            </button>
+          </div>
+          {icsEvents.length > 0 && (
+            <div style={{ fontSize:12, color:C.green }}>✓ {icsEvents.length} Termine synchronisiert — Kunden sehen nur frei/belegt.</div>
+          )}
+          {icsFehler && (
+            <div style={{ fontSize:12, color:C.red }}>{icsFehler}</div>
           )}
         </div>
 

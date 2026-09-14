@@ -24,6 +24,10 @@ export default function Onboarding() {
   const [postleitzahl, setPostleitzahl] = useState('')
   const [speichern, setSpeichern] = useState(false)
   const [fehler, setFehler] = useState('')
+  const [icsUrlInput, setIcsUrlInput] = useState('')
+  const [icsSpeichern, setIcsSpeichern] = useState(false)
+  const [icsVerbunden, setIcsVerbunden] = useState(false)
+  const [icsFehler, setIcsFehler] = useState('')
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -66,6 +70,19 @@ export default function Onboarding() {
     }
 
     setSchritt(2)
+  }
+
+  async function icsVerbindenOnboarding() {
+    if (!icsUrlInput || !user) return
+    setIcsSpeichern(true)
+    setIcsFehler('')
+    const { error } = await supabase.from('dienstleister').update({ ics_url: icsUrlInput }).eq('user_id', user.id)
+    if (error) { setIcsFehler('Fehler: ' + error.message); setIcsSpeichern(false); return }
+    const res = await fetch('/api/kalender-ics?userId=' + user.id)
+    const data = await res.json()
+    if (data.events) setIcsVerbunden(true)
+    else setIcsFehler(data.error || 'Kalender konnte nicht abgerufen werden')
+    setIcsSpeichern(false)
   }
 
   if (pruefeStatus) {
@@ -156,9 +173,37 @@ export default function Onboarding() {
               <div style={{ fontSize:13, color:C.green, marginBottom:16 }}>✓ Kalender verbunden ({googleSession.user?.email})</div>
             )}
 
+            <div style={{ display:'flex', alignItems:'center', gap:10, margin:'6px 0 14px' }}>
+              <div style={{ flex:1, height:1, background:C.border }} />
+              <span style={{ fontSize:11, color:C.textDim }}>oder</span>
+              <div style={{ flex:1, height:1, background:C.border }} />
+            </div>
+
+            {!icsVerbunden ? (
+              <div style={{ marginBottom:16 }}>
+                <div style={{ fontSize:12, color:C.textMid, marginBottom:8, lineHeight:1.5 }}>
+                  Nutzt du den <strong>Apple-Kalender auf dem iPhone</strong>? Dann per Link verbinden:
+                </div>
+                <div style={{ fontSize:11, color:C.copper, background:C.copperGlow, border:'1px solid ' + C.copperBord, borderRadius:8, padding:'9px 12px', marginBottom:10, lineHeight:1.5 }}>
+                  📱 Kalender-App → Kalender → dein Kalender → „Kalender freigeben" → „Öffentlicher Kalender" aktivieren → Link kopieren.
+                </div>
+                <div style={{ display:'flex', gap:8 }}>
+                  <input value={icsUrlInput} onChange={e => setIcsUrlInput(e.target.value)} placeholder="webcal://... oder https://..."
+                    style={{ flex:1, background:C.bg3, border:'1px solid ' + C.border, borderRadius:8, padding:'10px 12px', fontSize:13, color:C.text, fontFamily:'inherit', outline:'none' }} />
+                  <button onClick={icsVerbindenOnboarding} disabled={icsSpeichern || !icsUrlInput}
+                    style={{ fontSize:12, padding:'0 14px', borderRadius:8, background:C.copper, color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit', opacity: icsSpeichern ? 0.7 : 1 }}>
+                    {icsSpeichern ? '...' : 'OK'}
+                  </button>
+                </div>
+                {icsFehler && <div style={{ fontSize:12, color:'#e74c3c', marginTop:8 }}>{icsFehler}</div>}
+              </div>
+            ) : (
+              <div style={{ fontSize:13, color:C.green, marginBottom:16 }}>✓ Apple-Kalender verbunden</div>
+            )}
+
             <button onClick={() => router.push('/dashboard')}
-              style={{ width:'100%', padding:'12px', background: googleSession ? C.copper : 'transparent', border: googleSession ? 'none' : '1px solid ' + C.border, color: googleSession ? '#fff' : C.textDim, borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>
-              {googleSession ? 'Fertig — zum Dashboard →' : 'Später verbinden, zum Dashboard →'}
+              style={{ width:'100%', padding:'12px', background: (googleSession || icsVerbunden) ? C.copper : 'transparent', border: (googleSession || icsVerbunden) ? 'none' : '1px solid ' + C.border, color: (googleSession || icsVerbunden) ? '#fff' : C.textDim, borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>
+              {(googleSession || icsVerbunden) ? 'Fertig — zum Dashboard →' : 'Später verbinden, zum Dashboard →'}
             </button>
           </div>
         )}
