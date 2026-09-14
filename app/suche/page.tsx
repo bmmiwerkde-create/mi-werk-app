@@ -170,7 +170,6 @@ const hauptkategorien = [
       { emoji: '📊', name: 'Vergütungsberatung' },
       { emoji: '🩺', name: 'Fehlzeitenmanagement' },
       { emoji: '🎁', name: 'Mitarbeiterbenefits' },
-      { emoji: '📁', name: 'HR-Digitalisierung' },
     ]
   },
   {
