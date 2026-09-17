@@ -74,6 +74,12 @@ export default function Onboarding() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ record: { id: gespeichert.id, name, gewerk, ort, beschreibung: '' } }),
         }).catch(() => {})
+
+        fetch('/api/willkommen-dienstleister', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email, name }),
+        }).catch(() => {})
       }
     }
 
