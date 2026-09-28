@@ -10,9 +10,9 @@ export async function GET(request: Request) {
 
   let sent = 0
 
-  // ===== ERSTE 50 DIENSTLEISTER: 5-MONATS-ERINNERUNG (6 Monate gratis) =====
+  // ===== ERSTE 50 DIENSTLEISTER: 11-MONATS-ERINNERUNG (12 Monate gratis) =====
   const fiveMonthsAgo = new Date()
-  fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 5)
+  fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 11)
 
   const fiveWindowStart = new Date(fiveMonthsAgo)
   fiveWindowStart.setDate(fiveWindowStart.getDate() - 1)
@@ -33,7 +33,7 @@ export async function GET(request: Request) {
 
   const ersteFuenfzigIds = new Set((alleDienstleister || []).slice(0, 50).map(d => d.id))
 
-  // Erste 50: 5-Monats-Erinnerung (6 Monate gratis -> Erinnerung nach 5 Monaten)
+  // Erste 50: 11-Monats-Erinnerung (12 Monate gratis -> Erinnerung nach 11 Monaten)
   const fuenfMonateEmpfaenger = (alleDienstleister || []).filter(d =>
     ersteFuenfzigIds.has(d.id) &&
     d.abo_aktiv &&
@@ -52,11 +52,11 @@ export async function GET(request: Request) {
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
             <h2 style="color: #b45309;">Hallo ${d.name},</h2>
-            <p>dein kostenloses Profil auf <strong>mi-werk.de</strong> ist seit 5 Monaten aktiv.</p>
+            <p>dein kostenloses Profil auf <strong>mi-werk.de</strong> ist seit 11 Monaten aktiv.</p>
             <p>In 1 Monat endet die kostenlose Phase. Danach bleibt dein Profil nur sichtbar, wenn du ein Abo abschließt.</p>
             <h3 style="margin-top: 2rem;">Was passiert als nächstes?</h3>
             <ul>
-              <li>Ab Monat 7: regulärer Preis</li>
+              <li>Ab Monat 13: regulärer Preis</li>
               <li>Ohne Abo: Profil wird ausgeblendet</li>
             </ul>
             <a href="https://mi-werk.de/abo"

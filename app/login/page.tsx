@@ -19,7 +19,7 @@ const C = {
 }
 
 const VORTEILE = [
-  '6 Monate kostenlos testen',
+  '12 Monate kostenlos testen',
   'Kunden finden dich direkt in deiner Region',
   'Jederzeit kündbar, keine versteckten Kosten',
 ]

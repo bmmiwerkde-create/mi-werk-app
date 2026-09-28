@@ -32,14 +32,14 @@ export async function GET(request: Request) {
 
   const ersteFuenfzigIds = new Set((alleDienstleister || []).slice(0, 50).map(d => d.id))
 
-  // Erste 50: 6 Monate gratis. Ab Nr. 51: 1 Monat gratis.
-  const sechsMonate = windowAround(6)
+  // Erste 50: 12 Monate gratis. Ab Nr. 51: 1 Monat gratis.
+  const zwoelfMonate = windowAround(12)
   const einMonat = windowAround(1)
 
   const faellig = (alleDienstleister || []).filter(d => {
     if (!d.abo_aktiv || !d.erstellt_am || !d.user_id || d.stripe_subscription_id) return false
     const erstellt = new Date(d.erstellt_am)
-    const fenster = ersteFuenfzigIds.has(d.id) ? sechsMonate : einMonat
+    const fenster = ersteFuenfzigIds.has(d.id) ? zwoelfMonate : einMonat
     return erstellt >= fenster.start && erstellt <= fenster.end
   })
 

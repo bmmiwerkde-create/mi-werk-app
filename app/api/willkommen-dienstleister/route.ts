@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       html: `
         <h2>Willkommen bei mi-werk, ${name || ''}!</h2>
         <p>Dein Profil ist jetzt live — Kundinnen und Kunden können dich ab sofort finden und kontaktieren.</p>
-        <p>Die ersten 6 Monate sind für dich kostenlos.</p>
+        <p>Die ersten 12 Monate sind für dich kostenlos.</p>
         <p>Ein Tipp: Verbinde deinen Kalender im <a href="https://mi-werk.de/dashboard">Dashboard</a>, damit Kundinnen und Kunden direkt sehen, wann du Zeit hast.</p>
         <p><a href="https://mi-werk.de/dashboard">Zum Dashboard</a></p>
       `

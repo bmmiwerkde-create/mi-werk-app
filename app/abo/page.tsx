@@ -60,7 +60,7 @@ export default function AboPage() {
           Abo wählen
         </h1>
         <p style={{ color: "#888", marginBottom: "3rem", fontSize: "0.95rem" }}>
-          Die ersten 6 Monate sind kostenlos. Danach bleibt dein Profil mit einem Abo sichtbar.
+          Die ersten 12 Monate sind kostenlos. Danach bleibt dein Profil mit einem Abo sichtbar.
         </p>
         <div style={{ display: "grid", gap: "1.5rem" }}>
           {KATEGORIEN.map((kat) => (

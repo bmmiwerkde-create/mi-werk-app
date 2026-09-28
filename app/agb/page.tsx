@@ -27,10 +27,10 @@ export default function AGB() {
         </section>
         <section style={{ marginBottom:40 }}>
           <h2 style={{ fontSize:18, fontWeight:600, color:'#c8956c', marginBottom:12 }}>4. Kostenlose Phase & Abo-Modell</h2>
-          <p style={{ fontSize:14, color:'#9A8878', lineHeight:1.8, marginBottom:12 }}>Nach der Registrierung ist das Profil für die ersten 6 Monate kostenlos und öffentlich sichtbar. Im 5. Monat erhält der Dienstleister eine automatische E-Mail mit einem Hinweis auf das bevorstehende Ende der kostenlosen Phase.</p>
+          <p style={{ fontSize:14, color:'#9A8878', lineHeight:1.8, marginBottom:12 }}>Nach der Registrierung ist das Profil für die ersten 12 Monate kostenlos und öffentlich sichtbar. Im 11. Monat erhält der Dienstleister eine automatische E-Mail mit einem Hinweis auf das bevorstehende Ende der kostenlosen Phase.</p>
           <ul style={{ fontSize:14, color:'#9A8878', lineHeight:2, paddingLeft:20 }}>
-            <li>Monat 7–8: Einführungspreis (je nach Kategorie)</li>
-            <li>Ab Monat 9: regulärer Preis (je nach Kategorie)</li>
+            <li>Monat 13–14: Einführungspreis (je nach Kategorie)</li>
+            <li>Ab Monat 15: regulärer Preis (je nach Kategorie)</li>
             <li>Ohne aktives Abo wird das Profil automatisch ausgeblendet</li>
           </ul>
         </section>
