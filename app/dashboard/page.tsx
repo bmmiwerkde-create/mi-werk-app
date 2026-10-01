@@ -258,7 +258,7 @@ export default function DashboardPage() {
           {!googleSession ? (
             <div>
               <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>Verbinde deinen Google Kalender — Kunden sehen automatisch wann du verfügbar bist.</div>
-              <button onClick={() => signIn('google', { callbackUrl: 'https://mi-werk.de/dashboard' })} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#fff', color:'#333', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
+              <button onClick={() => signIn('google', { callbackUrl: 'https://www.mi-werk.de/dashboard' })} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#fff', color:'#333', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
                 <span style={{ fontSize:16 }}>📅</span> Mit Google verbinden
               </button>
             </div>
@@ -285,7 +285,7 @@ export default function DashboardPage() {
           {!googleSession || googleSession.provider !== 'microsoft-entra-id' ? (
             <div>
               <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>Verbinde deinen Outlook Kalender.</div>
-              <button onClick={() => signIn('microsoft-entra-id', { callbackUrl: 'https://mi-werk.de/dashboard' })} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#0078D4', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
+              <button onClick={() => signIn('microsoft-entra-id', { callbackUrl: 'https://www.mi-werk.de/dashboard' })} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#0078D4', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
                 <span style={{ fontSize:16 }}>📧</span> Mit Outlook verbinden
               </button>
             </div>

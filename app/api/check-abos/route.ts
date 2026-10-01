@@ -59,7 +59,7 @@ export async function GET(request: Request) {
               <li>Ab Monat 13: regulärer Preis</li>
               <li>Ohne Abo: Profil wird ausgeblendet</li>
             </ul>
-            <a href="https://mi-werk.de/abo"
+            <a href="https://www.mi-werk.de/abo"
                style="display: inline-block; margin-top: 1.5rem; padding: 12px 28px;
                       background: #b45309; color: white; text-decoration: none;
                       border-radius: 8px; font-weight: bold;">
@@ -67,7 +67,7 @@ export async function GET(request: Request) {
             </a>
             <p style="margin-top: 2rem; font-size: 13px; color: #666;">
               Du erhältst diese Mail, weil du ein Profil auf mi-werk.de erstellt hast.<br>
-              <a href="https://mi-werk.de/datenschutz" style="color: #666;">Datenschutz</a>
+              <a href="https://www.mi-werk.de/datenschutz" style="color: #666;">Datenschutz</a>
             </p>
           </div>
         `,
@@ -108,7 +108,7 @@ export async function GET(request: Request) {
             <h2 style="color: #b45309;">Hallo ${d.name},</h2>
             <p>dein kostenloses Profil auf <strong>mi-werk.de</strong> ist seit 1 Monat aktiv.</p>
             <p>Damit dein Profil weiterhin sichtbar bleibt, schließe jetzt ein Abo ab.</p>
-            <a href="https://mi-werk.de/abo"
+            <a href="https://www.mi-werk.de/abo"
                style="display: inline-block; margin-top: 1.5rem; padding: 12px 28px;
                       background: #b45309; color: white; text-decoration: none;
                       border-radius: 8px; font-weight: bold;">
@@ -116,7 +116,7 @@ export async function GET(request: Request) {
             </a>
             <p style="margin-top: 2rem; font-size: 13px; color: #666;">
               Du erhältst diese Mail, weil du ein Profil auf mi-werk.de erstellt hast.<br>
-              <a href="https://mi-werk.de/datenschutz" style="color: #666;">Datenschutz</a>
+              <a href="https://www.mi-werk.de/datenschutz" style="color: #666;">Datenschutz</a>
             </p>
           </div>
         `,

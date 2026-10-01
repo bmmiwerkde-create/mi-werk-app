@@ -44,7 +44,7 @@ export default function Login() {
       const { error } = await supabase.auth.signUp({
         email,
         password: passwort,
-        options: { emailRedirectTo: 'https://mi-werk.de/onboarding' },
+        options: { emailRedirectTo: 'https://www.mi-werk.de/onboarding' },
       })
       if (error) setMeldung('Fehler: ' + error.message)
       else setMeldung('Bestätigungs-E-Mail wurde gesendet — bitte prüfe dein Postfach.')
@@ -60,7 +60,7 @@ export default function Login() {
     setLaden(true)
     setMeldung('')
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://mi-werk.de/reset-passwort',
+      redirectTo: 'https://www.mi-werk.de/reset-passwort',
     })
     if (error) setMeldung('Fehler: ' + error.message)
     else setMeldung('Reset-Link wurde gesendet — bitte prüfe dein Postfach.')

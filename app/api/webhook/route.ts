@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
                   <h2 style="color: #b45309;">Hallo ${updated?.name || ""},</h2>
                   <p>dein Abo auf <strong>mi-werk.de</strong> ist ab sofort aktiv${kat ? ` (${kat.label}${preis !== undefined ? `, ${preis}€/Monat` : ""})` : ""}.</p>
                   <p>Dein Profil bleibt damit dauerhaft sichtbar. Zahlungsmethode und Kündigung kannst du jederzeit im Dashboard unter "Abo verwalten" ändern.</p>
-                  <a href="https://mi-werk.de/dashboard"
+                  <a href="https://www.mi-werk.de/dashboard"
                      style="display: inline-block; margin-top: 1.5rem; padding: 12px 28px;
                             background: #b45309; color: white; text-decoration: none;
                             border-radius: 8px; font-weight: bold;">
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
                   </a>
                   <p style="margin-top: 2rem; font-size: 13px; color: #666;">
                     Du erhältst diese Mail, weil ein Abo für dein Profil auf mi-werk.de abgeschlossen wurde.<br>
-                    <a href="https://mi-werk.de/datenschutz" style="color: #666;">Datenschutz</a>
+                    <a href="https://www.mi-werk.de/datenschutz" style="color: #666;">Datenschutz</a>
                   </p>
                 </div>
               `,

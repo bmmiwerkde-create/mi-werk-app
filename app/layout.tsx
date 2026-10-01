@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Mi-Werk – Handwerker & Dienstleister finden",
     description: "Finde Dienstleister in deiner Region – schnell, einfach, direkt.",
-    url: "https://mi-werk.de",
+    url: "https://www.mi-werk.de",
     siteName: "Mi-Werk",
     locale: "de_DE",
     type: "website",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: "https://mi-werk.de",
+    canonical: "https://www.mi-werk.de",
   },
 };
 

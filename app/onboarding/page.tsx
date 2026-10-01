@@ -174,11 +174,11 @@ export default function Onboarding() {
 
             {!googleSession ? (
               <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:16 }}>
-                <button onClick={() => signIn('google', { callbackUrl: 'https://mi-werk.de/dashboard' })}
+                <button onClick={() => signIn('google', { callbackUrl: 'https://www.mi-werk.de/dashboard' })}
                   style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'12px 20px', background:'#fff', color:'#333', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>
                   📅 Mit Google Kalender verbinden
                 </button>
-                <button onClick={() => signIn('microsoft-entra-id', { callbackUrl: 'https://mi-werk.de/dashboard' })}
+                <button onClick={() => signIn('microsoft-entra-id', { callbackUrl: 'https://www.mi-werk.de/dashboard' })}
                   style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'12px 20px', background:'#0078D4', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>
                   📧 Mit Outlook verbinden
                 </button>

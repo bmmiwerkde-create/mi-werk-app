@@ -17,7 +17,7 @@ export async function POST(req: Request) {
         <p><strong>Gewerk:</strong> ${record.gewerk || '-'}</p>
         <p><strong>Ort:</strong> ${record.ort || '-'}</p>
         <p><strong>Beschreibung:</strong> ${record.beschreibung || '-'}</p>
-        <p><a href="https://mi-werk.de/profil/${record.id}">Profil ansehen</a></p>
+        <p><a href="https://www.mi-werk.de/profil/${record.id}">Profil ansehen</a></p>
       `
     })
   } catch (err) {

@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .eq('abo_aktiv', true)
 
   const profileUrls = (dienstleister || []).map(d => ({
-    url: `https://mi-werk.de/profil/${d.id}`,
+    url: `https://www.mi-werk.de/profil/${d.id}`,
     lastModified: new Date(d.created_at),
     changeFrequency: 'weekly' as const,
     priority: 0.8,
@@ -21,19 +21,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: 'https://mi-werk.de',
+      url: 'https://www.mi-werk.de',
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
     },
     {
-      url: 'https://mi-werk.de/suche',
+      url: 'https://www.mi-werk.de/suche',
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
-      url: 'https://mi-werk.de/login',
+      url: 'https://www.mi-werk.de/login',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,

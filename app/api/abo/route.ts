@@ -80,7 +80,7 @@ export async function GET(request: Request) {
             </a>
             <p style="margin-top: 2rem; font-size: 13px; color: #666;">
               Du erhältst diese Mail, weil du ein Profil auf mi-werk.de erstellt hast.<br>
-              <a href="https://mi-werk.de/datenschutz" style="color: #666;">Datenschutz</a>
+              <a href="https://www.mi-werk.de/datenschutz" style="color: #666;">Datenschutz</a>
             </p>
           </div>
         `,
