@@ -16,6 +16,21 @@ export default function ProfilSeite({ params }) {
   const [loading, setLoading] = useState(true)
   const [events, setEvents] = useState([])
   const [kalenderMonat, setKalenderMonat] = useState(new Date())
+  const [bewertungen, setBewertungen] = useState([])
+  const [neuerName, setNeuerName] = useState('')
+  const [neueSterne, setNeueSterne] = useState(5)
+  const [neuerKommentar, setNeuerKommentar] = useState('')
+  const [bewertungSpeichern, setBewertungSpeichern] = useState(false)
+  const [bewertungFehler, setBewertungFehler] = useState('')
+
+  async function bewertungenLaden() {
+    const { data } = await supabase
+      .from('bewertungen')
+      .select('*')
+      .eq('dienstleister_id', Number(id))
+      .order('erstellt_am', { ascending: false })
+    setBewertungen(data || [])
+  }
 
   useEffect(() => {
     async function laden() {
@@ -28,10 +43,29 @@ export default function ProfilSeite({ params }) {
           .eq('user_id', data.user_id)
         setEvents(evs || [])
       }
+      await bewertungenLaden()
       setLoading(false)
     }
     laden()
   }, [id])
+
+  async function bewertungAbsenden() {
+    if (!neuerName.trim()) { setBewertungFehler('Bitte Namen angeben.'); return }
+    setBewertungFehler('')
+    setBewertungSpeichern(true)
+    const { error } = await supabase.from('bewertungen').insert({
+      dienstleister_id: Number(id),
+      name: neuerName.trim(),
+      sterne: neueSterne,
+      kommentar: neuerKommentar.trim() || null,
+    })
+    setBewertungSpeichern(false)
+    if (error) { setBewertungFehler('Fehler: ' + error.message); return }
+    setNeuerName('')
+    setNeueSterne(5)
+    setNeuerKommentar('')
+    await bewertungenLaden()
+  }
 
   function istBelegt(datum) {
     return events.some(e => {
@@ -95,6 +129,17 @@ export default function ProfilSeite({ params }) {
             <div style={{ flex:1 }}>
               <h1 style={{ fontSize:26, fontWeight:700, fontFamily:'Georgia,serif', marginBottom:6 }}>{profil.name}</h1>
               <div style={{ fontSize:15, color:'#c8956c', fontWeight:500, marginBottom:8 }}>{profil.gewerk}</div>
+              {bewertungen.length > 0 && (
+                <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+                  <span style={{ color:'#c8956c', fontSize:14, letterSpacing:1 }}>
+                    {'★'.repeat(Math.round(bewertungen.reduce((sum, b) => sum + b.sterne, 0) / bewertungen.length))}
+                    {'☆'.repeat(5 - Math.round(bewertungen.reduce((sum, b) => sum + b.sterne, 0) / bewertungen.length))}
+                  </span>
+                  <span style={{ fontSize:12, color:'#9A8878' }}>
+                    {(bewertungen.reduce((sum, b) => sum + b.sterne, 0) / bewertungen.length).toFixed(1)} ({bewertungen.length} {bewertungen.length === 1 ? 'Bewertung' : 'Bewertungen'})
+                  </span>
+                </div>
+              )}
               <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
                 {profil.ort && <span style={{ fontSize:12, color:'#9A8878', background:'rgba(255,255,255,0.04)', borderRadius:20, padding:'4px 12px' }}>📍 {profil.ort}{profil.umkreis ? ' (+' + profil.umkreis + ')' : ''}</span>}
                 {profil.verfuegbar_ab && <span style={{ fontSize:12, color:'#9A8878', background:'rgba(255,255,255,0.04)', borderRadius:20, padding:'4px 12px' }}>📅 ab {new Date(profil.verfuegbar_ab).toLocaleDateString('de-DE')}</span>}
@@ -184,6 +229,41 @@ export default function ProfilSeite({ params }) {
                 🌐 {profil.website}
               </a>
             )}
+          </div>
+        </div>
+
+        <div style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:16, padding:'24px', marginBottom:20 }}>
+          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:16 }}>Bewertungen</div>
+
+          {bewertungen.length === 0 && (
+            <div style={{ fontSize:13, color:'#5A5550', marginBottom:20 }}>Noch keine Bewertungen.</div>
+          )}
+          {bewertungen.map((b) => (
+            <div key={b.id} style={{ borderBottom:'1px solid rgba(255,255,255,0.05)', paddingBottom:14, marginBottom:14 }}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:4 }}>
+                <span style={{ fontSize:13, fontWeight:600, color:'#E8DDD4' }}>{b.name}</span>
+                <span style={{ color:'#c8956c', fontSize:13, letterSpacing:1 }}>{'★'.repeat(b.sterne)}{'☆'.repeat(5 - b.sterne)}</span>
+              </div>
+              {b.kommentar && <p style={{ fontSize:13, color:'#9A8878', lineHeight:1.6, margin:0 }}>{b.kommentar}</p>}
+            </div>
+          ))}
+
+          <div style={{ borderTop: bewertungen.length ? '1px solid rgba(255,255,255,0.06)' : 'none', paddingTop: bewertungen.length ? 20 : 0 }}>
+            <div style={{ fontSize:12, color:'#5A5550', marginBottom:12 }}>Eigene Bewertung abgeben</div>
+            <input value={neuerName} onChange={e => setNeuerName(e.target.value)} placeholder="Dein Name"
+              style={{ width:'100%', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:8, padding:'10px 13px', fontSize:13, color:'#E8DDD4', marginBottom:10, boxSizing:'border-box' }} />
+            <div style={{ display:'flex', gap:4, marginBottom:10 }}>
+              {[1, 2, 3, 4, 5].map(n => (
+                <span key={n} onClick={() => setNeueSterne(n)} style={{ cursor:'pointer', fontSize:22, color: n <= neueSterne ? '#c8956c' : '#3A3530' }}>★</span>
+              ))}
+            </div>
+            <textarea value={neuerKommentar} onChange={e => setNeuerKommentar(e.target.value)} placeholder="Kommentar (optional)" rows={3}
+              style={{ width:'100%', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:8, padding:'10px 13px', fontSize:13, color:'#E8DDD4', marginBottom:10, boxSizing:'border-box', fontFamily:'inherit', resize:'vertical' }} />
+            <button onClick={bewertungAbsenden} disabled={bewertungSpeichern}
+              style={{ padding:'10px 20px', background:'#c8956c', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer' }}>
+              {bewertungSpeichern ? 'Speichern...' : 'Bewertung absenden'}
+            </button>
+            {bewertungFehler && <div style={{ fontSize:12, color:'#e74c3c', marginTop:10 }}>{bewertungFehler}</div>}
           </div>
         </div>
 
