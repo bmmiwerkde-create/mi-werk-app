@@ -641,7 +641,15 @@ export default function Home() {
           ))}
         </div>
 
-        {gefiltert.length === 0 && !karteAktiv && (
+        {dienstleister.length === 0 && !karteAktiv && (
+          <div style={{ textAlign:'center', padding:'60px 0' }}>
+            <button onClick={() => router.push('/login')} style={{ fontSize:14, fontWeight:600, padding:'14px 28px', borderRadius:9, background:'#c8956c', color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
+              Jetzt kostenlos eintragen
+            </button>
+          </div>
+        )}
+
+        {dienstleister.length > 0 && gefiltert.length === 0 && !karteAktiv && (
           <div style={{ textAlign:'center', padding:'60px 0', color:'#5A5550', fontSize:14 }}>
             Keine Dienstleister gefunden
             {stadtFilter && ` in "${stadtFilter}"`}
