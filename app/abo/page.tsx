@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../Lib/supabase";
 import { KATEGORIEN } from "../Lib/kategorien";
+import { Icon, iconNameFuerKategorie } from "../components/Icons";
 
 export default function AboPage() {
   const router = useRouter();
@@ -68,7 +69,7 @@ export default function AboPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
                 <div>
                   <h2 style={{ color: "#fff", fontSize: "1.1rem", fontWeight: 700, marginBottom: "0.25rem" }}>
-                    {kat.emoji} {kat.label}
+                    <Icon name={iconNameFuerKategorie(kat.label)} size={18} style={{ color: "#b87333", marginRight: 10, verticalAlign: "-3px" }} />{kat.label}
                     {userKategorie === kat.key && <span style={{ marginLeft: "0.75rem", fontSize: "0.75rem", color: "#b87333", fontWeight: 400 }}>Deine Kategorie</span>}
                   </h2>
                   <p style={{ color: "#666", fontSize: "0.85rem", margin: 0 }}>{kat.beschreibung}</p>

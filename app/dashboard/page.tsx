@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { supabase } from '../Lib/supabase'
+import { Icon } from '../components/Icons'
 
 type Dienstleister = {
   id: string; name: string; gewerk: string; ort: string
@@ -259,7 +260,7 @@ export default function DashboardPage() {
             <div>
               <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>Verbinde deinen Google Kalender — Kunden sehen automatisch wann du verfügbar bist.</div>
               <button onClick={() => signIn('google', { callbackUrl: 'https://www.mi-werk.de/dashboard' })} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#fff', color:'#333', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
-                <span style={{ fontSize:16 }}>📅</span> Mit Google verbinden
+                <Icon name="calendar" size={16} /> Mit Google verbinden
               </button>
             </div>
           ) : (
@@ -286,7 +287,7 @@ export default function DashboardPage() {
             <div>
               <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>Verbinde deinen Outlook Kalender.</div>
               <button onClick={() => signIn('microsoft-entra-id', { callbackUrl: 'https://www.mi-werk.de/dashboard' })} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#0078D4', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
-                <span style={{ fontSize:16 }}>📧</span> Mit Outlook verbinden
+                <Icon name="mail" size={16} /> Mit Outlook verbinden
               </button>
             </div>
           ) : (
@@ -302,7 +303,7 @@ export default function DashboardPage() {
             Nutzt du den Apple-Kalender auf dem iPhone (kein Google- oder Outlook-Konto)? Dann verbinde ihn per Link:
           </div>
           <div style={{ fontSize:12, color:C.copper, background:'rgba(200,149,108,0.08)', border:'1px solid ' + C.copperBord, borderRadius:8, padding:'10px 13px', marginBottom:14, lineHeight:1.6 }}>
-            📱 Auf dem iPhone: <strong>Kalender-App → Kalender → dein Kalender → „Kalender freigeben" → „Öffentlicher Kalender" aktivieren → Link kopieren</strong> und hier einfügen.
+            <Icon name="calendar" size={13} style={{ verticalAlign:'-2px', marginRight:4 }} /> Auf dem iPhone: <strong>Kalender-App → Kalender → dein Kalender → „Kalender freigeben" → „Öffentlicher Kalender" aktivieren → Link kopieren</strong> und hier einfügen.
           </div>
           <div style={{ display:'flex', gap:8, marginBottom:10 }}>
             <input value={icsUrlInput} onChange={e => setIcsUrlInput(e.target.value)} placeholder="webcal://... oder https://..."

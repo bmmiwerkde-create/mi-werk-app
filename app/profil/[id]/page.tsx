@@ -3,6 +3,7 @@
 import { useEffect, useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
+import { Icon } from '../../components/Icons'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -34,7 +35,7 @@ export default function ProfilSeite({ params }) {
 
   useEffect(() => {
     async function laden() {
-      const { data } = await supabase.from('dienstleister').select('*').eq('id', Number(id)).single()
+      const { data } = await supabase.from('dienstleister').select('*').eq('id', Number(id)).eq('abo_aktiv', true).single()
       setProfil(data)
       if (data?.user_id) {
         const { data: evs } = await supabase
@@ -97,7 +98,7 @@ export default function ProfilSeite({ params }) {
 
   if (!profil) return (
     <div style={{ minHeight:'100vh', background:'#0A0A0A', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:16 }}>
-      <div style={{ fontSize:48 }}>🔍</div>
+      <div style={{ color:'#c8956c' }}><Icon name="search" size={48} /></div>
       <div style={{ color:'#E8DDD4', fontSize:18, fontWeight:500 }}>Profil nicht gefunden</div>
       <button onClick={() => router.push('/')} style={{ fontSize:13, color:'#c8956c', background:'none', border:'1px solid rgba(200,149,108,0.3)', borderRadius:8, padding:'8px 18px', cursor:'pointer' }}>
         Zurueck zur Startseite
@@ -124,7 +125,7 @@ export default function ProfilSeite({ params }) {
         <div style={{ background:'#111', border:'1px solid rgba(200,149,108,0.2)', borderRadius:16, padding:'32px', marginBottom:20 }}>
           <div style={{ display:'flex', alignItems:'flex-start', gap:20, marginBottom:24 }}>
             <div style={{ width:80, height:80, borderRadius:'50%', overflow:'hidden', background:'#181818', border:'2px solid rgba(200,149,108,0.3)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              {profil.profilbild ? <img src={profil.profilbild} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <span style={{ fontSize:36 }}>{profil.emoji || '🔧'}</span>}
+              {profil.profilbild ? <img src={profil.profilbild} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <Icon name="user" size={36} style={{ color:'#c8956c' }} />}
             </div>
             <div style={{ flex:1 }}>
               <h1 style={{ fontSize:26, fontWeight:700, fontFamily:'Georgia,serif', marginBottom:6 }}>{profil.name}</h1>
@@ -141,9 +142,9 @@ export default function ProfilSeite({ params }) {
                 </div>
               )}
               <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
-                {profil.ort && <span style={{ fontSize:12, color:'#9A8878', background:'rgba(255,255,255,0.04)', borderRadius:20, padding:'4px 12px' }}>📍 {profil.ort}{profil.umkreis ? ' (+' + profil.umkreis + ')' : ''}</span>}
-                {profil.verfuegbar_ab && <span style={{ fontSize:12, color:'#9A8878', background:'rgba(255,255,255,0.04)', borderRadius:20, padding:'4px 12px' }}>📅 ab {new Date(profil.verfuegbar_ab).toLocaleDateString('de-DE')}</span>}
-                {profil.preis && <span style={{ fontSize:12, color:'#c8956c', background:'rgba(200,149,108,0.08)', borderRadius:20, padding:'4px 12px', border:'1px solid rgba(200,149,108,0.2)' }}>💶 {profil.preis}</span>}
+                {profil.ort && <span style={{ fontSize:12, color:'#9A8878', background:'rgba(255,255,255,0.04)', borderRadius:20, padding:'4px 12px' }}><Icon name="pin" size={13} style={{ marginRight:6, verticalAlign:'-2px' }} />{profil.ort}{profil.umkreis ? ' (+' + profil.umkreis + ')' : ''}</span>}
+                {profil.verfuegbar_ab && <span style={{ fontSize:12, color:'#9A8878', background:'rgba(255,255,255,0.04)', borderRadius:20, padding:'4px 12px' }}><Icon name="calendar" size={13} style={{ marginRight:6, verticalAlign:'-2px' }} />ab {new Date(profil.verfuegbar_ab).toLocaleDateString('de-DE')}</span>}
+                {profil.preis && <span style={{ fontSize:12, color:'#c8956c', background:'rgba(200,149,108,0.08)', borderRadius:20, padding:'4px 12px', border:'1px solid rgba(200,149,108,0.2)' }}><Icon name="euro" size={13} style={{ marginRight:6, verticalAlign:'-2px' }} />{profil.preis}</span>}
               </div>
             </div>
           </div>
@@ -214,19 +215,19 @@ export default function ProfilSeite({ params }) {
             {profil.email && (
               <a href={'mailto:' + profil.email + '?subject=Anfrage ueber mi-werk.de'}
                 style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'#c8956c', color:'#fff', textDecoration:'none', borderRadius:10, fontSize:14, fontWeight:500 }}>
-                ✉️ E-Mail senden
+                <Icon name="mail" size={18} /> E-Mail senden
               </a>
             )}
             {profil.telefon && (
               <a href={'tel:' + profil.telefon}
                 style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'rgba(200,149,108,0.1)', color:'#c8956c', textDecoration:'none', borderRadius:10, fontSize:14, fontWeight:500, border:'1px solid rgba(200,149,108,0.3)' }}>
-                📞 {profil.telefon}
+                <Icon name="phone" size={18} /> {profil.telefon}
               </a>
             )}
             {profil.website && (
               <a href={profil.website.startsWith('http') ? profil.website : 'https://' + profil.website} target="_blank" rel="noopener noreferrer"
                 style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'14px 24px', background:'rgba(255,255,255,0.04)', color:'#9A8878', textDecoration:'none', borderRadius:10, fontSize:14, border:'1px solid rgba(255,255,255,0.08)' }}>
-                🌐 {profil.website}
+                <Icon name="globe" size={18} /> {profil.website}
               </a>
             )}
           </div>

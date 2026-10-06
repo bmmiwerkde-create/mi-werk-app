@@ -7,7 +7,7 @@ export const KATEGORIEN = [
   { key: "catering", label: "Catering & Essen", emoji: "🍽️", beschreibung: "Catering, Foodtruck, Getränkeservice, Grillservice, Kochservice, Meal Prep, Partyservice", einfuehrung: 34.99, regulaer: 49.99 },
   { key: "garten", label: "Garten & Außen", emoji: "🌿", beschreibung: "Baumfällung, Gartenbau, Rasenpflege, Landschaftspflege, Pflasterer, Teichbau, Zaunbau", einfuehrung: 19.99, regulaer: 34.99 },
   { key: "handwerk", label: "Haus & Handwerk", emoji: "🔨", beschreibung: "Elektriker, Klempner, Maler, Schreiner, Reinigung", einfuehrung: 19.99, regulaer: 34.99 },
-  { key: "buero", label: "Büro & Verwaltung", emoji: "📋", beschreibung: "Anwälte, Arbeitsrecht, Buchhaltung, Rechtsberatung, Steuerberatung, Übersetzung, Virtuelle Assistenz", einfuehrung: 54.99, regulaer: 69.99 },
+  { key: "buero", label: "Büro & Verwaltung", emoji: "📋", beschreibung: "Anwälte, Buchhaltung, Steuerberatung, Übersetzung, Virtuelle Assistenz", einfuehrung: 54.99, regulaer: 69.99 },
   { key: "events", label: "Events & Veranstaltung", emoji: "🎉", beschreibung: "DJ/Musik, Eventplanung, Moderation, Zauberer, Hochzeitsfotograf", einfuehrung: 34.99, regulaer: 49.99 },
   { key: "auto", label: "Fahrzeuge & Mobilität", emoji: "🚗", beschreibung: "KFZ-Werkstätten, Pannenhilfe, Umzugshelfer, Fahrdienste", einfuehrung: 19.99, regulaer: 34.99 },
   { key: "transport", label: "Transport & Logistik", emoji: "🚛", beschreibung: "Entrümpelung, Möbelmontage, Schwertransport, Umzugsservice", einfuehrung: 34.99, regulaer: 49.99 },

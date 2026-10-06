@@ -19,166 +19,169 @@ import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { supabase } from '../Lib/supabase'
 import { useRouter } from 'next/navigation'
+import { Icon, IconBadge, iconNameFuerKategorie } from '../components/Icons'
+
+const FilterIcon = ({ name }: { name: string }) => (
+  <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', color:'#9A8878', display:'flex', pointerEvents:'none' }}><Icon name={name} size={16} /></span>
+)
 
 const DienstleisterKarte = dynamic(() => import('../components/DienstleisterKarte'), { ssr: false })
 
 const hauptkategorien = [
   {
-    emoji: '✂️', name: 'Beauty & Pflege',
+    name: 'Beauty & Pflege',
     gewerke: [
-      { emoji: '🦶', name: 'Fußpflege' },
-      { emoji: '✂️', name: 'Friseur' },
-      { emoji: '💄', name: 'Kosmetik' },
-      { emoji: '💆', name: 'Massage' },
-      { emoji: '💅', name: 'Nagelpflege' },
-      { emoji: '💋', name: 'Permanent Make-up' },
-      { emoji: '👁️', name: 'Wimpern' },
+      { name: 'Fußpflege' },
+      { name: 'Friseur' },
+      { name: 'Kosmetik' },
+      { name: 'Massage' },
+      { name: 'Nagelpflege' },
+      { name: 'Permanent Make-up' },
+      { name: 'Wimpern' },
     ]
   },
   {
-    emoji: '🎓', name: 'Bildung & Coaching',
+    name: 'Bildung & Coaching',
     gewerke: [
-      { emoji: '📄', name: 'Bewerbungscoaching' },
-      { emoji: '🧠', name: 'Life Coach' },
-      { emoji: '🎵', name: 'Musikunterricht' },
-      { emoji: '📚', name: 'Nachhilfe' },
-      { emoji: '🗣️', name: 'Sprachkurs' },
+      { name: 'Bewerbungscoaching' },
+      { name: 'Life Coach' },
+      { name: 'Musikunterricht' },
+      { name: 'Nachhilfe' },
+      { name: 'Sprachkurs' },
     ]
   },
   {
-    emoji: '🍽️', name: 'Catering & Essen',
+    name: 'Catering & Essen',
     gewerke: [
-      { emoji: '🍽️', name: 'Catering' },
-      { emoji: '🚚', name: 'Foodtruck' },
-      { emoji: '🥤', name: 'Getränkeservice' },
-      { emoji: '🔥', name: 'Grillservice' },
-      { emoji: '👨‍🍳', name: 'Kochservice' },
-      { emoji: '🥗', name: 'Meal Prep' },
-      { emoji: '🎉', name: 'Partyservice' },
+      { name: 'Catering' },
+      { name: 'Foodtruck' },
+      { name: 'Getränkeservice' },
+      { name: 'Grillservice' },
+      { name: 'Kochservice' },
+      { name: 'Meal Prep' },
+      { name: 'Partyservice' },
     ]
   },
   {
-    emoji: '💪', name: 'Fitness & Sport',
+    name: 'Fitness & Sport',
     gewerke: [
-      { emoji: '🥦', name: 'Ernährungsberatung' },
-      { emoji: '🥋', name: 'Kampfsport' },
-      { emoji: '💪', name: 'Personal Trainer' },
-      { emoji: '🦴', name: 'Physiotherapie' },
-      { emoji: '🏋️', name: 'Pilates' },
-      { emoji: '🏊', name: 'Schwimmtrainer' },
-      { emoji: '🧘', name: 'Yoga' },
+      { name: 'Ernährungsberatung' },
+      { name: 'Kampfsport' },
+      { name: 'Personal Trainer' },
+      { name: 'Physiotherapie' },
+      { name: 'Pilates' },
+      { name: 'Schwimmtrainer' },
+      { name: 'Yoga' },
     ]
   },
   {
-    emoji: '🌿', name: 'Garten & Außen',
+    name: 'Garten & Außen',
     gewerke: [
-      { emoji: '🌳', name: 'Baumfällung' },
-      { emoji: '🌿', name: 'Gartenbau' },
-      { emoji: '🌱', name: 'Rasenpflege' },
-      { emoji: '🪴', name: 'Landschaftspflege' },
-      { emoji: '🧱', name: 'Pflasterer' },
-      { emoji: '🌊', name: 'Teichbau' },
-      { emoji: '🏡', name: 'Zaunbau' },
+      { name: 'Baumfällung' },
+      { name: 'Gartenbau' },
+      { name: 'Rasenpflege' },
+      { name: 'Landschaftspflege' },
+      { name: 'Pflasterer' },
+      { name: 'Teichbau' },
+      { name: 'Zaunbau' },
     ]
   },
   {
-    emoji: '🏠', name: 'Haus & Handwerk',
+    name: 'Haus & Handwerk',
     gewerke: [
-      { emoji: '🔌', name: 'Elektriker' },
-      { emoji: '🪟', name: 'Fensterbau' },
-      { emoji: '🪣', name: 'Klempner' },
-      { emoji: '🎨', name: 'Maler' },
-      { emoji: '🔨', name: 'Schreiner' },
-      { emoji: '🧹', name: 'Reinigung' },
-      { emoji: '🏗️', name: 'Renovierung' },
+      { name: 'Elektriker' },
+      { name: 'Fensterbau' },
+      { name: 'Klempner' },
+      { name: 'Maler' },
+      { name: 'Schreiner' },
+      { name: 'Reinigung' },
+      { name: 'Renovierung' },
     ]
   },
   {
-    emoji: '💻', name: 'IT & Digital',
+    name: 'IT & Digital',
     gewerke: [
-      { emoji: '🎨', name: 'Grafikdesign' },
-      { emoji: '📸', name: 'Fotografie' },
-      { emoji: '💻', name: 'Webentwicklung' },
-      { emoji: '📱', name: 'App-Entwicklung' },
-      { emoji: '📊', name: 'SEO / Marketing' },
-      { emoji: '🎬', name: 'Videoproduktion' },
+      { name: 'Grafikdesign' },
+      { name: 'Fotografie' },
+      { name: 'Webentwicklung' },
+      { name: 'App-Entwicklung' },
+      { name: 'SEO / Marketing' },
+      { name: 'Videoproduktion' },
     ]
   },
   {
-    emoji: '📋', name: 'Büro & Verwaltung',
+    name: 'Büro & Verwaltung',
     gewerke: [
-      { emoji: '🧑‍⚖️', name: 'Anwälte' },
-      { emoji: '📜', name: 'Arbeitsrecht' },
-      { emoji: '📋', name: 'Buchhaltung' },
-      { emoji: '⚖️', name: 'Rechtsberatung' },
-      { emoji: '💼', name: 'Steuerberatung' },
-      { emoji: '📝', name: 'Übersetzung' },
-      { emoji: '🗂️', name: 'Virtuelle Assistenz' },
+      { name: 'Anwälte' },
+      { name: 'Buchhaltung' },
+      { name: 'Steuerberatung' },
+      { name: 'Übersetzung' },
+      { name: 'Virtuelle Assistenz' },
     ]
   },
   {
-    emoji: '🎉', name: 'Events & Veranstaltung',
+    name: 'Events & Veranstaltung',
     gewerke: [
-      { emoji: '🎸', name: 'DJ / Musik' },
-      { emoji: '🎪', name: 'Eventplanung' },
-      { emoji: '🎭', name: 'Moderation' },
-      { emoji: '🎩', name: 'Zauberer' },
-      { emoji: '📸', name: 'Hochzeitsfotograf' },
+      { name: 'DJ / Musik' },
+      { name: 'Eventplanung' },
+      { name: 'Moderation' },
+      { name: 'Zauberer' },
+      { name: 'Hochzeitsfotograf' },
     ]
   },
   {
-    emoji: '🚗', name: 'Fahrzeuge & Mobilität',
+    name: 'Fahrzeuge & Mobilität',
     gewerke: [
-      { emoji: '🔧', name: 'Kfz-Mechaniker' },
-      { emoji: '🚗', name: 'Fahrservice' },
-      { emoji: '🚕', name: 'Kurierdienst' },
-      { emoji: '🚐', name: 'Reisebegleitung' },
+      { name: 'Kfz-Mechaniker' },
+      { name: 'Fahrservice' },
+      { name: 'Kurierdienst' },
+      { name: 'Reisebegleitung' },
     ]
   },
   {
-    emoji: '👶', name: 'Familie & Soziales',
+    name: 'Familie & Soziales',
     gewerke: [
-      { emoji: '👶', name: 'Babysitter' },
-      { emoji: '👴', name: 'Seniorenbetreuung' },
-      { emoji: '🏫', name: 'Kinderbetreuung' },
-      { emoji: '♿', name: 'Pflegedienst' },
+      { name: 'Babysitter' },
+      { name: 'Seniorenbetreuung' },
+      { name: 'Kinderbetreuung' },
+      { name: 'Pflegedienst' },
     ]
   },
   {
-    emoji: '🐾', name: 'Tiere',
+    name: 'Tiere',
     gewerke: [
-      { emoji: '✂️', name: 'Hundefriseur' },
-      { emoji: '🐕', name: 'Hundesitter' },
-      { emoji: '🐩', name: 'Tierpflege' },
-      { emoji: '🎾', name: 'Tiertrainer' },
+      { name: 'Hundefriseur' },
+      { name: 'Hundesitter' },
+      { name: 'Tierpflege' },
+      { name: 'Tiertrainer' },
     ]
   },
   {
-    emoji: '🚛', name: 'Transport & Logistik',
+    name: 'Transport & Logistik',
     gewerke: [
-      { emoji: '🗑️', name: 'Entrümpelung' },
-      { emoji: '📦', name: 'Möbelmontage' },
-      { emoji: '🏋️', name: 'Schwertransport' },
-      { emoji: '🚛', name: 'Umzugsservice' },
+      { name: 'Entrümpelung' },
+      { name: 'Möbelmontage' },
+      { name: 'Schwertransport' },
+      { name: 'Umzugsservice' },
     ]
   },
   {
-    emoji: '🧑‍💼', name: 'Personal',
+    name: 'Personal',
     gewerke: [
-      { emoji: '🧑‍💼', name: 'Personalvermittlung' },
-      { emoji: '💰', name: 'Lohnabrechnung' },
-      { emoji: '📊', name: 'Vergütungsberatung' },
-      { emoji: '🩺', name: 'Fehlzeitenmanagement' },
-      { emoji: '🎁', name: 'Mitarbeiterbenefits' },
+      { name: 'Personalvermittlung' },
+      { name: 'Lohnabrechnung' },
+      { name: 'Vergütungsberatung' },
+      { name: 'Fehlzeitenmanagement' },
+      { name: 'Mitarbeiterbenefits' },
     ]
   },
   {
-    emoji: '🏥', name: 'Gesundheit',
+    name: 'Gesundheit',
     gewerke: [
-      { emoji: '👨‍⚕️', name: 'Ärzte' },
-      { emoji: '🦷', name: 'Zahnärzte' },
-      { emoji: '🧠', name: 'Psychologen' },
-      { emoji: '🌿', name: 'Heilpraktiker' },
+      { name: 'Ärzte' },
+      { name: 'Zahnärzte' },
+      { name: 'Psychologen' },
+      { name: 'Heilpraktiker' },
     ]
   },
 ]
@@ -413,28 +416,30 @@ export default function Home() {
             placeholder="Name, Gewerk oder Ort suchen…"
             style={{ width:'100%', padding:'16px 60px 16px 20px', background:'#181818', border:'1px solid rgba(200,149,108,0.3)', borderRadius:12, fontSize:15, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
           />
-          <div style={{ position:'absolute', right:18, top:'50%', transform:'translateY(-50%)', color:'#c8956c', fontSize:18 }}>🔍</div>
+          <div style={{ position:'absolute', right:18, top:'50%', transform:'translateY(-50%)', color:'#c8956c', display:'flex' }}><Icon name="search" size={20} /></div>
         </div>
 
         {/* STADT + PLZ FILTER */}
         <div className="filter-row" style={{ maxWidth:560, margin:'12px auto 0', display:'flex', gap:10 }}>
-          <div style={{ flex:1 }}>
+          <div style={{ flex:1, position:'relative' }}>
+            <FilterIcon name="pin" />
             <input
               value={stadtFilter}
               onChange={e => filterStadt(e.target.value)}
-              placeholder="📍 Stadt filtern…"
-              style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
+              placeholder="Stadt filtern…"
+              style={{ width:'100%', padding:'12px 16px 12px 40px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
               onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
               onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
             />
           </div>
-          <div style={{ flex:1 }}>
+          <div style={{ flex:1, position:'relative' }}>
+            <FilterIcon name="map" />
             <input
               value={plzFilter}
               onChange={e => filterPlz(e.target.value)}
-              placeholder="🔢 PLZ filtern…"
+              placeholder="PLZ filtern…"
               maxLength={5}
-              style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
+              style={{ width:'100%', padding:'12px 16px 12px 40px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
               onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
               onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
             />
@@ -443,23 +448,25 @@ export default function Home() {
 
         {/* DATUM + UHRZEIT FILTER */}
         <div className="filter-row" style={{ maxWidth:560, margin:'10px auto 0', display:'flex', gap:10 }}>
-          <div style={{ flex:2 }}>
+          <div style={{ flex:2, position:'relative' }}>
+            <FilterIcon name="calendar" />
             <input
               value={datumFilter}
               onChange={e => filterDatum(e.target.value)}
-              placeholder="📅 Datum z.B. 15.06.2026"
-              style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
+              placeholder="Datum z.B. 15.06.2026"
+              style={{ width:'100%', padding:'12px 16px 12px 40px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
               onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
               onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
               onKeyDown={e => e.key === 'Enter' && suchAusfuehren()}
             />
           </div>
-          <div style={{ flex:1 }}>
+          <div style={{ flex:1, position:'relative' }}>
+            <FilterIcon name="clock" />
             <input
               type="time"
               value={uhrzeitFilter}
               onChange={e => filterUhrzeit(e.target.value)}
-              style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color: uhrzeitFilter ? '#E8DDD4' : '#5A5550', fontFamily:'inherit', outline:'none', boxSizing:'border-box', colorScheme:'dark' }}
+              style={{ width:'100%', padding:'12px 16px 12px 40px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color: uhrzeitFilter ? '#E8DDD4' : '#5A5550', fontFamily:'inherit', outline:'none', boxSizing:'border-box', colorScheme:'dark' }}
               onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
               onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
             />
@@ -467,17 +474,18 @@ export default function Home() {
         </div>
         {datumFilter && uhrzeitFilter && (
           <div style={{ maxWidth:560, margin:'6px auto 0', fontSize:11, color:'#9A8878', textAlign:'left', paddingLeft:4 }}>
-            ⏰ Zeigt nur Dienstleister die am {datumFilter} um {uhrzeitFilter} Uhr verfügbar sind
+            <Icon name="clock" size={12} style={{ verticalAlign:'-2px', marginRight:4 }} />Zeigt nur Dienstleister die am {datumFilter} um {uhrzeitFilter} Uhr verfügbar sind
           </div>
         )}
 
         {/* PREIS FILTER */}
-        <div style={{ maxWidth:560, margin:'10px auto 0' }}>
+        <div style={{ maxWidth:560, margin:'10px auto 0', position:'relative' }}>
+          <FilterIcon name="euro" />
           <input
             value={preisFilter}
             onChange={e => setPreisFilter(e.target.value.replace(/[^0-9]/g, ''))}
-            placeholder="💶 Max. Preis z.B. 80 (€/Std.)"
-            style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
+            placeholder="Max. Preis z.B. 80 (€/Std.)"
+            style={{ width:'100%', padding:'12px 16px 12px 40px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
             onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
             onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
             onKeyDown={e => e.key === 'Enter' && suchAusfuehren()}
@@ -489,11 +497,11 @@ export default function Home() {
           <button
             onClick={kiSuche}
             disabled={kiLaden}
-            style={{ width:'100%', padding:'14px', background: kiLaden ? '#8a6644' : '#c8956c', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:600, cursor: kiLaden ? 'wait' : 'pointer', fontFamily:'inherit', letterSpacing:0.5, transition:'background 0.2s' }}
+            style={{ width:'100%', padding:'14px', background: kiLaden ? '#8a6644' : '#c8956c', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:600, cursor: kiLaden ? 'wait' : 'pointer', fontFamily:'inherit', letterSpacing:0.5, transition:'background 0.2s', display:'inline-flex', alignItems:'center', justifyContent:'center', gap:8 }}
             onMouseEnter={e => { if (!kiLaden) e.currentTarget.style.background = '#b8845c' }}
             onMouseLeave={e => { if (!kiLaden) e.currentTarget.style.background = '#c8956c' }}
           >
-            {kiLaden ? '🔍 KI sucht…' : '🔍 Suchen'}
+            <Icon name="search" size={16} />{kiLaden ? 'KI sucht…' : 'Suchen'}
           </button>
         </div>
 
@@ -538,7 +546,7 @@ export default function Home() {
                     onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'; e.currentTarget.style.color = '#c8956c'; e.currentTarget.style.background = 'rgba(200,149,108,0.06)' }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#9A8878'; e.currentTarget.style.background = '#111' }}
                   >
-                    <span style={{ fontSize:28, flexShrink:0 }}>{kat.emoji}</span>
+                    <IconBadge name={iconNameFuerKategorie(kat.name)} size={46} />
                     <div>
                       <div style={{ fontSize:13, fontWeight:500, color:'#E8DDD4' }}>{kat.name}</div>
                       <div style={{ fontSize:11, color:'#5A5550', marginTop:2 }}>{kat.gewerke.length} Gewerke</div>
@@ -554,7 +562,7 @@ export default function Home() {
                 <button onClick={() => { setAktiveKategorie(null); setSelectedGewerk('') }} style={{ fontSize:12, color:'#c8956c', background:'none', border:'1px solid rgba(200,149,108,0.3)', borderRadius:8, padding:'6px 14px', cursor:'pointer', fontFamily:'inherit' }}>
                   ← Zurück
                 </button>
-                <span style={{ fontSize:22, fontWeight:700, fontFamily:'Georgia,serif' }}>{aktiveKatData.emoji} {aktiveKatData.name}</span>
+                <span style={{ display:'inline-flex', alignItems:'center', gap:12, fontSize:22, fontWeight:700, fontFamily:'Georgia,serif' }}><IconBadge name={iconNameFuerKategorie(aktiveKatData.name)} size={40} />{aktiveKatData.name}</span>
               </div>
               <div className="gewerk-grid" style={{ display:'grid', gridTemplateColumns:'repeat(6, 1fr)', gap:10 }}>
                 {aktiveKatData.gewerke.map(kat => (
@@ -565,7 +573,7 @@ export default function Home() {
                     onMouseEnter={e => { if (selectedGewerk !== kat.name) { e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'; e.currentTarget.style.color = '#c8956c' } }}
                     onMouseLeave={e => { if (selectedGewerk !== kat.name) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#9A8878' } }}
                   >
-                    <span style={{ fontSize:28, marginBottom:8 }}>{kat.emoji}</span>
+                    <Icon name={iconNameFuerKategorie(aktiveKatData.name)} size={24} style={{ marginBottom:10, opacity:0.85 }} />
                     <span style={{ fontSize:11, textAlign:'center', lineHeight:1.3 }}>{kat.name}</span>
                   </button>
                 ))}
@@ -596,10 +604,10 @@ export default function Home() {
         {/* ANSICHT UMSCHALTEN */}
         <div style={{ display:'flex', gap:8, marginBottom:20 }}>
           <button onClick={() => setKarteAktiv(false)} style={{ flex:1, padding:'10px', borderRadius:8, border:'1px solid ' + (!karteAktiv ? 'rgba(200,149,108,0.6)' : 'rgba(255,255,255,0.08)'), background: !karteAktiv ? 'rgba(200,149,108,0.12)' : 'transparent', color: !karteAktiv ? '#c8956c' : '#5A5550', cursor:'pointer', fontFamily:'inherit', fontSize:13, fontWeight: !karteAktiv ? 600 : 400 }}>
-            ☰ Listenansicht
+            <Icon name="list" size={15} style={{ marginRight:8, verticalAlign:'-3px' }} />Listenansicht
           </button>
           <button onClick={() => setKarteAktiv(true)} style={{ flex:1, padding:'10px', borderRadius:8, border:'1px solid ' + (karteAktiv ? 'rgba(200,149,108,0.6)' : 'rgba(255,255,255,0.08)'), background: karteAktiv ? 'rgba(200,149,108,0.12)' : 'transparent', color: karteAktiv ? '#c8956c' : '#5A5550', cursor:'pointer', fontFamily:'inherit', fontSize:13, fontWeight: karteAktiv ? 600 : 400 }}>
-            🗺 Kartenansicht
+            <Icon name="map" size={15} style={{ marginRight:8, verticalAlign:'-3px' }} />Kartenansicht
           </button>
         </div>
 
@@ -613,7 +621,7 @@ export default function Home() {
                 <div style={{ width:44, height:44, borderRadius:'50%', overflow:'hidden', background:'#181818', border:'1px solid rgba(200,149,108,0.2)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                   {d.profilbild
                     ? <img src={d.profilbild} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                    : <span style={{ fontSize:22 }}>{d.emoji || '🔧'}</span>
+                    : <Icon name="user" size={22} style={{ color:'#c8956c' }} />
                   }
                 </div>
                 <div>
@@ -674,12 +682,12 @@ export default function Home() {
           <div style={{ fontFamily:'Georgia,serif', fontSize:28, fontWeight:700, marginBottom:48 }}>In 3 Schritten zum Dienstleister</div>
           <div className="steps-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:32 }}>
             {[
-              ['🔍', 'Suchen', 'Nach Name, Gewerk oder Ort suchen und den passenden Dienstleister finden.'],
-              ['👁️', 'Vergleichen', 'Profile, Beschreibungen und Verfügbarkeit vergleichen.'],
-              ['✉️', 'Kontaktieren', 'Direkt per E-Mail Kontakt aufnehmen — kostenlos und einfach.'],
+              ['search', 'Suchen', 'Nach Name, Gewerk oder Ort suchen und den passenden Dienstleister finden.'],
+              ['eye', 'Vergleichen', 'Profile, Beschreibungen und Verfügbarkeit vergleichen.'],
+              ['mail', 'Kontaktieren', 'Direkt per E-Mail Kontakt aufnehmen — kostenlos und einfach.'],
             ].map(([icon, titel, text]) => (
               <div key={titel as string} style={{ textAlign:'center' }}>
-                <div style={{ fontSize:32, marginBottom:14 }}>{icon}</div>
+                <div style={{ marginBottom:16, display:'flex', justifyContent:'center' }}><IconBadge name={icon as string} size={56} /></div>
                 <div style={{ fontSize:15, fontWeight:500, marginBottom:8, color:'#c8956c' }}>{titel}</div>
                 <div style={{ fontSize:13, color:'#5A5550', lineHeight:1.7 }}>{text}</div>
               </div>
