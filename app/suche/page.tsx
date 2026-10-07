@@ -460,13 +460,12 @@ export default function Home() {
               onKeyDown={e => e.key === 'Enter' && suchAusfuehren()}
             />
           </div>
-          <div style={{ flex:1, position:'relative' }}>
-            <FilterIcon name="clock" />
+          <div style={{ flex:1 }}>
             <input
               type="time"
               value={uhrzeitFilter}
               onChange={e => filterUhrzeit(e.target.value)}
-              style={{ width:'100%', padding:'12px 16px 12px 40px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color: uhrzeitFilter ? '#E8DDD4' : '#5A5550', fontFamily:'inherit', outline:'none', boxSizing:'border-box', colorScheme:'dark' }}
+              style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color: uhrzeitFilter ? '#E8DDD4' : '#5A5550', fontFamily:'inherit', outline:'none', boxSizing:'border-box', colorScheme:'dark' }}
               onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
               onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
             />

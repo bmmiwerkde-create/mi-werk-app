@@ -58,12 +58,36 @@ const CSS = `
   }
   .lp-nav .lp-btn { white-space:nowrap; }
   .lp-nav-logo { white-space:nowrap; }
+  .lp-show-s { display:none; }
   @media (max-width:560px) {
-    .lp-grid3, .lp-grid4 { grid-template-columns:1fr; }
-    .lp-grid5 { grid-template-columns:repeat(2,1fr); }
-    .lp-btn { width:100%; }
+    .lp-wrap { padding:0 18px; }
+    .lp-nav-in { height:56px; }
+    .lp-nav-logo { font-size:20px !important; }
+    .lp-nav .lp-btn { width:auto; padding:8px 14px !important; font-size:13px !important; border-radius:10px; }
     .lp-hide-s { display:none; }
-    .lp-nav .lp-btn { width:auto; padding:9px 14px !important; font-size:13px !important; }
+    .lp-show-s { display:inline; }
+    .lp-hero { padding:40px 0 36px; }
+    .lp-hero h1 { font-size:28px; line-height:1.18; margin-bottom:14px; }
+    .lp-hero p { font-size:15px; line-height:1.55; margin-bottom:24px; }
+    .lp-kicker { font-size:10.5px; letter-spacing:1.5px; margin-bottom:10px; }
+    .lp-btn { width:100%; padding:13px 18px; font-size:15px; border-radius:11px; }
+    .lp-chips { gap:8px; margin-top:22px; }
+    .lp-chip { font-size:12px; padding:6px 12px; }
+    .lp-sec { padding:44px 0; }
+    .lp-title { font-size:24px; line-height:1.2; margin-bottom:12px; }
+    .lp-lead { font-size:15px; line-height:1.6; margin-bottom:18px; }
+    .lp-two { gap:28px; }
+    .lp-card { padding:18px; border-radius:16px; }
+    .lp-card h3 { font-size:19px !important; margin-bottom:12px !important; }
+    .lp-check { font-size:14px; gap:10px; margin-bottom:10px; line-height:1.5; }
+    .lp-cal { padding:16px; border-radius:16px; }
+    .lp-cal-grid { gap:4px; }
+    .lp-day { padding:6px 0; font-size:11.5px; }
+    .lp-grid3, .lp-grid4 { grid-template-columns:1fr; gap:14px; }
+    .lp-grid5 { grid-template-columns:repeat(2,1fr); gap:10px; }
+    .lp-kat { padding:14px 8px; font-size:12px; gap:8px; }
+    .lp-cta { padding:40px 18px; border-radius:18px; }
+    .lp-foot { padding:28px 18px !important; }
   }
 `
 
@@ -81,7 +105,7 @@ export default function LandingPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
             <Link href="/suche" className="lp-hide-m" style={{ fontSize: 14, color: '#9A8878' }}>Dienstleister finden</Link>
             <Link href="/login" className="lp-hide-s" style={{ fontSize: 14, color: '#9A8878' }}>Anmelden</Link>
-            <Link href="/login" className="lp-btn lp-btn-p" style={{ padding: '10px 20px', fontSize: 14 }}>Kostenlos eintragen</Link>
+            <Link href="/login" className="lp-btn lp-btn-p" style={{ padding: '10px 20px', fontSize: 14 }}><span className="lp-hide-s">Kostenlos eintragen</span><span className="lp-show-s">Eintragen</span></Link>
           </div>
         </div>
       </nav>
