@@ -46,7 +46,7 @@ body{background:#E9EDF5;color:#14213D;font-family:system-ui,-apple-system,"Segoe
 .tile:hover{border-color:#16316B}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.sf{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.sf{display:grid;grid-template-columns:1.4fr 1fr .8fr 1fr;gap:10px;margin-bottom:12px}
 .pr{display:grid;grid-template-columns:1.1fr 1fr;gap:26px;align-items:start}
 .hero{text-align:center;padding:38px 24px 30px;background:#F6F8FC}
 .h1{font-size:36px;line-height:1.12;margin-bottom:12px}
@@ -77,10 +77,11 @@ body{background:#E9EDF5;color:#14213D;font-family:system-ui,-apple-system,"Segoe
 <div class="k">DIENSTLEISTER IN DEINER REGION</div>
 <div class="t h1">Finde Dienstleister, die <span style="color:#16316B">wirklich Zeit</span> haben.</div>
 <div class="m narrow" style="margin-bottom:20px">Sag uns, was du brauchst und wann. Du siehst sofort, wer in dieser Zeit frei ist.</div>
-<div class="cd" style="max-width:600px;margin:0 auto;padding:14px;background:#fff;text-align:left">
+<div class="cd" style="max-width:720px;margin:0 auto;padding:14px;background:#fff;text-align:left">
 <div class="sf">
 <div><div class="lb">WAS</div><input class="in" id="was" list="wasliste" placeholder="z. B. Elektriker, Friseur, Nachhilfe" autocomplete="off"><datalist id="wasliste"></datalist></div>
 <div><div class="lb">WO</div><input class="in" id="wo" value="Bochum"></div>
+<div><div class="lb">PLZ</div><input class="in" id="plz" inputmode="numeric" maxlength="5" pattern="[0-9]*" placeholder="z. B. 44787" autocomplete="postal-code"></div>
 <div><div class="lb">WANN</div><input class="in" id="wann" type="date" value="2026-10-12"></div>
 </div>
 <button class="btn" data-go="res">Freie Dienstleister anzeigen</button>
@@ -161,7 +162,9 @@ function wasLabel(){var w=($('was').value||'').trim();if(!w)return 'Anbieter';re
 function dateDay(){var v=$('wann').value;if(!v)return null;var d=v.split('-');return d[1]==='10'?parseInt(d[2],10):null}
 function mk(id,busy,click,pre){var el=$(id);el.innerHTML='';['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(function(d){el.insertAdjacentHTML('beforeend','<b>'+d+'</b>')});el.insertAdjacentHTML('beforeend','<i></i><i></i><i></i>');
 for(var d=1;d<=31;d++){var c=busy.indexOf(d)>-1?'x':'f';var n=document.createElement('i');n.className=c+(click&&pre===d&&c==='f'?' sel':'');n.textContent=d;if(click&&c==='f'){n.onclick=(function(dd,nn){return function(){sel=dd;el.querySelectorAll('i').forEach(function(q){q.classList.remove('sel')});nn.classList.add('sel');$('si').textContent='Wunschtag: '+dd+'. Oktober 2026'}})(d,n)}el.appendChild(n)}}
-function build(){var wd=dateDay(),w=($('was').value||'').trim(),o=$('wo').value||'deiner Nähe';
+$('plz').addEventListener('input',function(){this.value=this.value.replace(/\D/g,'').slice(0,5)});
+function ortLabel(){var p=$('plz').value,o=$('wo').value.trim();return (p.length===5?p+(o?' ':''):'')+o||'deiner Nähe'}
+function build(){var wd=dateDay(),w=($('was').value||'').trim(),o=ortLabel();
 $('rt').textContent=(isCat(w)?'Alle in '+w:(w||'Alle Dienstleister'))+' in '+o;
 $('rs').textContent='Beispiel-Profile, '+(wd?'am '+wd+'. Oktober 2026':'ohne festen Termin')+'. Tippe auf eins.';
 var L=$('list');L.innerHTML='';var fr=[],bz=[];P.forEach(function(p,i){(wd&&p.b.indexOf(wd)>-1?bz:fr).push(i)});
@@ -170,7 +173,7 @@ d.innerHTML='<div style="display:flex;gap:12px;align-items:center"><span class="
 d.onclick=function(){cur=i;show('prof')};L.appendChild(d)})}
 function show(id){document.querySelectorAll('.sc').forEach(function(s){s.classList.remove('on')});var t=$(id);t.classList.add('on');$('stp').textContent=t.getAttribute('data-step')||'Startseite';
 if(id==='res')build();
-if(id==='prof'){var p=P[cur||0];sel=null;$('pn').textContent='Beispiel '+wasLabel()+' '+p.n;$('pm').textContent='★★★★★ '+p.r+' ('+p.c+' Bewertungen) · '+($('wo').value||'Bochum');var wd=dateDay();if(wd&&p.b.indexOf(wd)===-1)sel=wd;$('si').textContent=sel?'Wunschtag: '+sel+'. Oktober 2026':'Wunschtag: noch keiner gewählt';mk('cal',p.b,true,sel)}
+if(id==='prof'){var p=P[cur||0];sel=null;$('pn').textContent='Beispiel '+wasLabel()+' '+p.n;$('pm').textContent='★★★★★ '+p.r+' ('+p.c+' Bewertungen) · '+ortLabel();var wd=dateDay();if(wd&&p.b.indexOf(wd)===-1)sel=wd;$('si').textContent=sel?'Wunschtag: '+sel+'. Oktober 2026':'Wunschtag: noch keiner gewählt';mk('cal',p.b,true,sel)}
 if(id==='sent'){$('sd').textContent=sel?'Wunschtag '+sel+'. Oktober. Der Dienstleister meldet sich direkt bei dir.':'Der Dienstleister meldet sich direkt bei dir.'}
 if(id==='d4'){mk('cal2',[3,4,10,11,17,18,24,25,31],false)}
 window.scrollTo(0,0)}
