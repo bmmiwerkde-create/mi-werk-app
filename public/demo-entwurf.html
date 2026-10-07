@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>mi-werk – Design-Entwurf (Demo)</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#E9EDF5;color:#14213D;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;-webkit-text-size-adjust:100%}
+.demo{background:#16316B;color:#fff;text-align:center;font-size:13px;padding:9px 14px;line-height:1.4}
+.wrap{max-width:940px;margin:18px auto;padding:0 14px}
+.pg{background:#fff;border:1px solid #DDE3EF;border-radius:14px;overflow:hidden;min-height:620px}
+.sc{display:none}.sc.on{display:block}
+.nv{display:flex;justify-content:space-between;align-items:center;padding:13px 24px;border-bottom:1px solid #E3E8F2;gap:10px}
+.lg{font-family:Georgia,serif;font-weight:700;font-size:20px;cursor:pointer;white-space:nowrap}
+.lg span{color:#16316B}
+.nl{font-size:13px;color:#4A5878;display:flex;gap:16px;align-items:center}
+.nl span{cursor:pointer;white-space:nowrap}
+.eb{background:#16316B;color:#fff;padding:7px 13px;border-radius:9px}
+.stp{font-size:12px;color:#6B7794;padding:9px 24px;background:#F6F8FC;border-bottom:1px solid #E3E8F2}
+.sec{padding:26px 24px}
+.k{font-size:11px;letter-spacing:1.6px;color:#16316B;font-weight:700;margin-bottom:8px}
+.t{font-family:Georgia,serif;font-weight:700;letter-spacing:-.5px;color:#14213D}
+.m{color:#4A5878;font-size:14px;line-height:1.55}
+.cd{background:#F6F8FC;border:1px solid #E1E7F2;border-radius:14px;padding:16px}
+.ib{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#16316B;background:#E4EBF8;border:1px solid #D2DCF0;margin-bottom:10px}
+.ib svg{width:21px;height:21px}
+.btn{display:block;width:100%;background:#16316B;color:#fff;border:none;border-radius:11px;padding:13px;text-align:center;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit}
+.btn:hover{background:#0f2552}
+.btn.s{background:#fff;color:#16316B;border:1px solid #C9D3E6}
+.btn.s:hover{background:#F1F4FA}
+.in{width:100%;background:#fff;color:#14213D;border:1px solid #D6DDEC;border-radius:10px;padding:11px 12px;font-size:15px;font-family:inherit}
+.lb{font-size:11px;font-weight:600;color:#16316B;margin:0 0 4px;letter-spacing:.5px}
+.card{background:#fff;border:1px solid #E1E7F2;border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;display:flex;gap:12px;align-items:center;justify-content:space-between}
+.card:hover{border-color:#16316B}
+.bd{display:inline-block;font-size:12px;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.ok{background:#D6EFDF;color:#14532D}.no{background:#FADBD8;color:#8A2A1D}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:8px 0;max-width:360px}
+.cal b{font-weight:400;font-size:11px;text-align:center;color:#6B7794}
+.cal i{font-style:normal;font-size:13px;text-align:center;padding:7px 0;border-radius:7px}
+.cal i.f{background:#D6EFDF;color:#14532D;cursor:pointer}.cal i.x{background:#FADBD8;color:#8A2A1D}
+.cal i.sel{outline:2px solid #16316B;outline-offset:1px;font-weight:600}
+.tile{text-align:center;padding:16px 8px;cursor:pointer}
+.tile:hover{border-color:#16316B}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sf{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.pr{display:grid;grid-template-columns:1.1fr 1fr;gap:26px;align-items:start}
+.hero{text-align:center;padding:38px 24px 30px;background:#F6F8FC}
+.h1{font-size:36px;line-height:1.12;margin-bottom:12px}
+.narrow{max-width:440px;margin:0 auto}
+.foot{text-align:center;font-size:12px;color:#6B7794;padding:14px}
+@media(max-width:700px){
+.h1{font-size:28px}
+.g3{grid-template-columns:1fr}
+.g4{grid-template-columns:repeat(2,1fr)}
+.sf{grid-template-columns:1fr}
+.pr{grid-template-columns:1fr}
+.nv{padding:11px 14px}.sec{padding:22px 16px}.stp{padding:9px 16px}.hero{padding:30px 16px 24px}
+.nl{gap:10px;font-size:12px}
+.wrap{margin:10px auto}
+}
+@media(max-width:430px){.nl span:first-child{display:none}.lg{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="demo">Design-Entwurf zum Ausprobieren. Alle Profile, Bewertungen und Termine sind Beispieldaten.</div>
+<div class="wrap">
+<div class="pg">
+<div class="nv"><span class="lg" data-go="home">Mi-<span>Werk</span></span><div class="nl"><span data-go="home">Dienstleister finden</span><span class="eb" data-go="d1">Eintragen</span></div></div>
+<div class="stp" id="stp">Startseite</div>
+
+<div class="sc on" id="home">
+<div class="hero">
+<div class="k">DIENSTLEISTER IN DEINER REGION</div>
+<div class="t h1">Finde Dienstleister, die <span style="color:#16316B">wirklich Zeit</span> haben.</div>
+<div class="m narrow" style="margin-bottom:20px">Sag uns, was du brauchst und wann. Du siehst sofort, wer in dieser Zeit frei ist.</div>
+<div class="cd" style="max-width:600px;margin:0 auto;padding:14px;background:#fff;text-align:left">
+<div class="sf">
+<div><div class="lb">WAS</div><input class="in" id="was" list="wasliste" placeholder="z. B. Elektriker, Friseur, Nachhilfe" autocomplete="off"><datalist id="wasliste"></datalist></div>
+<div><div class="lb">WO</div><input class="in" id="wo" value="Bochum"></div>
+<div><div class="lb">WANN</div><input class="in" id="wann" type="date" value="2026-10-12"></div>
+</div>
+<button class="btn" data-go="res">Freie Dienstleister anzeigen</button>
+</div>
+<div style="display:flex;gap:18px;justify-content:center;margin-top:16px;font-size:13px;color:#4A5878;flex-wrap:wrap"><span>✓ Kein Konto nötig</span><span>✓ Für Kunden kostenlos</span><span>✓ 15 Branchen</span></div>
+</div>
+<div class="sec" style="border-top:1px solid #E3E8F2;text-align:center">
+<div class="k">SO FUNKTIONIERT ES</div>
+<div class="t" style="font-size:23px;margin-bottom:16px">In drei Schritten zum passenden Termin</div>
+<div class="g3" style="text-align:left">
+<div class="cd"><div class="t" style="font-size:30px;color:#16316B;line-height:1">1</div><div style="font-weight:600;font-size:15px;margin:8px 0 4px">Angeben, was und wann</div><div class="m" style="font-size:13px">Branche, Ort und Wunschtermin eingeben.</div></div>
+<div class="cd"><div class="t" style="font-size:30px;color:#16316B;line-height:1">2</div><div style="font-weight:600;font-size:15px;margin:8px 0 4px">Sehen, wer frei ist</div><div class="m" style="font-size:13px">Alle Profile zeigen ihren Kalender.</div></div>
+<div class="cd"><div class="t" style="font-size:30px;color:#16316B;line-height:1">3</div><div style="font-weight:600;font-size:15px;margin:8px 0 4px">Direkt anfragen</div><div class="m" style="font-size:13px">Per E-Mail, ohne auf Angebote zu warten.</div></div>
+</div></div>
+<div class="sec" style="border-top:1px solid #E3E8F2;background:#F6F8FC">
+<div class="t" style="font-size:20px;margin-bottom:12px">Alle Branchen</div>
+<div class="g4" id="tiles"></div></div>
+<div class="sec" style="padding-top:20px"><div class="cd" style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:#16316B;border-color:#16316B">
+<div><div class="t" style="font-size:19px;color:#fff;margin-bottom:4px">Du bietest Leistungen an?</div><div style="font-size:13px;color:#C9D6F2">12 Monate kostenlos. Nur passende Anfragen erhalten.</div></div>
+<div data-go="d1" style="background:#fff;color:#16316B;border-radius:10px;padding:11px 18px;font-size:14px;font-weight:600;cursor:pointer">Kostenlos eintragen</div></div></div>
+<div class="foot">Impressum · Datenschutz · Kontakt · AGB</div>
+</div>
+
+<div class="sc" id="res" data-step="Kunde · Ergebnisse">
+<div class="sec">
+<div class="t" style="font-size:23px;margin-bottom:4px" id="rt">Elektriker in Bochum</div>
+<div class="m" style="margin-bottom:16px" id="rs">Beispiel-Profile. Tippe auf eins.</div>
+<div id="list"></div>
+<button class="btn s" data-go="home" style="margin-top:6px;max-width:220px">Suche ändern</button>
+</div></div>
+
+<div class="sc" id="prof" data-step="Kunde · Profil und Anfrage">
+<div class="sec">
+<div style="display:flex;gap:12px;align-items:center;margin-bottom:16px"><span class="ib" style="width:52px;height:52px;border-radius:50%;margin:0"><span data-ic="user"></span></span><div><div class="t" style="font-size:20px" id="pn">Beispiel A</div><div style="font-size:13px;color:#6B7794" id="pm"></div></div></div>
+<div class="pr">
+<div><div class="lb">VERFÜGBARKEIT OKTOBER 2026 (freien Tag antippen)</div><div class="cal" id="cal"></div><div style="display:flex;gap:14px;font-size:12px;color:#6B7794"><span><span class="bd ok" style="padding:0 7px">&nbsp;</span> Frei</span><span><span class="bd no" style="padding:0 7px">&nbsp;</span> Belegt</span></div><div class="m" style="font-size:13px;margin-top:10px" id="si">Wunschtag: noch keiner gewählt</div></div>
+<div><div class="lb">NACHRICHT AN DEN DIENSTLEISTER</div><textarea class="in" rows="4" id="msg">Hallo, ich hätte gern einen Termin. Können Sie mir helfen?</textarea><div style="height:10px"></div><input class="in" placeholder="Deine E-Mail" value="ich@beispiel.de"><div style="height:12px"></div><button class="btn" data-go="sent">Anfrage senden</button></div>
+</div></div></div>
+
+<div class="sc" id="sent" data-step="Kunde · Fertig">
+<div class="sec" style="text-align:center;padding:52px 24px"><span class="ib" style="width:60px;height:60px;border-radius:50%;margin:0 auto 14px;background:#16316B;color:#fff"><span data-ic="check"></span></span>
+<div class="t" style="font-size:25px;margin-bottom:8px">Anfrage gesendet</div><div class="m narrow" id="sd" style="margin-bottom:18px">Der Dienstleister meldet sich direkt bei dir.</div>
+<div class="cd narrow" style="margin-bottom:18px;font-size:14px">Kein Konto nötig. Deine Anfrage geht per E-Mail direkt an den Dienstleister.</div>
+<button class="btn s" data-go="home" style="max-width:240px;margin:0 auto">Zur Startseite</button></div></div>
+
+<div class="sc" id="d1" data-step="Dienstleister · Schritt 1 von 4: Registrieren">
+<div class="sec narrow"><div class="t" style="font-size:25px;margin-bottom:6px">Kostenlos eintragen</div><div class="m" style="margin-bottom:16px">12 Monate gratis. In wenigen Minuten startklar.</div>
+<div class="lb">E-MAIL</div><input class="in" value="name@firma.de"><div style="height:10px"></div><div class="lb">PASSWORT</div><input class="in" type="password" value="passwort123"><div style="height:16px"></div><button class="btn" data-go="d2">Konto erstellen</button></div></div>
+
+<div class="sc" id="d2" data-step="Dienstleister · Schritt 2 von 4: Profil">
+<div class="sec narrow"><div class="t" style="font-size:25px;margin-bottom:6px">Dein Profil</div><div class="m" style="margin-bottom:16px">Das sehen Kundinnen und Kunden.</div>
+<div class="lb">NAME</div><input class="in" value="Mustermann Elektro"><div style="height:10px"></div><div class="lb">BEREICH</div><select class="in" id="bereich"></select><div style="height:10px"></div><div class="lb">ORT</div><input class="in" value="Bochum"><div style="height:16px"></div><button class="btn" data-go="d3">Weiter</button></div></div>
+
+<div class="sc" id="d3" data-step="Dienstleister · Schritt 3 von 4: Kalender verbinden">
+<div class="sec narrow"><div class="t" style="font-size:25px;margin-bottom:6px">Kalender verbinden</div><div class="m" style="margin-bottom:16px">So sehen Kunden, wann du Zeit hast. Du bekommst nur passende Anfragen.</div>
+<button class="btn s" data-go="d4" style="margin-bottom:8px;text-align:left">Mit Google Kalender</button><button class="btn s" data-go="d4" style="margin-bottom:8px;text-align:left">Mit Outlook</button><button class="btn s" data-go="d4" style="margin-bottom:14px;text-align:left">iPhone-Kalender per Link</button>
+<div class="cd" style="font-size:14px;margin-bottom:14px">Sichtbar ist nur frei oder belegt, nie Titel oder Details.</div><div style="text-align:center;font-size:14px;color:#6B7794;cursor:pointer" data-go="d4">Später verbinden</div></div></div>
+
+<div class="sc" id="d4" data-step="Dienstleister · Schritt 4 von 4: Fertig">
+<div class="sec narrow" style="text-align:center"><span class="ib" style="width:60px;height:60px;border-radius:50%;margin:0 auto 12px;background:#16316B;color:#fff"><span data-ic="check"></span></span>
+<div class="t" style="font-size:25px;margin-bottom:6px">Dein Profil ist live</div><div class="m" style="margin-bottom:8px">So sehen Kunden deine Verfügbarkeit.</div><div class="cal" id="cal2" style="margin:8px auto"></div><div class="cd" style="font-size:14px;margin:8px 0 16px">12 Monate kostenlos. Danach ein günstiges Abo je Branche.</div><button class="btn s" data-go="home">Zur Startseite</button></div></div>
+
+</div></div>
+
+<script>
+var IC={"beauty": "<circle cx=\"6\" cy=\"6\" r=\"2.5\" /><circle cx=\"6\" cy=\"18\" r=\"2.5\" /><path d=\"M8 7.5 20 18M8 16.5 20 6\" />", "bildung": "<path d=\"m2 9 10-5 10 5-10 5z\" /><path d=\"M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5M22 9v6\" />", "catering": "<path d=\"M6 3v6a2 2 0 0 0 4 0V3M8 3v18\" /><path d=\"M17 21V3c-2.2 1.5-3.5 4.5-3.5 8H17\" />", "fitness": "<path d=\"M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11\" />", "garten": "<path d=\"M12 21V11\" /><path d=\"M12 11c0-4 3-6 7-6 0 4-3 6-7 6z\" /><path d=\"M12 15c0-3-2.5-5-6-5 0 3.5 2.5 5 6 5z\" />", "handwerk": "<path d=\"m3 11 9-8 9 8\" /><path d=\"M5 10v10h14V10\" /><path d=\"M10 20v-6h4v6\" />", "it": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\" /><path d=\"M8 20h8M12 16v4\" />", "buero": "<rect x=\"3\" y=\"7\" width=\"18\" height=\"13\" rx=\"2\" /><path d=\"M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18\" />", "events": "<path d=\"m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z\" /><path d=\"m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z\" />", "auto": "<path d=\"M5 17h-.5A1.5 1.5 0 0 1 3 15.5V13l1.8-4.6A2 2 0 0 1 6.7 7h10.6a2 2 0 0 1 1.9 1.4L21 13v2.5a1.5 1.5 0 0 1-1.5 1.5H19\" /><path d=\"M3 13h18\" /><circle cx=\"7.5\" cy=\"17\" r=\"2\" /><circle cx=\"16.5\" cy=\"17\" r=\"2\" /><path d=\"M9.5 17h5\" />", "familie": "<circle cx=\"9\" cy=\"8\" r=\"3\" /><path d=\"M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6\" /><circle cx=\"17\" cy=\"9\" r=\"2.2\" /><path d=\"M16 14.2c2.9.3 5 2.6 5 5.8\" />", "tiere": "<circle cx=\"6\" cy=\"10\" r=\"1.8\" /><circle cx=\"10\" cy=\"6\" r=\"1.8\" /><circle cx=\"14\" cy=\"6\" r=\"1.8\" /><circle cx=\"18\" cy=\"10\" r=\"1.8\" /><path d=\"M12 12c-3 0-6 3-6 5.500 0 1.700 1.400 2.500 3 2.500 1 0 2-.5 3-.5s2 .5 3 .5c1.600 0 3-.8 3-2.500 0-2.500-3-5.500-6-5.500z\" />", "transport": "<rect x=\"2\" y=\"6\" width=\"11\" height=\"10\" rx=\"1\" /><path d=\"M13 9h4l4 4v3h-8\" /><circle cx=\"6.500\" cy=\"17.500\" r=\"1.800\" /><circle cx=\"17.500\" cy=\"17.500\" r=\"1.800\" />", "personal": "<circle cx=\"12\" cy=\"7.500\" r=\"3.200\" /><path d=\"M5.500 20.500c.7-3.600 3.300-5.500 6.500-5.500s5.800 1.900 6.500 5.500\" /><path d=\"m12 15-1.200 1.600 1.200 4 1.200-4z\" />", "gesundheit": "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"5\" /><path d=\"M12 7.500v9M7.500 12h9\" />", "search": "<circle cx=\"11\" cy=\"11\" r=\"7\" /><path d=\"m21 21-4.300-4.300\" />", "list": "<path d=\"M8 6h13M8 12h13M8 18h13\" /><circle cx=\"3.800\" cy=\"6\" r=\".6\" /><circle cx=\"3.800\" cy=\"12\" r=\".6\" /><circle cx=\"3.800\" cy=\"18\" r=\".6\" />", "map": "<path d=\"m9 4-6 2v14l6-2 6 2 6-2V4l-6 2z\" /><path d=\"M9 4v14M15 6v14\" />", "pin": "<path d=\"M12 21s-7-6.200-7-11a7 7 0 0 1 14 0c0 4.800-7 11-7 11z\" /><circle cx=\"12\" cy=\"10\" r=\"2.500\" />", "calendar": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\" /><path d=\"M3 10h18M8 3v4M16 3v4\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"9\" /><path d=\"M12 7v5l3 2\" />", "euro": "<path d=\"M17.500 6.500A7 7 0 1 0 17.500 17.500\" /><path d=\"M4 10h9M4 14h9\" />", "mail": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\" /><path d=\"m3 7 9 6 9-6\" />", "phone": "<path d=\"M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"9\" /><path d=\"M3 12h18M12 3c2.500 2.500 3.500 5.500 3.500 9S14.500 18.500 12 21c-2.500-2.500-3.500-5.500-3.500-9S9.500 5.500 12 3z\" />", "check": "<path d=\"m5 12.500 4.500 4.500L19 7\" />", "lock": "<rect x=\"5\" y=\"11\" width=\"14\" height=\"10\" rx=\"2\" /><path d=\"M8 11V8a4 4 0 0 1 8 0v3\" />", "arrow": "<path d=\"M5 12h14M13 6l6 6-6 6\" />", "star": "<path d=\"m12 3 2.700 5.600 6.100.9-4.400 4.300 1 6.100L12 17l-5.400 2.900 1-6.100L3.200 9.500l6.100-.9z\" />", "eye": "<path d=\"M2 12s3.500-7 10-7 10 7 10 7-3.500 7-10 7S2 12 2 12z\" /><circle cx=\"12\" cy=\"12\" r=\"3\" />", "user": "<circle cx=\"12\" cy=\"8\" r=\"4\" /><path d=\"M4 21c0-4 3.600-7 8-7s8 3 8 7\" />", "trend": "<path d=\"m3 17 6-6 4 4 8-8\" /><path d=\"M15 7h6v6\" />", "shield": "<path d=\"M12 3 4 6v6c0 4.500 3.200 8 8 9 4.800-1 8-4.500 8-9V6z\" /><path d=\"m9 12 2 2 4-4\" />", "sparkle": "<path d=\"m12 3 1.800 5.200L19 10l-5.200 1.800L12 17l-1.800-5.200L5 10l5.200-1.800z\" />"};
+var CATS=[{"name": "Beauty & Pflege", "gewerke": ["Fußpflege", "Friseur", "Kosmetik", "Massage", "Nagelpflege", "Permanent Make-up", "Wimpern"], "icon": "beauty"}, {"name": "Bildung & Coaching", "gewerke": ["Bewerbungscoaching", "Life Coach", "Musikunterricht", "Nachhilfe", "Sprachkurs"], "icon": "bildung"}, {"name": "Catering & Essen", "gewerke": ["Catering", "Foodtruck", "Getränkeservice", "Grillservice", "Kochservice", "Meal Prep", "Partyservice"], "icon": "catering"}, {"name": "Fitness & Sport", "gewerke": ["Ernährungsberatung", "Kampfsport", "Personal Trainer", "Physiotherapie", "Pilates", "Schwimmtrainer", "Yoga"], "icon": "fitness"}, {"name": "Garten & Außen", "gewerke": ["Baumfällung", "Gartenbau", "Rasenpflege", "Landschaftspflege", "Pflasterer", "Teichbau", "Zaunbau"], "icon": "garten"}, {"name": "Haus & Handwerk", "gewerke": ["Elektriker", "Fensterbau", "Klempner", "Maler", "Schreiner", "Reinigung", "Renovierung"], "icon": "handwerk"}, {"name": "IT & Digital", "gewerke": ["Grafikdesign", "Fotografie", "Webentwicklung", "App-Entwicklung", "SEO / Marketing", "Videoproduktion"], "icon": "it"}, {"name": "Büro & Verwaltung", "gewerke": ["Anwälte", "Buchhaltung", "Steuerberatung", "Übersetzung", "Virtuelle Assistenz"], "icon": "buero"}, {"name": "Events & Veranstaltung", "gewerke": ["DJ / Musik", "Eventplanung", "Moderation", "Zauberer", "Hochzeitsfotograf"], "icon": "events"}, {"name": "Fahrzeuge & Mobilität", "gewerke": ["Kfz-Mechaniker", "Fahrservice", "Kurierdienst", "Reisebegleitung"], "icon": "auto"}, {"name": "Familie & Soziales", "gewerke": ["Babysitter", "Seniorenbetreuung", "Kinderbetreuung", "Pflegedienst"], "icon": "familie"}, {"name": "Tiere", "gewerke": ["Hundefriseur", "Hundesitter", "Tierpflege", "Tiertrainer"], "icon": "tiere"}, {"name": "Transport & Logistik", "gewerke": ["Entrümpelung", "Möbelmontage", "Schwertransport", "Umzugsservice"], "icon": "transport"}, {"name": "Personal", "gewerke": ["Personalvermittlung", "Lohnabrechnung", "Vergütungsberatung", "Fehlzeitenmanagement", "Mitarbeiterbenefits"], "icon": "personal"}, {"name": "Gesundheit", "gewerke": ["Ärzte", "Zahnärzte", "Psychologen", "Heilpraktiker"], "icon": "gesundheit"}];
+document.querySelectorAll('[data-ic]').forEach(function(e){e.outerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+IC[e.getAttribute('data-ic')]+'</svg>'});
+var P=[{n:'A',b:[3,4,10,11,17,18,24,25,31],r:'5,0',c:12},{n:'B',b:[12,13,14,19,20,26,27],r:'4,8',c:7},{n:'C',b:[5,6,12,18,19,25,26],r:'4,6',c:4},{n:'D',b:[1,2,12,15,16,22,23,29,30],r:'4,9',c:9}];
+var cur=null,sel=null;
+function $(i){return document.getElementById(i)}
+function svg(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(IC[n]||IC.user)+'</svg>'}
+function opts(sel,withAll){var s=$(sel);CATS.forEach(function(c){var g=document.createElement('optgroup');g.label=c.name;if(withAll){var o=document.createElement('option');o.value='Alle: '+c.name;o.textContent='Alle in '+c.name;g.appendChild(o)}c.gewerke.forEach(function(x){var o=document.createElement('option');o.textContent=x;g.appendChild(o)});s.appendChild(g)})}
+opts('bereich',false);CATS.forEach(function(c){var o=document.createElement('option');o.value=c.name;o.label='Alle in '+c.name;$('wasliste').appendChild(o);c.gewerke.forEach(function(x){var q=document.createElement('option');q.value=x;q.label=c.name;$('wasliste').appendChild(q)})});
+CATS.forEach(function(c){var d=document.createElement('div');d.className='cd tile';d.style.background='#fff';d.innerHTML='<div class="ib" style="margin:0 auto 8px">'+svg(c.icon)+'</div><div style="font-size:13px;font-weight:600">'+c.name.replace(' & ',' und ')+'</div><div style="font-size:12px;color:#6B7794">'+c.gewerke.length+' Gewerke</div>';d.onclick=function(){$('was').value=c.name;show('res')};$('tiles').appendChild(d)});
+function isCat(w){return CATS.some(function(c){return c.name===w})}
+function wasLabel(){var w=($('was').value||'').trim();if(!w)return 'Anbieter';return isCat(w)?'Anbieter ('+w+')':w}
+function dateDay(){var v=$('wann').value;if(!v)return null;var d=v.split('-');return d[1]==='10'?parseInt(d[2],10):null}
+function mk(id,busy,click,pre){var el=$(id);el.innerHTML='';['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(function(d){el.insertAdjacentHTML('beforeend','<b>'+d+'</b>')});el.insertAdjacentHTML('beforeend','<i></i><i></i><i></i>');
+for(var d=1;d<=31;d++){var c=busy.indexOf(d)>-1?'x':'f';var n=document.createElement('i');n.className=c+(click&&pre===d&&c==='f'?' sel':'');n.textContent=d;if(click&&c==='f'){n.onclick=(function(dd,nn){return function(){sel=dd;el.querySelectorAll('i').forEach(function(q){q.classList.remove('sel')});nn.classList.add('sel');$('si').textContent='Wunschtag: '+dd+'. Oktober 2026'}})(d,n)}el.appendChild(n)}}
+function build(){var wd=dateDay(),w=($('was').value||'').trim(),o=$('wo').value||'deiner Nähe';
+$('rt').textContent=(isCat(w)?'Alle in '+w:(w||'Alle Dienstleister'))+' in '+o;
+$('rs').textContent='Beispiel-Profile, '+(wd?'am '+wd+'. Oktober 2026':'ohne festen Termin')+'. Tippe auf eins.';
+var L=$('list');L.innerHTML='';var fr=[],bz=[];P.forEach(function(p,i){(wd&&p.b.indexOf(wd)>-1?bz:fr).push(i)});
+fr.concat(bz).forEach(function(i){var p=P[i],isb=bz.indexOf(i)>-1;var d=document.createElement('div');d.className='card';d.style.opacity=isb?'.6':'1';
+d.innerHTML='<div style="display:flex;gap:12px;align-items:center"><span class="ib" style="margin:0;border-radius:50%">'+svg('user')+'</span><div><div style="font-weight:600;font-size:15px">Beispiel '+wasLabel()+' '+p.n+'</div><div style="font-size:13px;color:#6B7794">★ '+p.r+' ('+p.c+') · '+o+'</div></div></div><span class="bd '+(isb?'no':'ok')+'">'+(isb?'Belegt':(wd?'Frei am '+wd+'.10.':'Verfügbar'))+'</span>';
+d.onclick=function(){cur=i;show('prof')};L.appendChild(d)})}
+function show(id){document.querySelectorAll('.sc').forEach(function(s){s.classList.remove('on')});var t=$(id);t.classList.add('on');$('stp').textContent=t.getAttribute('data-step')||'Startseite';
+if(id==='res')build();
+if(id==='prof'){var p=P[cur||0];sel=null;$('pn').textContent='Beispiel '+wasLabel()+' '+p.n;$('pm').textContent='★★★★★ '+p.r+' ('+p.c+' Bewertungen) · '+($('wo').value||'Bochum');var wd=dateDay();if(wd&&p.b.indexOf(wd)===-1)sel=wd;$('si').textContent=sel?'Wunschtag: '+sel+'. Oktober 2026':'Wunschtag: noch keiner gewählt';mk('cal',p.b,true,sel)}
+if(id==='sent'){$('sd').textContent=sel?'Wunschtag '+sel+'. Oktober. Der Dienstleister meldet sich direkt bei dir.':'Der Dienstleister meldet sich direkt bei dir.'}
+if(id==='d4'){mk('cal2',[3,4,10,11,17,18,24,25,31],false)}
+window.scrollTo(0,0)}
+document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){show(b.getAttribute('data-go'))})});
+document.querySelectorAll('[data-pick]').forEach(function(b){b.addEventListener('click',function(){$('was').value=b.getAttribute('data-pick');show('res')})});
+</script>
+</body>
+</html>
