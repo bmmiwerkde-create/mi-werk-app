@@ -1,15 +1,12 @@
 import type { Metadata } from 'next'
 import Kopfzeile from '@/components/Kopfzeile'
-import { KATEGORIEN } from '../Lib/kategorien'
-import { IconBadge, iconNameFuerKategorie } from '../components/Icons'
+import { IconBadge } from '../components/Icons'
 
 export const metadata: Metadata = {
   title: 'Für Dienstleister – Mi-Werk',
   description: 'Profil anlegen, Kalender verbinden und von Kunden in deiner Region gefunden werden. Für die ersten 50 Dienstleister 12 Monate kostenlos.',
   alternates: { canonical: 'https://www.mi-werk.de/fuer-dienstleister' },
 }
-
-const euro = (n: number) => n.toFixed(2).replace('.', ',') + ' €'
 
 const INHALT = [
   ['user', 'Profilbild und Logo', 'Damit Kunden dich wiedererkennen.'],
@@ -67,36 +64,12 @@ export default function FuerDienstleister() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="mw-abschnitt">
-        <div className="mw-wrap">
-          <div className="mw-kicker">Preise</div>
-          <h2 className="mw-h2">Ein Abo je Branche, nach der Gratisphase</h2>
-          <p className="mw-muted">Die ersten 50 Dienstleister nutzen Mi-Werk 12 Monate kostenlos. Danach gilt der Preis deiner Branche, jederzeit kündbar.</p>
-          <div style={{ display: 'grid', gap: 10, marginTop: 20 }}>
-            {KATEGORIEN.map(k => (
-              <div key={k.key} className="mw-karte" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, padding: '16px 18px', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: '1 1 280px' }}>
-                  <IconBadge name={iconNameFuerKategorie(k.label)} size={40} />
-                  <div style={{ minWidth: 0 }}>
-                    <b style={{ color: 'var(--mw-ink)' }}>{k.label}</b>
-                    <div className="mw-muted" style={{ fontSize: 13 }}>{k.beschreibung}</div>
-                  </div>
-                </div>
-                <div style={{ whiteSpace: 'nowrap' }}>
-                  <b style={{ color: 'var(--mw-ink)' }}>{euro(k.einfuehrung)}</b><span className="mw-muted" style={{ fontSize: 13 }}> / Monat Einführungspreis</span>
-                  <div className="mw-muted" style={{ fontSize: 13 }}>regulär {euro(k.regulaer)} / Monat</div>
-                </div>
-              </div>
-            ))}
-          </div>
           <div style={{ textAlign: 'center', marginTop: 32 }}>
             <a className="mw-btn" href="/login">Jetzt kostenlos eintragen</a>
           </div>
         </div>
       </section>
+
     </div>
   )
 }
