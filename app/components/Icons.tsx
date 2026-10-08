@@ -91,10 +91,8 @@ export function IconBadge({ name, size = 52, style }: { name: string; size?: num
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
-        color: '#e0b48c',
-        background: 'linear-gradient(145deg, rgba(200,149,108,0.28) 0%, rgba(200,149,108,0.06) 100%)',
-        border: '1px solid rgba(200,149,108,0.32)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 6px 18px rgba(0,0,0,0.35)',
+        color: 'var(--mw-cta)',
+        background: 'var(--mw-cta-soft)',
         ...style,
       }}
     >
