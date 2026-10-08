@@ -33,6 +33,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: 'https://www.mi-werk.de/fuer-dienstleister',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
       url: 'https://www.mi-werk.de/login',
       lastModified: new Date(),
       changeFrequency: 'monthly',
