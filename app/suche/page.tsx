@@ -3,7 +3,7 @@
 const mobileStyle = `
   @media (max-width: 640px) {
     .kat-grid { grid-template-columns: repeat(2, 1fr) !important; }
-    .gewerk-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    .gewerk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
     .dl-grid { grid-template-columns: repeat(1, 1fr) !important; }
     .hero-pad { padding: 40px 16px 32px !important; }
     .hero-title { font-size: 36px !important; letter-spacing: -1px !important; }
