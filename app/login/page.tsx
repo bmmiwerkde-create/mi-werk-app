@@ -10,6 +10,18 @@ const VORTEILE = [
   'Jederzeit kündbar, keine versteckten Kosten',
 ]
 
+// Häufige Supabase-Fehlermeldungen verständlich auf Deutsch
+function aufDeutsch(text: string) {
+  const t = text.toLowerCase()
+  if (t.includes('already registered')) return 'Diese E-Mail ist schon registriert. Bitte melde dich an.'
+  if (t.includes('invalid login credentials')) return 'E-Mail oder Passwort stimmt nicht.'
+  if (t.includes('password should be at least')) return 'Das Passwort muss mindestens 6 Zeichen haben.'
+  if (t.includes('unable to validate email') || t.includes('invalid format')) return 'Bitte gib eine gültige E-Mail-Adresse ein.'
+  if (t.includes('email not confirmed')) return 'Deine E-Mail ist noch nicht bestätigt. Bitte prüfe dein Postfach.'
+  if (t.includes('rate limit') || t.includes('too many')) return 'Zu viele Versuche. Bitte warte kurz und versuche es dann erneut.'
+  return text
+}
+
 export default function Login() {
   const [email, setEmail] = useState('')
   const [passwort, setPasswort] = useState('')
@@ -28,7 +40,7 @@ export default function Login() {
     setMeldung('')
     if (modus === 'login') {
       const { error } = await supabase.auth.signInWithPassword({ email, password: passwort })
-      if (error) setMeldung('Fehler: ' + error.message)
+      if (error) setMeldung('Fehler: ' + aufDeutsch(error.message))
       else window.location.href = '/dashboard'
     } else {
       const { data, error } = await supabase.auth.signUp({
@@ -36,7 +48,7 @@ export default function Login() {
         password: passwort,
         options: { emailRedirectTo: 'https://www.mi-werk.de/onboarding' },
       })
-      if (error) setMeldung('Fehler: ' + error.message)
+      if (error) setMeldung('Fehler: ' + aufDeutsch(error.message))
       // Ist die E-Mail-Bestätigung in Supabase ausgeschaltet, ist man sofort angemeldet
       else if (data.session) window.location.href = '/onboarding'
       else setMeldung('Bestätigungs-E-Mail wurde gesendet — bitte prüfe dein Postfach.')
@@ -54,7 +66,7 @@ export default function Login() {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: 'https://www.mi-werk.de/reset-passwort',
     })
-    if (error) setMeldung('Fehler: ' + error.message)
+    if (error) setMeldung('Fehler: ' + aufDeutsch(error.message))
     else setMeldung('Reset-Link wurde gesendet — bitte prüfe dein Postfach.')
     setLaden(false)
   }
@@ -137,7 +149,16 @@ export default function Login() {
             </div>
           )}
 
-          {meldung && <div className={'mw-meldung ' + (istFehler ? 'fehler' : 'ok')}>{meldung}</div>}
+          {meldung && (
+            <div className={'mw-meldung ' + (istFehler ? 'fehler' : 'ok')}>
+              {meldung}
+              {modus === 'register' && meldung.includes('schon registriert') && (
+                <div style={{ marginTop:8 }}>
+                  <button className="mw-link" onClick={() => { setModus('login'); setMeldung(''); setPasswort('') }}>Zum Anmelden wechseln →</button>
+                </div>
+              )}
+            </div>
+          )}
 
           {modus === 'register' && (
             <p className="mw-muted" style={{ fontSize:13, textAlign:'center', margin:'16px 0 0', lineHeight:1.5 }}>
