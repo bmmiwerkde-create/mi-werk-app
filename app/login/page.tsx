@@ -31,12 +31,14 @@ export default function Login() {
       if (error) setMeldung('Fehler: ' + error.message)
       else window.location.href = '/dashboard'
     } else {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password: passwort,
         options: { emailRedirectTo: 'https://www.mi-werk.de/onboarding' },
       })
       if (error) setMeldung('Fehler: ' + error.message)
+      // Ist die E-Mail-Bestätigung in Supabase ausgeschaltet, ist man sofort angemeldet
+      else if (data.session) window.location.href = '/onboarding'
       else setMeldung('Bestätigungs-E-Mail wurde gesendet — bitte prüfe dein Postfach.')
     }
     setLaden(false)
