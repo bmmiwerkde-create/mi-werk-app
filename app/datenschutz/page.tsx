@@ -52,8 +52,11 @@ const ABSCHNITTE: { titel: string; text: string[] }[] = [
     ],
   },
   {
-    titel: '10. Google Analytics',
-    text: ['Nur mit deiner Zustimmung über das Cookie-Banner nutzen wir Google Analytics zur Reichweitenmessung. Dabei können Daten an Google übermittelt werden. Grundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Du kannst sie jederzeit mit Wirkung für die Zukunft widerrufen, z. B. indem du die Cookies in deinem Browser löschst und die Abfrage erneut ablehnst.'],
+    titel: '10. Reichweitenmessung (Google Analytics und Vercel Web Analytics)',
+    text: [
+      'Nur mit deiner Zustimmung über das Cookie-Banner nutzen wir Google Analytics zur Reichweitenmessung. Dabei können Daten an Google übermittelt werden. Grundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Du kannst sie jederzeit mit Wirkung für die Zukunft widerrufen, z. B. indem du die Cookies in deinem Browser löschst und die Abfrage erneut ablehnst.',
+      'Außerdem nutzen wir Vercel Web Analytics, um zu zählen, wie oft unsere Seiten aufgerufen werden. Dabei werden keine Cookies gesetzt. Erfasst werden u. a. die aufgerufene Seite, die verweisende Seite, Land, Browser, Betriebssystem und Gerätetyp. Besuche werden nicht über mehrere Tage hinweg einer Person zugeordnet. Grundlage ist unser berechtigtes Interesse an einer datensparsamen Reichweitenmessung (Art. 6 Abs. 1 lit. f DSGVO).',
+    ],
   },
   {
     titel: '11. Cookies',
