@@ -6,7 +6,7 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { supabase } from '../Lib/supabase'
 import { Icon } from '../components/Icons'
 import Kopfzeile from '@/components/Kopfzeile'
-import { PROFIL_FELDER } from '@/app/Lib/profilFelder'
+import { PROFIL_FELDER, nurBearbeitbare } from '@/app/Lib/profilFelder'
 
 type Dienstleister = {
   id: string; name: string; gewerk: string; ort: string
@@ -209,10 +209,10 @@ export default function DashboardPage() {
     if (!user) return
     setSaving(true)
     setMessage('')
-    const payload = { ...form, user_id: user.id }
+    const payload = nurBearbeitbare(form)
     const { data: gespeichert, error } = profil?.id
       ? await supabase.from('dienstleister').update(payload).eq('id', profil.id).select('id').single()
-      : await supabase.from('dienstleister').insert({ ...payload, abo_aktiv: true }).select('id').single()
+      : await supabase.from('dienstleister').insert({ ...payload, user_id: user.id, abo_aktiv: true }).select('id').single()
     if (error) { setMessage('Fehler: ' + error.message) }
     else {
       setMessage('Gespeichert'); setEditMode(false); await loadProfil(user.id)
