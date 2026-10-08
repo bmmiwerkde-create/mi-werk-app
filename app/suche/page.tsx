@@ -329,11 +329,11 @@ export default function Home() {
             </div>
             <div>
               <label className="mw-label" htmlFor="f-datum">Datum</label>
-              <input id="f-datum" className="mw-feld" type="date" value={datumFilter} onChange={e => setDatumFilter(e.target.value)} onKeyDown={enter} />
+              <input id="f-datum" className={'mw-feld' + (datumFilter ? '' : ' leer')} type="date" value={datumFilter} onChange={e => setDatumFilter(e.target.value)} onKeyDown={enter} />
             </div>
             <div>
               <label className="mw-label" htmlFor="f-zeit">Uhrzeit</label>
-              <input id="f-zeit" className="mw-feld" type="time" value={uhrzeitFilter} onChange={e => filterUhrzeit(e.target.value)} />
+              <input id="f-zeit" className={'mw-feld' + (uhrzeitFilter ? '' : ' leer')} type="time" value={uhrzeitFilter} onChange={e => filterUhrzeit(e.target.value)} />
             </div>
             <div>
               <label className="mw-label" htmlFor="f-preis">Max. Preis (€/Std.)</label>
