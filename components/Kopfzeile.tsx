@@ -15,7 +15,8 @@ export default function Kopfzeile({ aktiv }: { aktiv?: Aktiv }) {
     supabase.auth.getSession().then(({ data: { session } }) => setAngemeldet(!!session))
   }, [])
 
-  const links: [string, string, Aktiv][] = [
+  const links: [string, string, Aktiv | 'start'][] = [
+    ['/', 'Startseite', 'start'],
     ['/suche', 'Dienstleister finden', 'suche'],
     ['/suche#so-gehts', "So funktioniert's", 'so'],
     ['/fuer-dienstleister', 'Für Dienstleister', 'fd'],
