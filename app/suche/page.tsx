@@ -1,29 +1,11 @@
 'use client'
 
-const mobileStyle = `
-  @media (max-width: 640px) {
-    .kat-grid { grid-template-columns: repeat(2, 1fr) !important; }
-    .gewerk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-    .dl-grid { grid-template-columns: repeat(1, 1fr) !important; }
-    .hero-pad { padding: 40px 16px 32px !important; }
-    .hero-title { font-size: 36px !important; letter-spacing: -1px !important; }
-    .nav-pad { padding: 0 16px !important; }
-    .stats-row { gap: 20px !important; }
-    .section-pad { padding: 32px 16px 0 !important; }
-    .steps-grid { grid-template-columns: repeat(1, 1fr) !important; }
-    .filter-row { flex-direction: column !important; }
-  }
-`
-
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { supabase } from '../Lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Icon, IconBadge, iconNameFuerKategorie } from '../components/Icons'
-
-const FilterIcon = ({ name }: { name: string }) => (
-  <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', color:'#9A8878', display:'flex', pointerEvents:'none' }}><Icon name={name} size={16} /></span>
-)
+import Kopfzeile from '@/components/Kopfzeile'
 
 const DienstleisterKarte = dynamic(() => import('../components/DienstleisterKarte'), { ssr: false })
 
@@ -198,28 +180,37 @@ export default function Home() {
   const [preisFilter, setPreisFilter] = useState('')
   const [aktiveKategorie, setAktiveKategorie] = useState<string | null>(null)
   const [selectedGewerk, setSelectedGewerk] = useState('')
-  const [user, setUser] = useState<any>(null)
   const [karteAktiv, setKarteAktiv] = useState(false)
   const [kalenderEvents, setKalenderEvents] = useState<any[]>([])
+  const [geladen, setGeladen] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     laden()
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setUser(session.user)
-    })
   }, [])
 
   async function laden() {
     const { data } = await supabase.from('dienstleister').select('*').eq('abo_aktiv', true)
     if (data) { setDienstleister(data); setGefiltert(data) }
-    // Alle kalender_events laden für Uhrzeitfilter
+    // Alle kalender_events laden für Uhrzeitfilter und Wochenvorschau
     const { data: events } = await supabase.from('kalender_events').select('*')
     if (events) setKalenderEvents(events)
+    setGeladen(true)
   }
 
-  function istBelegt(userId: string, datum: string, uhrzeit: string): boolean {
-    return false
+  // Wie auf dem Profil: Ein Tag gilt als belegt, wenn um 12 Uhr ein Termin läuft
+  function tagBelegt(userId: string, tag: Date) {
+    const mittag = new Date(tag)
+    mittag.setHours(12, 0, 0, 0)
+    return kalenderEvents.some(e => e.user_id === userId && mittag >= new Date(e.start_zeit) && mittag <= new Date(e.end_zeit))
+  }
+
+  function naechsteTage(anzahl: number) {
+    const tage: Date[] = []
+    const d = new Date()
+    d.setHours(0, 0, 0, 0)
+    for (let i = 0; i < anzahl; i++) { tage.push(new Date(d)); d.setDate(d.getDate() + 1) }
+    return tage
   }
 
   function anwenden(suche_: string, stadt_: string, plz_: string, datum_: string, uhrzeit_: string = uhrzeitFilter) {
@@ -245,12 +236,7 @@ export default function Home() {
     }
     // Uhrzeitfilter: Dienstleister ausblenden die zu Datum+Uhrzeit belegt sind
     if (datum_ && uhrzeit_) {
-      let isoD = datum_
-      if (datum_.includes('.')) {
-        const p = datum_.split('.')
-        if (p.length === 3) isoD = p[2] + '-' + p[1].padStart(2,'0') + '-' + p[0].padStart(2,'0')
-      }
-      const checkStr = isoD + 'T' + uhrzeit_
+      const checkStr = datum_ + 'T' + uhrzeit_
       result = result.filter(d => {
         if (!d.user_id) return true
         const meineEvents = kalenderEvents.filter(e => e.user_id === d.user_id)
@@ -274,71 +260,6 @@ export default function Home() {
     setGefiltert(result)
   }
 
-  function filtern(wert: string) { setSuche(wert) }
-  function filterStadt(wert: string) { setStadtFilter(wert) }
-  function filterPlz(wert: string) { setPlzFilter(wert) }
-  function filterDatum(wert: string) { setDatumFilter(wert) }
-  function filterUhrzeit(wert: string) {
-    setUhrzeitFilter(wert)
-    anwenden(suche, stadtFilter, plzFilter, datumFilter, wert)
-  }
-
-  const [kiLaden, setKiLaden] = useState(false)
-
-  async function kiSuche() {
-    if (!suche.trim()) { suchAusfuehren(); return }
-    setKiLaden(true)
-    try {
-      const alleGewerke = hauptkategorien.flatMap(k => k.gewerke.map(g => g.name)).join(', ')
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 100,
-          messages: [{
-            role: 'user',
-            content: `Du bist ein Assistent für eine Dienstleister-Plattform. Der Nutzer sucht: "${suche}". Welche der folgenden Gewerke passen am besten dazu? Antworte NUR mit einer kommaseparierten Liste der passenden Gewerke (maximal 5), keine Erklärung. Verfügbare Gewerke: ${alleGewerke}`
-          }]
-        })
-      })
-      const data = await response.json()
-      const gewerkeText = data.content?.[0]?.text || ''
-      const gewerkeList = gewerkeText.split(',').map((g: string) => g.trim().toLowerCase())
-      let result = dienstleister
-      if (stadtFilter) result = result.filter(d => d.ort?.toLowerCase().includes(stadtFilter.toLowerCase()))
-      if (plzFilter) result = result.filter(d => d.postleitzahl?.toString().startsWith(plzFilter))
-      if (datumFilter.length === 10) {
-        const parts = datumFilter.split('.')
-        if (parts.length === 3) {
-          const iso = parts[2] + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0')
-          result = result.filter(d => !d.verfuegbar_ab || d.verfuegbar_ab <= iso)
-        }
-      }
-      if (datumFilter && uhrzeitFilter) {
-        result = result.filter(d => {
-          if (!d.user_id) return true
-          return !istBelegt(d.user_id, datumFilter, uhrzeitFilter)
-        })
-      }
-      result = result.filter(d => gewerkeList.some((g: string) =>
-        d.gewerk?.toLowerCase().includes(g) ||
-        d.beschreibung?.toLowerCase().includes(g) ||
-        d.name?.toLowerCase().includes(g)
-      ))
-      if (result.length === 0) anwenden(suche, stadtFilter, plzFilter, datumFilter, uhrzeitFilter)
-      else setGefiltert(result)
-      setAktiveKategorie(null)
-      setSelectedGewerk('')
-    } catch {
-      anwenden(suche, stadtFilter, plzFilter, datumFilter, uhrzeitFilter)
-    }
-    setKiLaden(false)
-    setTimeout(() => {
-      document.getElementById('ergebnisse')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 100)
-  }
-
   function suchAusfuehren() {
     setAktiveKategorie(null)
     setSelectedGewerk('')
@@ -346,6 +267,11 @@ export default function Home() {
     setTimeout(() => {
       document.getElementById('ergebnisse')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 100)
+  }
+
+  function filterUhrzeit(wert: string) {
+    setUhrzeitFilter(wert)
+    anwenden(suche, stadtFilter, plzFilter, datumFilter, wert)
   }
 
   function filterGewerk(gewerk: string) {
@@ -372,185 +298,70 @@ export default function Home() {
 
   const aktiveKatData = hauptkategorien.find(k => k.name === aktiveKategorie)
   const hatFilter = suche || stadtFilter || plzFilter || datumFilter || uhrzeitFilter || preisFilter
+  const datumText = datumFilter ? new Date(datumFilter + 'T12:00').toLocaleDateString('de-DE') : ''
+  const woche = naechsteTage(7)
+  const enter = (e: React.KeyboardEvent) => { if (e.key === 'Enter') suchAusfuehren() }
 
   return (
-    <div style={{ minHeight:'100vh', background:'#0A0A0A', color:'#E8DDD4', fontFamily:'system-ui' }}>
-      <style dangerouslySetInnerHTML={{ __html: mobileStyle }} />
+    <div style={{ minHeight:'100vh' }}>
+      <Kopfzeile aktiv="suche" />
 
-      {/* NAV */}
-      <div className="nav-pad" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 32px', height:56, background:'#111', borderBottom:'1px solid rgba(200,149,108,0.18)', position:'sticky', top:0, zIndex:100 }}>
-        <div style={{ fontFamily:'Georgia,serif', fontSize:20, fontWeight:700, cursor:'pointer' }} onClick={resetAlles}>
-          Mi-<span style={{ color:'#c8956c' }}>Werk</span>
-        </div>
-        <div style={{ display:'flex', alignItems:'center', gap:16 }}>
-          {user ? (
-            <button onClick={() => router.push('/dashboard')} style={{ fontSize:12, fontWeight:500, padding:'7px 18px', borderRadius:6, background:'#c8956c', color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
-              Mein Profil
-            </button>
-          ) : (
-            <>
-              <button onClick={() => router.push('/login')} style={{ fontSize:12, color:'#9A8878', background:'transparent', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
-                Anmelden
-              </button>
-              <button onClick={() => router.push('/login')} style={{ fontSize:12, fontWeight:500, padding:'7px 18px', borderRadius:6, background:'#c8956c', color:'#fff', border:'1px solid #c8956c', cursor:'pointer', fontFamily:'inherit' }}>
-                Registrieren
-              </button>
-            </>
+      {/* SUCHE */}
+      <section className="mw-such-kopf">
+        <div className="mw-wrap">
+          <h1 className="mw-h1">Dienstleister finden</h1>
+          <p className="mw-muted" style={{ margin:'6px 0 0' }}>Finde Dienstleister in deiner Region, schnell, einfach, direkt. Für Kunden kostenlos.</p>
+          <div className="mw-filter">
+            <div className="breit">
+              <label className="mw-label" htmlFor="f-suche">Was suchst du?</label>
+              <input id="f-suche" className="mw-feld" value={suche} onChange={e => setSuche(e.target.value)} onKeyDown={enter} placeholder="Name, Gewerk oder Ort" list="mw-gewerke" />
+              <datalist id="mw-gewerke">
+                {hauptkategorien.flatMap(k => k.gewerke.map(g => <option key={k.name + g.name} value={g.name} />))}
+              </datalist>
+            </div>
+            <div>
+              <label className="mw-label" htmlFor="f-stadt">Stadt</label>
+              <input id="f-stadt" className="mw-feld" value={stadtFilter} onChange={e => setStadtFilter(e.target.value)} onKeyDown={enter} placeholder="z. B. Bochum" />
+            </div>
+            <div>
+              <label className="mw-label" htmlFor="f-plz">PLZ</label>
+              <input id="f-plz" className="mw-feld" value={plzFilter} onChange={e => setPlzFilter(e.target.value.replace(/\D/g, '').slice(0, 5))} onKeyDown={enter} placeholder="z. B. 44787" inputMode="numeric" maxLength={5} />
+            </div>
+            <div>
+              <label className="mw-label" htmlFor="f-datum">Datum</label>
+              <input id="f-datum" className="mw-feld" type="date" value={datumFilter} onChange={e => setDatumFilter(e.target.value)} onKeyDown={enter} />
+            </div>
+            <div>
+              <label className="mw-label" htmlFor="f-zeit">Uhrzeit</label>
+              <input id="f-zeit" className="mw-feld" type="time" value={uhrzeitFilter} onChange={e => filterUhrzeit(e.target.value)} />
+            </div>
+            <div>
+              <label className="mw-label" htmlFor="f-preis">Max. Preis (€/Std.)</label>
+              <input id="f-preis" className="mw-feld" value={preisFilter} onChange={e => setPreisFilter(e.target.value.replace(/[^0-9]/g, ''))} onKeyDown={enter} placeholder="z. B. 80" inputMode="numeric" />
+            </div>
+            <div style={{ display:'flex', alignItems:'flex-end' }}>
+              <button className="mw-btn voll" onClick={suchAusfuehren}><Icon name="search" size={18} />Suchen</button>
+            </div>
+          </div>
+          {datumFilter && uhrzeitFilter && (
+            <p className="mw-muted" style={{ fontSize:14, margin:'10px 0 0' }}>
+              <Icon name="clock" size={14} style={{ verticalAlign:'-2px', marginRight:6 }} />Zeigt nur Dienstleister, die am {datumText} um {uhrzeitFilter} Uhr verfügbar sind.
+            </p>
           )}
         </div>
-      </div>
-
-      {/* HERO */}
-      <div className="hero-pad" style={{ textAlign:'center', padding:'72px 24px 56px', background:'linear-gradient(180deg, #111 0%, #0A0A0A 100%)', borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
-        <div className="hero-title" style={{ fontFamily:'Georgia,serif', fontSize:52, fontWeight:700, letterSpacing:-1, marginBottom:14 }}>
-          Mi-<span style={{ color:'#c8956c' }}>Werk</span>
-        </div>
-        <div style={{ fontSize:16, color:'#9A8878', marginBottom:40, maxWidth:480, margin:'0 auto 40px' }}>
-          Finde Dienstleister in deiner Region — schnell, einfach, direkt.
-        </div>
-
-        {/* SUCHFELD */}
-        <div style={{ maxWidth:560, margin:'0 auto', position:'relative' }}>
-          <input
-            value={suche}
-            onChange={e => filtern(e.target.value)}
-            placeholder="Name, Gewerk oder Ort suchen…"
-            style={{ width:'100%', padding:'16px 60px 16px 20px', background:'#181818', border:'1px solid rgba(200,149,108,0.3)', borderRadius:12, fontSize:15, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
-          />
-          <div style={{ position:'absolute', right:18, top:'50%', transform:'translateY(-50%)', color:'#c8956c', display:'flex' }}><Icon name="search" size={20} /></div>
-        </div>
-
-        {/* STADT + PLZ FILTER */}
-        <div className="filter-row" style={{ maxWidth:560, margin:'12px auto 0', display:'flex', gap:10 }}>
-          <div style={{ flex:1, position:'relative' }}>
-            <FilterIcon name="pin" />
-            <input
-              value={stadtFilter}
-              onChange={e => filterStadt(e.target.value)}
-              placeholder="Stadt filtern…"
-              style={{ width:'100%', padding:'12px 16px 12px 40px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
-              onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
-              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
-            />
-          </div>
-          <div style={{ flex:1, position:'relative' }}>
-            <FilterIcon name="map" />
-            <input
-              value={plzFilter}
-              onChange={e => filterPlz(e.target.value)}
-              placeholder="PLZ filtern…"
-              maxLength={5}
-              style={{ width:'100%', padding:'12px 16px 12px 40px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
-              onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
-              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
-            />
-          </div>
-        </div>
-
-        {/* DATUM + UHRZEIT FILTER */}
-        <div className="filter-row" style={{ maxWidth:560, margin:'10px auto 0', display:'flex', gap:10 }}>
-          <div style={{ flex:2, position:'relative' }}>
-            <FilterIcon name="calendar" />
-            <input
-              value={datumFilter}
-              onChange={e => filterDatum(e.target.value)}
-              placeholder="Datum z.B. 15.06.2026"
-              style={{ width:'100%', padding:'12px 16px 12px 40px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
-              onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
-              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
-              onKeyDown={e => e.key === 'Enter' && suchAusfuehren()}
-            />
-          </div>
-          <div style={{ flex:1 }}>
-            <input
-              type="time"
-              value={uhrzeitFilter}
-              onChange={e => filterUhrzeit(e.target.value)}
-              style={{ width:'100%', padding:'12px 16px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color: uhrzeitFilter ? '#E8DDD4' : '#5A5550', fontFamily:'inherit', outline:'none', boxSizing:'border-box', colorScheme:'dark' }}
-              onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
-              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
-            />
-          </div>
-        </div>
-        {datumFilter && uhrzeitFilter && (
-          <div style={{ maxWidth:560, margin:'6px auto 0', fontSize:11, color:'#9A8878', textAlign:'left', paddingLeft:4 }}>
-            <Icon name="clock" size={12} style={{ verticalAlign:'-2px', marginRight:4 }} />Zeigt nur Dienstleister die am {datumFilter} um {uhrzeitFilter} Uhr verfügbar sind
-          </div>
-        )}
-
-        {/* PREIS FILTER */}
-        <div style={{ maxWidth:560, margin:'10px auto 0', position:'relative' }}>
-          <FilterIcon name="euro" />
-          <input
-            value={preisFilter}
-            onChange={e => setPreisFilter(e.target.value.replace(/[^0-9]/g, ''))}
-            placeholder="Max. Preis z.B. 80 (€/Std.)"
-            style={{ width:'100%', padding:'12px 16px 12px 40px', background:'#181818', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, fontSize:14, color:'#E8DDD4', fontFamily:'inherit', outline:'none', boxSizing:'border-box' }}
-            onFocus={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'}
-            onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
-            onKeyDown={e => e.key === 'Enter' && suchAusfuehren()}
-          />
-        </div>
-
-        {/* SUCHEN BUTTON */}
-        <div style={{ maxWidth:560, margin:'12px auto 0' }}>
-          <button
-            onClick={kiSuche}
-            disabled={kiLaden}
-            style={{ width:'100%', padding:'14px', background: kiLaden ? '#8a6644' : '#c8956c', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:600, cursor: kiLaden ? 'wait' : 'pointer', fontFamily:'inherit', letterSpacing:0.5, transition:'background 0.2s', display:'inline-flex', alignItems:'center', justifyContent:'center', gap:8 }}
-            onMouseEnter={e => { if (!kiLaden) e.currentTarget.style.background = '#b8845c' }}
-            onMouseLeave={e => { if (!kiLaden) e.currentTarget.style.background = '#c8956c' }}
-          >
-            <Icon name="search" size={16} />{kiLaden ? 'KI sucht…' : 'Suchen'}
-          </button>
-        </div>
-
-        <div className="stats-row" style={{ display:'flex', gap:40, justifyContent:'center', marginTop:48 }}>
-          {[
-            [dienstleister.length + '+', 'Dienstleister'],
-            [hauptkategorien.length + '', 'Kategorien'],
-            ['100%', 'Kostenlos'],
-          ].map(([zahl, label]) => (
-            <div key={label as string} style={{ textAlign:'center' }}>
-              <div style={{ fontFamily:'Georgia,serif', fontSize:28, fontWeight:700, color:'#c8956c' }}>{zahl}</div>
-              <div style={{ fontSize:12, color:'#5A5550', marginTop:2 }}>{label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* DIENSTLEISTER CTA BANNER */}
-        <div style={{ marginTop:40, background:'rgba(200,149,108,0.06)', border:'1px solid rgba(200,149,108,0.2)', borderRadius:14, padding:'20px 24px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
-          <div>
-            <div style={{ fontSize:15, fontWeight:600, color:'#E8DDD4', marginBottom:4 }}>Du bist Dienstleister?</div>
-            <div style={{ fontSize:13, color:'#9A8878' }}>Trag dich kostenlos ein und werde von Kunden in deiner Region gefunden.</div>
-          </div>
-          <button onClick={() => router.push('/login')} style={{ flexShrink:0, fontSize:13, fontWeight:600, padding:'12px 24px', borderRadius:9, background:'#c8956c', color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap' }}>
-            Jetzt kostenlos eintragen →
-          </button>
-        </div>
-      </div>
+      </section>
 
       {/* KATEGORIEN */}
       {!suche && !stadtFilter && !plzFilter && !datumFilter && (
-        <div className="section-pad" style={{ maxWidth:1000, margin:'0 auto', padding:'48px 24px 0' }}>
+        <section className="mw-wrap" style={{ paddingTop:32 }}>
           {!aktiveKategorie && (
             <>
-              <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:6 }}>Kategorie wählen</div>
-              <div style={{ fontSize:22, fontWeight:700, fontFamily:'Georgia,serif', marginBottom:24 }}>Was suchst du?</div>
-              <div className="kat-grid" style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12 }}>
+              <h2 className="mw-h2" style={{ fontSize:22, marginBottom:14 }}>Was suchst du?</h2>
+              <div className="mw-kat-grid">
                 {hauptkategorien.map(kat => (
-                  <button
-                    key={kat.name}
-                    onClick={() => setAktiveKategorie(kat.name)}
-                    style={{ display:'flex', alignItems:'center', gap:14, padding:'18px 20px', borderRadius:12, cursor:'pointer', fontFamily:'inherit', textAlign:'left', border:'1px solid rgba(255,255,255,0.06)', background:'#111', color:'#9A8878', transition:'all 0.15s', width:'100%' }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'; e.currentTarget.style.color = '#c8956c'; e.currentTarget.style.background = 'rgba(200,149,108,0.06)' }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#9A8878'; e.currentTarget.style.background = '#111' }}
-                  >
-                    <IconBadge name={iconNameFuerKategorie(kat.name)} size={46} />
-                    <div>
-                      <div style={{ fontSize:13, fontWeight:500, color:'#E8DDD4' }}>{kat.name}</div>
-                      <div style={{ fontSize:11, color:'#5A5550', marginTop:2 }}>{kat.gewerke.length} Gewerke</div>
-                    </div>
+                  <button key={kat.name} className="mw-kat" onClick={() => setAktiveKategorie(kat.name)}>
+                    <IconBadge name={iconNameFuerKategorie(kat.name)} size={40} />
+                    <span><b>{kat.name}</b><small>{kat.gewerke.length} Gewerke</small></span>
                   </button>
                 ))}
               </div>
@@ -558,156 +369,160 @@ export default function Home() {
           )}
           {aktiveKategorie && aktiveKatData && (
             <>
-              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24 }}>
-                <button onClick={() => { setAktiveKategorie(null); setSelectedGewerk('') }} style={{ fontSize:12, color:'#c8956c', background:'none', border:'1px solid rgba(200,149,108,0.3)', borderRadius:8, padding:'6px 14px', cursor:'pointer', fontFamily:'inherit' }}>
-                  ← Zurück
-                </button>
-                <span style={{ display:'inline-flex', alignItems:'center', gap:12, fontSize:22, fontWeight:700, fontFamily:'Georgia,serif' }}><IconBadge name={iconNameFuerKategorie(aktiveKatData.name)} size={40} />{aktiveKatData.name}</span>
+              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:14, flexWrap:'wrap' }}>
+                <button className="mw-btn zwei klein" onClick={() => { setAktiveKategorie(null); setSelectedGewerk('') }}>← Alle Kategorien</button>
+                <h2 className="mw-h2" style={{ fontSize:22, display:'flex', alignItems:'center', gap:10 }}>
+                  <IconBadge name={iconNameFuerKategorie(aktiveKatData.name)} size={40} />{aktiveKatData.name}
+                </h2>
               </div>
-              <div className="gewerk-grid" style={{ display:'grid', gridTemplateColumns:'repeat(6, 1fr)', gap:10 }}>
-                {aktiveKatData.gewerke.map(kat => (
-                  <button
-                    key={kat.name}
-                    onClick={() => filterGewerk(kat.name)}
-                    style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'16px 8px', borderRadius:12, cursor:'pointer', fontFamily:'inherit', border: selectedGewerk === kat.name ? '1px solid #c8956c' : '1px solid rgba(255,255,255,0.06)', background: selectedGewerk === kat.name ? 'rgba(200,149,108,0.12)' : '#111', color: selectedGewerk === kat.name ? '#c8956c' : '#9A8878', transition:'all 0.15s' }}
-                    onMouseEnter={e => { if (selectedGewerk !== kat.name) { e.currentTarget.style.borderColor = 'rgba(200,149,108,0.4)'; e.currentTarget.style.color = '#c8956c' } }}
-                    onMouseLeave={e => { if (selectedGewerk !== kat.name) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#9A8878' } }}
-                  >
-                    <Icon name={iconNameFuerKategorie(aktiveKatData.name)} size={24} style={{ marginBottom:10, opacity:0.85 }} />
-                    <span style={{ fontSize:11, textAlign:'center', lineHeight:1.3 }}>{kat.name}</span>
-                  </button>
+              <div className="mw-gw-grid">
+                {aktiveKatData.gewerke.map(g => (
+                  <button key={g.name} className={'mw-gw' + (selectedGewerk === g.name ? ' an' : '')} onClick={() => filterGewerk(g.name)}>{g.name}</button>
                 ))}
               </div>
             </>
           )}
-        </div>
+        </section>
       )}
 
-      {/* DIENSTLEISTER GRID */}
-      <div id="ergebnisse" style={{ maxWidth:1000, margin:'0 auto', padding:'32px 24px 48px' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
-          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550' }}>
-            {hatFilter ? `${gefiltert.length} Ergebnisse` : 'Alle Dienstleister'}
+      {/* ERGEBNISSE */}
+      <section id="ergebnisse" className="mw-wrap" style={{ paddingTop:32, paddingBottom:48, scrollMarginTop:80 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap' }}>
+          <h2 className="mw-h2" style={{ fontSize:22 }}>
+            {hatFilter ? `${gefiltert.length} ${gefiltert.length === 1 ? 'Ergebnis' : 'Ergebnisse'}` : 'Alle Dienstleister'}
             {stadtFilter && ` in ${stadtFilter}`}
             {plzFilter && ` · PLZ ${plzFilter}`}
-            {datumFilter && uhrzeitFilter && ` · ${datumFilter} ${uhrzeitFilter} Uhr`}
-          </div>
-          <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-            {hatFilter && (
-              <button onClick={resetAlles} style={{ fontSize:11, color:'#c8956c', background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
-                Filter zurücksetzen ✕
-              </button>
-            )}
-          </div>
+          </h2>
+          {hatFilter && <button className="mw-link" onClick={resetAlles}>Filter zurücksetzen ✕</button>}
         </div>
 
-        {/* ANSICHT UMSCHALTEN */}
-        <div style={{ display:'flex', gap:8, marginBottom:20 }}>
-          <button onClick={() => setKarteAktiv(false)} style={{ flex:1, padding:'10px', borderRadius:8, border:'1px solid ' + (!karteAktiv ? 'rgba(200,149,108,0.6)' : 'rgba(255,255,255,0.08)'), background: !karteAktiv ? 'rgba(200,149,108,0.12)' : 'transparent', color: !karteAktiv ? '#c8956c' : '#5A5550', cursor:'pointer', fontFamily:'inherit', fontSize:13, fontWeight: !karteAktiv ? 600 : 400 }}>
-            <Icon name="list" size={15} style={{ marginRight:8, verticalAlign:'-3px' }} />Listenansicht
-          </button>
-          <button onClick={() => setKarteAktiv(true)} style={{ flex:1, padding:'10px', borderRadius:8, border:'1px solid ' + (karteAktiv ? 'rgba(200,149,108,0.6)' : 'rgba(255,255,255,0.08)'), background: karteAktiv ? 'rgba(200,149,108,0.12)' : 'transparent', color: karteAktiv ? '#c8956c' : '#5A5550', cursor:'pointer', fontFamily:'inherit', fontSize:13, fontWeight: karteAktiv ? 600 : 400 }}>
-            <Icon name="map" size={15} style={{ marginRight:8, verticalAlign:'-3px' }} />Kartenansicht
-          </button>
+        <div className="mw-ansicht">
+          <button className={!karteAktiv ? 'an' : ''} onClick={() => setKarteAktiv(false)}><Icon name="list" size={16} />Liste</button>
+          <button className={karteAktiv ? 'an' : ''} onClick={() => setKarteAktiv(true)}><Icon name="map" size={16} />Karte</button>
         </div>
 
-        <div className="dl-grid" style={{ display: karteAktiv ? 'none' : 'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:14 }}>
-          {gefiltert.map((d: any) => (
-            <div key={d.id} onClick={() => window.location.href = `/profil/${d.id}`} style={{ background:'#111', border:'1px solid rgba(255,255,255,0.06)', borderRadius:12, padding:'20px', cursor:'pointer' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,149,108,0.35)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'}
-            >
-              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:12 }}>
-                <div style={{ width:44, height:44, borderRadius:'50%', overflow:'hidden', background:'#181818', border:'1px solid rgba(200,149,108,0.2)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  {d.profilbild
-                    ? <img src={d.profilbild} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                    : <Icon name="user" size={22} style={{ color:'#c8956c' }} />
-                  }
-                </div>
-                <div>
-                  <div style={{ fontSize:14, fontWeight:500 }}>{d.name}</div>
-                  <div style={{ fontSize:11, color:'#9A8878', marginTop:2 }}>{d.gewerk}{d.ort ? ' · ' + d.ort : ''}{d.postleitzahl ? ' ' + d.postleitzahl : ''}</div>
-                </div>
-              </div>
-              {d.beschreibung && (
-                <div style={{ fontSize:12, color:'#5A5550', lineHeight:1.6, marginBottom:12 }}>
-                  {d.beschreibung.slice(0, 80)}{d.beschreibung.length > 80 ? '…' : ''}
-                </div>
-              )}
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                <div style={{ fontSize:14, fontWeight:600, color:'#c8956c' }}>{d.preis ? d.preis + ' €/h' : ''}</div>
-                {d.verfuegbar_ab && (
-                  <div style={{ fontSize:10, color:'#5A5550' }}>ab {new Date(d.verfuegbar_ab).toLocaleDateString('de-DE')}</div>
-                )}
-              </div>
-              {d.email && (
-                <a href={'mailto:' + d.email} onClick={e => e.stopPropagation()} style={{ display:'block', marginTop:12, fontSize:12, color:'#c8956c', textDecoration:'none', padding:'7px 0', borderTop:'1px solid rgba(255,255,255,0.05)', textAlign:'center' }}>
-                  Kontakt aufnehmen →
+        {!karteAktiv && gefiltert.length > 0 && (
+          <div className="mw-treffer">
+            {gefiltert.map((d: any) => {
+              const hatKalender = d.user_id && kalenderEvents.some(e => e.user_id === d.user_id)
+              const amTagBelegt = datumFilter && d.user_id ? tagBelegt(d.user_id, new Date(datumFilter + 'T00:00')) : null
+              return (
+                <a key={d.id} href={`/profil/${d.id}`} className="mw-karte mw-treffer-karte">
+                  <div style={{ display:'flex', gap:14, alignItems:'center' }}>
+                    <div className="mw-avatar">
+                      {d.profilbild ? <img src={d.profilbild} alt="" /> : <Icon name="user" size={24} />}
+                    </div>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <b style={{ color:'var(--mw-ink)', fontSize:17 }}>{d.name}</b>
+                      <div className="mw-muted" style={{ fontSize:14 }}>{d.gewerk}{d.ort ? ' · ' + d.ort : ''}{d.postleitzahl ? ' ' + d.postleitzahl : ''}</div>
+                    </div>
+                    {datumFilter && hatKalender && (
+                      <span className={'mw-badge ' + (amTagBelegt ? 'mw-belegt' : 'mw-frei')}>{amTagBelegt ? 'Belegt' : 'Frei'}</span>
+                    )}
+                  </div>
+                  {d.beschreibung && (
+                    <p className="mw-muted" style={{ margin:0, fontSize:14 }}>{d.beschreibung.slice(0, 90)}{d.beschreibung.length > 90 ? '…' : ''}</p>
+                  )}
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', gap:12 }}>
+                    <div style={{ flex:1 }}>
+                      {hatKalender ? (
+                        <>
+                          <div className="mw-muted" style={{ fontSize:12, marginBottom:4 }}>Nächste 7 Tage</div>
+                          <div className="mw-mini-woche" aria-label="Verfügbarkeit der nächsten 7 Tage">
+                            {woche.map(tag => {
+                              const b = tagBelegt(d.user_id, tag)
+                              return <i key={tag.toISOString()} className={b ? 'b' : 'f'} title={tag.toLocaleDateString('de-DE', { weekday:'short', day:'numeric', month:'numeric' }) + (b ? ' belegt' : ' frei')} />
+                            })}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="mw-muted" style={{ fontSize:12 }}>{d.verfuegbar_ab ? 'Verfügbar ab ' + new Date(d.verfuegbar_ab).toLocaleDateString('de-DE') : ''}</div>
+                      )}
+                    </div>
+                    {d.preis && <b style={{ color:'var(--mw-cta)', whiteSpace:'nowrap' }}>{d.preis}</b>}
+                  </div>
                 </a>
-              )}
-            </div>
-          ))}
-        </div>
+              )
+            })}
+          </div>
+        )}
 
-        {dienstleister.length === 0 && !karteAktiv && (
-          <div style={{ textAlign:'center', padding:'60px 0' }}>
-            <button onClick={() => router.push('/login')} style={{ fontSize:14, fontWeight:600, padding:'14px 28px', borderRadius:9, background:'#c8956c', color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
-              Jetzt kostenlos eintragen
-            </button>
+        {geladen && dienstleister.length === 0 && !karteAktiv && (
+          <div className="mw-karte" style={{ padding:32, textAlign:'center' }}>
+            <a className="mw-btn" href="/login">Jetzt kostenlos eintragen</a>
           </div>
         )}
 
         {dienstleister.length > 0 && gefiltert.length === 0 && !karteAktiv && (
-          <div style={{ textAlign:'center', padding:'60px 0', color:'#5A5550', fontSize:14 }}>
+          <div className="mw-karte mw-muted" style={{ padding:32, textAlign:'center' }}>
             Keine Dienstleister gefunden
             {stadtFilter && ` in "${stadtFilter}"`}
             {plzFilter && ` mit PLZ "${plzFilter}"`}
             {suche && ` für "${suche}"`}
-            {datumFilter && uhrzeitFilter && ` · am ${datumFilter} um ${uhrzeitFilter} Uhr verfügbar`}
+            {datumFilter && uhrzeitFilter && ` · am ${datumText} um ${uhrzeitFilter} Uhr verfügbar`}
           </div>
         )}
 
-        {/* KARTEN-ANSICHT */}
         {karteAktiv && (
-          <div style={{ borderRadius:12, overflow:'hidden', border:'1px solid rgba(255,255,255,0.08)', marginBottom:20 }}>
+          <div className="mw-karte" style={{ overflow:'hidden' }}>
             <DienstleisterKarte eintraege={gefiltert.map((d: any) => ({ id: d.id, name: d.name, ort: d.ort, lat: d.lat, lng: d.lng }))} />
           </div>
         )}
-      </div>
+      </section>
 
-      {/* WIE ES FUNKTIONIERT */}
-      <div style={{ background:'#111', borderTop:'1px solid rgba(255,255,255,0.05)', padding:'60px 24px' }}>
-        <div style={{ maxWidth:800, margin:'0 auto', textAlign:'center' }}>
-          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:'#5A5550', marginBottom:12 }}>So funktioniert es</div>
-          <div style={{ fontFamily:'Georgia,serif', fontSize:28, fontWeight:700, marginBottom:48 }}>In 3 Schritten zum Dienstleister</div>
-          <div className="steps-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:32 }}>
+      {/* SO FUNKTIONIERT ES */}
+      <section id="so-gehts" className="mw-abschnitt hell" style={{ scrollMarginTop:64 }}>
+        <div className="mw-wrap">
+          <div className="mw-kicker">So funktioniert es</div>
+          <h2 className="mw-h2">In 3 Schritten zum Dienstleister</h2>
+          <div className="mw-schritte">
             {[
-              ['search', 'Suchen', 'Nach Name, Gewerk oder Ort suchen und den passenden Dienstleister finden.'],
-              ['eye', 'Vergleichen', 'Profile, Beschreibungen und Verfügbarkeit vergleichen.'],
-              ['mail', 'Kontaktieren', 'Direkt per E-Mail Kontakt aufnehmen — kostenlos und einfach.'],
-            ].map(([icon, titel, text]) => (
-              <div key={titel as string} style={{ textAlign:'center' }}>
-                <div style={{ marginBottom:16, display:'flex', justifyContent:'center' }}><IconBadge name={icon as string} size={56} /></div>
-                <div style={{ fontSize:15, fontWeight:500, marginBottom:8, color:'#c8956c' }}>{titel}</div>
-                <div style={{ fontSize:13, color:'#5A5550', lineHeight:1.7 }}>{text}</div>
+              ['search', 'Suchen', 'Nach Name, Gewerk, Ort oder Wunschtermin suchen und den passenden Dienstleister finden.'],
+              ['calendar', 'Vergleichen', 'Profile, Fotos, Bewertungen und freie Tage auf einen Blick vergleichen.'],
+              ['mail', 'Kontaktieren', 'Direkt per E-Mail oder Telefon Kontakt aufnehmen, kostenlos und ohne Umweg.'],
+            ].map(([icon, titel, text], i) => (
+              <div key={titel} className="mw-karte" style={{ padding:24 }}>
+                <div className="mw-serif" style={{ fontSize:15, fontWeight:700, color:'var(--mw-cta)', marginBottom:12 }}>Schritt {i + 1}</div>
+                <IconBadge name={icon} size={48} />
+                <h3 className="mw-h3" style={{ margin:'14px 0 6px' }}>{titel}</h3>
+                <p className="mw-muted" style={{ margin:0 }}>{text}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* FOOTER */}
-      <div style={{ borderTop:'1px solid rgba(255,255,255,0.05)', padding:'32px', textAlign:'center' }}>
-        <div style={{ fontFamily:'Georgia,serif', fontSize:16, fontWeight:700, marginBottom:8 }}>
-          Mi-<span style={{ color:'#c8956c' }}>Werk</span>
+      {/* WARUM MI-WERK */}
+      <section className="mw-abschnitt">
+        <div className="mw-wrap">
+          <div className="mw-kicker">Warum Mi-Werk</div>
+          <h2 className="mw-h2">Weniger Telefonieren, schneller ein Termin</h2>
+          <div className="mw-vorteile">
+            {[
+              ['calendar', 'Freie Tage sofort sehen', 'Der Kalender zeigt, wer an deinem Wunschtag Zeit hat.'],
+              ['star', 'Bewertungen von Kunden', 'Sterne und Kommentare bei jedem Dienstleister helfen bei der Entscheidung.'],
+              ['lock', 'Datenschutz eingebaut', 'Aus dem Kalender wird nur frei oder belegt übertragen, keine Titel, Orte oder Details.'],
+            ].map(([icon, titel, text]) => (
+              <div key={titel}>
+                <IconBadge name={icon} size={48} />
+                <h3 className="mw-h3" style={{ fontSize:18, margin:'12px 0 6px' }}>{titel}</h3>
+                <p className="mw-muted" style={{ margin:0 }}>{text}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <div style={{ fontSize:11, color:'#5A5550' }}>Dienstleister in deiner Region · © 2026</div>
-        <div style={{ marginTop:16, display:'flex', gap:20, justifyContent:'center' }}>
-          <button onClick={() => router.push('/login')} style={{ fontSize:12, color:'#5A5550', background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>Anmelden</button>
-          <button onClick={() => router.push('/login')} style={{ fontSize:12, color:'#5A5550', background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>Registrieren</button>
-        </div>
-      </div>
+      </section>
 
+      {/* DIENSTLEISTER CTA */}
+      <section className="mw-wrap" style={{ paddingBottom:64 }}>
+        <div className="mw-karte" style={{ padding:'22px 24px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:16, flexWrap:'wrap', background:'var(--mw-cta-soft)', borderColor:'#EAD3C0' }}>
+          <div>
+            <b style={{ color:'var(--mw-ink)', fontSize:17 }}>Du bist Dienstleister?</b>
+            <div className="mw-muted" style={{ fontSize:15 }}>Trag dich kostenlos ein und werde von Kunden in deiner Region gefunden.</div>
+          </div>
+          <button className="mw-btn" onClick={() => router.push('/fuer-dienstleister')}>Jetzt kostenlos eintragen →</button>
+        </div>
+      </section>
     </div>
   )
 }
