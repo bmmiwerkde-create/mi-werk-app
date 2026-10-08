@@ -198,6 +198,14 @@ textarea.mw-feld { resize: vertical; }
 .mw-kal-knopf { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border: 1.5px solid var(--mw-line); border-radius: 12px; background: var(--mw-card); cursor: pointer; margin-bottom: 10px; font-weight: 600; color: var(--mw-ink); text-align: left; font-family: inherit; font-size: 15px; }
 .mw-kal-knopf:hover { border-color: var(--mw-ink); }
 
+/* ---------- Abo-Auswahl ---------- */
+.mw-abo-kacheln { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.mw-abo-kachel { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 12px; background: var(--mw-card); border: 1.5px solid var(--mw-line); border-radius: 16px; cursor: pointer; font-family: inherit; text-align: center; position: relative; }
+.mw-abo-kachel span { font-size: 14px; font-weight: 600; color: var(--mw-ink); line-height: 1.3; overflow-wrap: anywhere; }
+.mw-abo-kachel small { position: absolute; top: 8px; font-size: 11px; }
+.mw-abo-kachel:hover { border-color: var(--mw-ink); }
+.mw-abo-kachel.an { border-color: var(--mw-cta); background: var(--mw-cta-soft); box-shadow: 0 0 0 2px var(--mw-cta); }
+
 /* ---------- Login / Onboarding ---------- */
 .mw-tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--mw-soft); border-radius: 12px; padding: 4px; margin-bottom: 22px; }
 .mw-tabs button { border: none; background: none; padding: 10px; border-radius: 9px; cursor: pointer; font-weight: 600; color: var(--mw-muted); font-family: inherit; font-size: 15px; }
@@ -227,6 +235,7 @@ textarea.mw-feld { resize: vertical; }
 @media (max-width: 900px) {
   .mw-profil-grid, .mw-dash { grid-template-columns: 1fr; }
   .mw-kat-grid { grid-template-columns: repeat(2, 1fr); }
+  .mw-abo-kacheln { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .mw-gw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .mw-sticky { position: static; }
   .mw-dash-menu { display: flex; overflow-x: auto; gap: 4px; }
@@ -244,6 +253,7 @@ textarea.mw-feld { resize: vertical; }
   .mw-filter .breit { grid-column: span 2; }
   .mw-treffer, .mw-schritte, .mw-vorteile, .mw-zwei-spalten { grid-template-columns: 1fr; }
   .mw-gw-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mw-abo-kacheln { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mw-profil-info { flex-direction: column; align-items: flex-start; gap: 10px; }
   .mw-profil-info > div:last-child { padding-top: 0; }
   .mw-titelbild { height: 130px; }
