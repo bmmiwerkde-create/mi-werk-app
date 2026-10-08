@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { Icon } from '../../components/Icons'
 import Kopfzeile from '@/components/Kopfzeile'
+import { PROFIL_FELDER } from '@/app/Lib/profilFelder'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -38,7 +39,7 @@ export default function ProfilSeite({ params }) {
 
   useEffect(() => {
     async function laden() {
-      const { data: gefunden } = await supabase.from('dienstleister').select('*').eq('id', Number(id)).single()
+      const { data: gefunden } = await supabase.from('dienstleister').select(PROFIL_FELDER).eq('id', Number(id)).single()
       // Ausgeblendete Profile sieht nur der Inhaber selbst (als Vorschau)
       const { data: { session } } = await supabase.auth.getSession()
       const istInhaber = !!gefunden && !!session && session.user.id === gefunden.user_id

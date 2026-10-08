@@ -6,10 +6,11 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { supabase } from '../Lib/supabase'
 import { Icon } from '../components/Icons'
 import Kopfzeile from '@/components/Kopfzeile'
+import { PROFIL_FELDER } from '@/app/Lib/profilFelder'
 
 type Dienstleister = {
   id: string; name: string; gewerk: string; ort: string
-  beschreibung: string; preis: string; emoji: string
+  beschreibung: string; preis: string; emoji?: string
   profilbild?: string; telefon?: string; website?: string
   qualifikationen?: string; user_id?: string; postleitzahl?: string
   abo_aktiv?: boolean; stripe_customer_id?: string | null; ics_url?: string | null
@@ -45,6 +46,8 @@ export default function DashboardPage() {
   const [icsFehler, setIcsFehler] = useState('')
   const [portalLaden, setPortalLaden] = useState(false)
   const [portalFehler, setPortalFehler] = useState('')
+  const [icsGespeichert, setIcsGespeichert] = useState(false)
+  const [hatStripe, setHatStripe] = useState(false)
 
   async function kalenderAbrufen() {
     setKalenderLaden(true)
@@ -58,10 +61,10 @@ export default function DashboardPage() {
     setPortalLaden(true)
     setPortalFehler('')
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const res = await fetch('/api/stripe-portal', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user?.id }),
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (session?.access_token || '') },
       })
       const data = await res.json()
       if (data.url) window.location.href = data.url
@@ -83,8 +86,14 @@ export default function DashboardPage() {
   }
 
   async function loadProfil(userId: string) {
-    const { data } = await supabase.from('dienstleister').select('*').eq('user_id', userId).single()
-    if (data) { setProfil(data); setForm(data); setIcsUrlInput(data.ics_url || '') }
+    const { data } = await supabase.from('dienstleister').select(PROFIL_FELDER).eq('user_id', userId).single()
+    if (data) { setProfil(data as Dienstleister); setForm(data as Dienstleister) }
+    // Kalender-Link und Abo-Status sind privat und kommen nur über den Server
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      const res = await fetch('/api/mein-status', { headers: { Authorization: 'Bearer ' + session.access_token } })
+      if (res.ok) { const st = await res.json(); setIcsUrlInput(st.ics_url || ''); setIcsGespeichert(!!st.ics_url); setHatStripe(!!st.hat_stripe) }
+    }
   }
 
   async function icsVerbinden() {
@@ -95,7 +104,7 @@ export default function DashboardPage() {
     if (error) { setIcsFehler('Fehler: ' + error.message); setIcsSpeichern(false); return }
     const res = await fetch('/api/kalender-ics?userId=' + user.id)
     const data = await res.json()
-    if (data.events) setIcsEvents(data.events)
+    if (data.events) { setIcsEvents(data.events); setIcsGespeichert(true) }
     else { setIcsEvents(null); setIcsFehler(data.error || 'Kalender konnte nicht abgerufen werden') }
     setIcsSpeichern(false)
   }
@@ -390,7 +399,7 @@ export default function DashboardPage() {
                     : '✓ Kalender verbunden. In den nächsten 3 Monaten sind keine Termine eingetragen, daher ist alles als frei markiert.'}
                 </div>
               )}
-              {!icsEvents && profil?.ics_url && !icsFehler && (
+              {!icsEvents && icsGespeichert && !icsFehler && (
                 <p className="mw-muted" style={{ fontSize:13, margin:'10px 0 0' }}>Ein iPhone-Kalender ist hinterlegt. Tippe auf „Verbinden“, um neue Termine zu übernehmen.</p>
               )}
               {icsFehler && <div className="mw-meldung fehler">{icsFehler}</div>}
@@ -400,7 +409,7 @@ export default function DashboardPage() {
           {reiter === 'abo' && (
             <div className="mw-karte mw-block">
               <h2 className="mw-h3">Abo verwalten</h2>
-              {profil?.stripe_customer_id ? (
+              {hatStripe ? (
                 <>
                   <p className="mw-muted" style={{ margin:'0 0 14px' }}>Zahlungsmethode ändern oder Abo kündigen verwaltest du direkt bei Stripe.</p>
                   <button className="mw-btn" onClick={aboVerwalten} disabled={portalLaden}>{portalLaden ? 'Öffnet…' : 'Abo verwalten'}</button>

@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server"
 import { stripe } from "../../Lib/stripeCheckout"
-import { supabase } from "../../Lib/supabase"
+import { supabaseAdmin as supabase, nutzerAusAnfrage } from "../../Lib/supabaseAdmin"
 
 export async function POST(req: Request) {
-  const { userId } = await req.json()
-
-  if (!userId) {
-    return NextResponse.json({ error: "userId ist erforderlich" }, { status: 400 })
+  // Nur der angemeldete Inhaber darf sein eigenes Abo verwalten
+  const user = await nutzerAusAnfrage(req)
+  if (!user) {
+    return NextResponse.json({ error: "Bitte melde dich erneut an." }, { status: 401 })
   }
+  const userId = user.id
 
   const { data: profil, error } = await supabase
     .from("dienstleister")

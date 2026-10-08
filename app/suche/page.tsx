@@ -6,6 +6,7 @@ import { supabase } from '../Lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Icon, IconBadge, iconNameFuerKategorie } from '../components/Icons'
 import Kopfzeile from '@/components/Kopfzeile'
+import { PROFIL_FELDER } from '@/app/Lib/profilFelder'
 
 const DienstleisterKarte = dynamic(() => import('../components/DienstleisterKarte'), { ssr: false })
 
@@ -190,7 +191,7 @@ export default function Home() {
   }, [])
 
   async function laden() {
-    const { data } = await supabase.from('dienstleister').select('*').eq('abo_aktiv', true)
+    const { data } = await supabase.from('dienstleister').select(PROFIL_FELDER).eq('abo_aktiv', true)
     if (data) { setDienstleister(data); setGefiltert(data) }
     // Alle kalender_events laden für Uhrzeitfilter und Wochenvorschau
     const { data: events } = await supabase.from('kalender_events').select('*')

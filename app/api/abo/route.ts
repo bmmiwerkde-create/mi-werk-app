@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '../../Lib/supabase'
+import { supabaseAdmin as supabase } from '../../Lib/supabaseAdmin'
 import { createAboCheckoutSession } from '../../Lib/stripeCheckout'
 import { findKategorie } from '../../Lib/kategorien'
 import { Resend } from 'resend'
