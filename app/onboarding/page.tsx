@@ -19,6 +19,7 @@ export default function Onboarding() {
   const [gewerk, setGewerk] = useState('')
   const [ort, setOrt] = useState('')
   const [postleitzahl, setPostleitzahl] = useState('')
+  const [telefon, setTelefon] = useState('')
   const [speichern, setSpeichern] = useState(false)
   const [fehler, setFehler] = useState('')
   const [icsUrlInput, setIcsUrlInput] = useState('')
@@ -50,10 +51,10 @@ export default function Onboarding() {
     if (!name || !gewerk || !ort) { setFehler('Bitte Name, Bereich und Ort ausfüllen.'); return }
     setFehler('')
     setSpeichern(true)
-    const payload = { user_id: user.id, name, gewerk, ort, postleitzahl: postleitzahl || null, email: user.email }
+    const payload = { user_id: user.id, name, gewerk, ort, postleitzahl: postleitzahl || null, telefon: telefon.trim() || null, email: user.email }
     const { data: bestehend } = await supabase.from('dienstleister').select('id').eq('user_id', user.id).single()
     const { data: gespeichert, error } = bestehend
-      ? await supabase.from('dienstleister').update({ name, gewerk, ort, postleitzahl: postleitzahl || null, email: user.email }).eq('id', bestehend.id).select('id').single()
+      ? await supabase.from('dienstleister').update({ name, gewerk, ort, postleitzahl: postleitzahl || null, telefon: telefon.trim() || null, email: user.email }).eq('id', bestehend.id).select('id').single()
       : await supabase.from('dienstleister').insert({ ...payload, abo_aktiv: true }).select('id').single()
     setSpeichern(false)
     if (error) { setFehler('Fehler: ' + error.message); return }
@@ -69,7 +70,7 @@ export default function Onboarding() {
         fetch('/api/neuer-dienstleister', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ record: { id: gespeichert.id, name, gewerk, ort, beschreibung: '' } }),
+          body: JSON.stringify({ record: { id: gespeichert.id, name, gewerk, ort, postleitzahl, telefon: telefon.trim(), email: user.email, beschreibung: '' } }),
         }).catch(() => {})
 
         fetch('/api/willkommen-dienstleister', {
@@ -120,7 +121,7 @@ export default function Onboarding() {
             <label className="mw-label" htmlFor="o-gewerk">In welchem Bereich bist du tätig?</label>
             <input id="o-gewerk" className="mw-feld" value={gewerk} onChange={e => setGewerk(e.target.value)} placeholder="z. B. Elektriker, Friseurin, Personal Trainer" style={{ marginBottom:14 }} />
 
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 120px', gap:10, marginBottom:20 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 120px', gap:10, marginBottom:14 }}>
               <div>
                 <label className="mw-label" htmlFor="o-ort">Ort</label>
                 <input id="o-ort" className="mw-feld" value={ort} onChange={e => setOrt(e.target.value)} placeholder="z. B. Bochum" />
@@ -130,6 +131,10 @@ export default function Onboarding() {
                 <input id="o-plz" className="mw-feld" value={postleitzahl} onChange={e => setPostleitzahl(e.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="44787" inputMode="numeric" />
               </div>
             </div>
+
+            <label className="mw-label" htmlFor="o-tel">Telefonnummer (optional)</label>
+            <input id="o-tel" className="mw-feld" type="tel" autoComplete="tel" value={telefon} onChange={e => setTelefon(e.target.value)} placeholder="z. B. 0151 12345678" />
+            <p className="mw-muted" style={{ fontSize:13, margin:'6px 0 20px' }}>Wird auf deinem Profil angezeigt, damit Kunden dich anrufen können.</p>
 
             <button className="mw-btn voll" onClick={weiterZuKalender} disabled={speichern}>{speichern ? 'Speichern…' : 'Weiter'}</button>
             {fehler && <div className="mw-meldung fehler">{fehler}</div>}
