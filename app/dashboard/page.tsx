@@ -41,7 +41,7 @@ export default function DashboardPage() {
   const [kalenderLaden, setKalenderLaden] = useState(false)
   const [icsUrlInput, setIcsUrlInput] = useState('')
   const [icsSpeichern, setIcsSpeichern] = useState(false)
-  const [icsEvents, setIcsEvents] = useState<any[]>([])
+  const [icsEvents, setIcsEvents] = useState<any[] | null>(null)
   const [icsFehler, setIcsFehler] = useState('')
   const [portalLaden, setPortalLaden] = useState(false)
   const [portalFehler, setPortalFehler] = useState('')
@@ -96,7 +96,7 @@ export default function DashboardPage() {
     const res = await fetch('/api/kalender-ics?userId=' + user.id)
     const data = await res.json()
     if (data.events) setIcsEvents(data.events)
-    else setIcsFehler(data.error || 'Kalender konnte nicht abgerufen werden')
+    else { setIcsEvents(null); setIcsFehler(data.error || 'Kalender konnte nicht abgerufen werden') }
     setIcsSpeichern(false)
   }
 
@@ -377,13 +377,22 @@ export default function DashboardPage() {
 
               <h3 className="mw-label" style={{ fontSize:15, marginTop:16 }}>iPhone / Apple-Kalender</h3>
               <p className="mw-muted" style={{ fontSize:14, margin:'0 0 8px', lineHeight:1.6 }}>
-                Auf dem iPhone: <b>Kalender-App → Kalender → dein Kalender → „Kalender freigeben“ → „Öffentlicher Kalender“ aktivieren → Link kopieren</b> und hier einfügen.
+                Auf dem iPhone: <b>Kalender-App öffnen → unten auf das Kalender-Symbol → beim iCloud-Kalender auf ⓘ → „Öffentlicher Kalender“ einschalten → „Link teilen …“ → „Kopieren“</b> und hier einfügen. Neue Termine übernimmst du mit einem erneuten Tipp auf „Verbinden“.
               </p>
               <div style={{ display:'flex', gap:8 }}>
                 <input className="mw-feld" value={icsUrlInput} onChange={e => setIcsUrlInput(e.target.value)} placeholder="webcal://… oder https://…" />
                 <button className="mw-btn" onClick={icsVerbinden} disabled={icsSpeichern || !icsUrlInput}>{icsSpeichern ? 'Verbinde…' : 'Verbinden'}</button>
               </div>
-              {icsEvents.length > 0 && <div className="mw-meldung ok">✓ {icsEvents.length} Termine synchronisiert. Kunden sehen nur frei/belegt.</div>}
+              {icsEvents && (
+                <div className="mw-meldung ok">
+                  {icsEvents.length > 0
+                    ? `✓ Verbunden: ${icsEvents.length} ${icsEvents.length === 1 ? 'Termin' : 'Termine'} der nächsten 3 Monate übernommen. Kunden sehen nur frei/belegt.`
+                    : '✓ Kalender verbunden. In den nächsten 3 Monaten sind keine Termine eingetragen, daher ist alles als frei markiert.'}
+                </div>
+              )}
+              {!icsEvents && profil?.ics_url && !icsFehler && (
+                <p className="mw-muted" style={{ fontSize:13, margin:'10px 0 0' }}>Ein iPhone-Kalender ist hinterlegt. Tippe auf „Verbinden“, um neue Termine zu übernehmen.</p>
+              )}
               {icsFehler && <div className="mw-meldung fehler">{icsFehler}</div>}
             </div>
           )}

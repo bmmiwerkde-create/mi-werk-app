@@ -163,7 +163,7 @@ export default function Onboarding() {
             {!icsVerbunden ? (
               <div style={{ marginBottom:18 }}>
                 <p style={{ fontSize:14, margin:'0 0 8px', color:'var(--mw-text2)' }}>Nutzt du den <b>Apple-Kalender auf dem iPhone</b>? Dann per Link verbinden:</p>
-                <p className="mw-muted" style={{ fontSize:13, margin:'0 0 10px', lineHeight:1.5 }}>Kalender-App → Kalender → dein Kalender → „Kalender freigeben“ → „Öffentlicher Kalender“ aktivieren → Link kopieren.</p>
+                <p className="mw-muted" style={{ fontSize:13, margin:'0 0 10px', lineHeight:1.5 }}>Kalender-App öffnen → unten auf das Kalender-Symbol → beim iCloud-Kalender auf ⓘ → „Öffentlicher Kalender“ einschalten → „Link teilen …“ → „Kopieren“.</p>
                 <div style={{ display:'flex', gap:8 }}>
                   <input className="mw-feld" value={icsUrlInput} onChange={e => setIcsUrlInput(e.target.value)} placeholder="webcal://… oder https://…" />
                   <button className="mw-btn" onClick={icsVerbindenOnboarding} disabled={icsSpeichern || !icsUrlInput}>{icsSpeichern ? '…' : 'OK'}</button>
