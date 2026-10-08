@@ -27,6 +27,7 @@ export default function ProfilSeite({ params }) {
   const [bewertungFehler, setBewertungFehler] = useState('')
   const [grossesFoto, setGrossesFoto] = useState(null)
   const [nurVorschau, setNurVorschau] = useState(false)
+  const [kalenderVerbunden, setKalenderVerbunden] = useState(false)
 
   async function bewertungenLaden() {
     const { data } = await supabase
@@ -46,6 +47,7 @@ export default function ProfilSeite({ params }) {
       const data = gefunden && (gefunden.abo_aktiv || istInhaber) ? gefunden : null
       setNurVorschau(!!data && !data.abo_aktiv)
       setProfil(data)
+      if (data) fetch('/api/kalender-status?id=' + data.id).then(r => r.json()).then(k => setKalenderVerbunden(!!k.verbunden)).catch(() => {})
       if (data?.user_id) {
         const { data: evs } = await supabase
           .from('kalender_events')
@@ -266,9 +268,20 @@ export default function ProfilSeite({ params }) {
               <span><i style={{ background:'var(--mw-frei-bg)' }} />frei</span>
               <span><i style={{ background:'var(--mw-belegt-bg)' }} />belegt</span>
             </div>
-            {events.length === 0 && <p className="mw-muted" style={{ fontSize:13, margin:'12px 0 0' }}>Kein Kalender verbunden</p>}
+            {events.length === 0 && (
+              <p className="mw-muted" style={{ fontSize:13, margin:'12px 0 0' }}>
+                {kalenderVerbunden ? 'Kalender verbunden, aktuell keine Termine eingetragen.' : 'Kein Kalender verbunden'}
+              </p>
+            )}
           </div>
 
+          {!(profil.email || profil.telefon || profil.website) && nurVorschau && (
+            <div className="mw-meldung fehler" style={{ marginTop:0, marginBottom:20 }}>
+              Kunden können dich noch nicht erreichen: Trag im Dashboard unter „Mein Profil“ eine E-Mail, Telefonnummer oder Website ein.
+            </div>
+          )}
+
+          {(profil.email || profil.telefon || profil.website) && (
           <div className="mw-karte mw-block">
             <h2 className="mw-h3">Kontakt aufnehmen</h2>
             <div style={{ display:'grid', gap:10 }}>
@@ -283,6 +296,7 @@ export default function ProfilSeite({ params }) {
               )}
             </div>
           </div>
+          )}
 
           <div className="mw-karte mw-block">
             <h2 className="mw-h3">Details</h2>
