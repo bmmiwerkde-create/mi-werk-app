@@ -25,6 +25,7 @@ export default function ProfilSeite({ params }) {
   const [bewertungSpeichern, setBewertungSpeichern] = useState(false)
   const [bewertungFehler, setBewertungFehler] = useState('')
   const [grossesFoto, setGrossesFoto] = useState(null)
+  const [nurVorschau, setNurVorschau] = useState(false)
 
   async function bewertungenLaden() {
     const { data } = await supabase
@@ -37,7 +38,12 @@ export default function ProfilSeite({ params }) {
 
   useEffect(() => {
     async function laden() {
-      const { data } = await supabase.from('dienstleister').select('*').eq('id', Number(id)).eq('abo_aktiv', true).single()
+      const { data: gefunden } = await supabase.from('dienstleister').select('*').eq('id', Number(id)).single()
+      // Ausgeblendete Profile sieht nur der Inhaber selbst (als Vorschau)
+      const { data: { session } } = await supabase.auth.getSession()
+      const istInhaber = !!gefunden && !!session && session.user.id === gefunden.user_id
+      const data = gefunden && (gefunden.abo_aktiv || istInhaber) ? gefunden : null
+      setNurVorschau(!!data && !data.abo_aktiv)
       setProfil(data)
       if (data?.user_id) {
         const { data: evs } = await supabase
@@ -121,6 +127,14 @@ export default function ProfilSeite({ params }) {
   return (
     <div>
       <Kopfzeile aktiv="suche" />
+
+      {nurVorschau && (
+        <div className="mw-wrap" style={{ paddingTop:16 }}>
+          <div className="mw-meldung fehler" style={{ marginTop:0 }}>
+            <b>Ausgeblendet:</b> Dein Profil ist zurzeit nicht öffentlich. Nur du siehst diese Vorschau.
+          </div>
+        </div>
+      )}
 
       <section className="mw-profil-kopf">
         <div className="mw-titelbild">
