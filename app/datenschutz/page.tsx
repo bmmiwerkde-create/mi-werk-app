@@ -1,3 +1,4 @@
+import Kopfzeile from '@/components/Kopfzeile'
 const ABSCHNITTE: { titel: string; text: string[] }[] = [
   {
     titel: '1. Verantwortlicher',
@@ -78,20 +79,22 @@ const ABSCHNITTE: { titel: string; text: string[] }[] = [
 
 export default function Datenschutz() {
   return (
-    <main style={{ backgroundColor: "#0a0a0a", minHeight: "100vh", padding: "4rem 1.5rem" }}>
-      <div style={{ maxWidth: "720px", margin: "0 auto" }}>
-        <a href="/" style={{ color: "#b87333", display: "block", marginBottom: "2rem", textDecoration: "none" }}>← Zurück zur Startseite</a>
-        <h1 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#b87333", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "0.75rem" }}>Datenschutzerklärung</h1>
-        <p style={{ color: "#666", fontSize: "0.85rem", margin: "0 0 2.5rem" }}>Stand: Oktober 2026</p>
+    <div>
+      <Kopfzeile />
+      <main className="mw-text-seite">
+      <div>
+                <h1 className="mw-h1" style={{ marginBottom: 24 }}>Datenschutzerklärung</h1>
+        <p className="mw-muted" style={{ marginTop: -16 }}>Stand: Oktober 2026</p>
         {ABSCHNITTE.map((a) => (
-          <section key={a.titel} style={{ marginBottom: "2rem" }}>
-            <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#fff", marginBottom: "0.5rem" }}>{a.titel}</h2>
+          <section key={a.titel}>
+            <h2>{a.titel}</h2>
             {a.text.map((t, i) => (
-              <p key={i} style={{ color: "#aaa", fontSize: "0.95rem", lineHeight: 1.8, margin: i === 0 ? 0 : "0.75rem 0 0", whiteSpace: "pre-line" }}>{t}</p>
+              <p key={i}>{t}</p>
             ))}
           </section>
         ))}
       </div>
     </main>
+    </div>
   );
 }
