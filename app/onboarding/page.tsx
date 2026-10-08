@@ -73,11 +73,13 @@ export default function Onboarding() {
           body: JSON.stringify({ record: { id: gespeichert.id, name, gewerk, ort, postleitzahl, telefon: telefon.trim(), email: user.email, beschreibung: '' } }),
         }).catch(() => {})
 
-        fetch('/api/willkommen-dienstleister', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: user.email, name }),
-        }).catch(() => {})
+        supabase.auth.getSession().then(({ data: { session } }) =>
+          fetch('/api/willkommen-dienstleister', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (session?.access_token || '') },
+            body: JSON.stringify({ name }),
+          })
+        ).catch(() => {})
       }
     }
 
