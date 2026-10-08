@@ -168,6 +168,7 @@ const hauptkategorien = [
   {
     name: 'Personal',
     gewerke: [
+      { name: 'Personaler' },
       { name: 'Personalvermittlung' },
       { name: 'Lohnabrechnung' },
       { name: 'Vergütungsberatung' },
