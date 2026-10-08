@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { supabase } from '../Lib/supabase'
 import { Icon } from '../components/Icons'
+import Kopfzeile from '@/components/Kopfzeile'
 
 type Dienstleister = {
   id: string; name: string; gewerk: string; ort: string
@@ -12,15 +13,13 @@ type Dienstleister = {
   profilbild?: string; telefon?: string; website?: string
   qualifikationen?: string; user_id?: string; postleitzahl?: string
   abo_aktiv?: boolean; stripe_customer_id?: string | null; ics_url?: string | null
+  logo?: string | null; fotos?: string[] | null
 }
 
-const C = {
-  copper:'#c8956c', copperBord:'rgba(200,149,108,0.22)',
-  bg:'#0A0A0A', bg2:'#111111', bg3:'#181818',
-  border:'rgba(255,255,255,0.06)', text:'#E8DDD4',
-  textMid:'#9A8878', textDim:'#5A5550',
-  green:'#27AE60', red:'#C0392B',
-}
+const MAX_FOTOS = 6
+const MAX_BYTES = 5 * 1024 * 1024
+type Reiter = 'profil' | 'bilder' | 'kalender' | 'abo' | 'konto'
+
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -33,6 +32,10 @@ export default function DashboardPage() {
   const [message, setMessage] = useState('')
   const [bildLaden, setBildLaden] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [reiter, setReiter] = useState<Reiter>('profil')
+  const [bildMeldung, setBildMeldung] = useState('')
+  const [logoLaden, setLogoLaden] = useState(false)
+  const [fotosLaden, setFotosLaden] = useState(false)
   const { data: googleSession } = useSession()
   const [kalenderEvents, setKalenderEvents] = useState<any[]>([])
   const [kalenderLaden, setKalenderLaden] = useState(false)
@@ -114,6 +117,85 @@ export default function DashboardPage() {
     setBildLaden(false)
   }
 
+  function bildPruefen(file: File) {
+    if (!file.type.startsWith('image/')) return 'Bitte nur Bilder (JPG, PNG, WebP) hochladen.'
+    if (file.size > MAX_BYTES) return 'Das Bild ist zu groß (höchstens 5 MB).'
+    return ''
+  }
+
+  // Pfad einer Datei im Speicher "profilbilder" aus ihrer öffentlichen Adresse lesen
+  function pfadAusUrl(url?: string | null) {
+    if (!url) return null
+    const teil = url.split('/profilbilder/')[1]
+    return teil ? decodeURIComponent(teil.split('?')[0]) : null
+  }
+
+  async function datenHochladen(file: File, name: string) {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+    const pfad = user.id + '-' + name + '-' + Date.now() + '.' + ext
+    const { error } = await supabase.storage.from('profilbilder').upload(pfad, file, { contentType: file.type })
+    if (error) throw error
+    return supabase.storage.from('profilbilder').getPublicUrl(pfad).data.publicUrl
+  }
+
+  async function logoHochladen(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !user || !profil) return
+    const fehler = bildPruefen(file)
+    if (fehler) { setBildMeldung('Fehler: ' + fehler); return }
+    setLogoLaden(true); setBildMeldung('')
+    try {
+      const url = await datenHochladen(file, 'logo')
+      const { error } = await supabase.from('dienstleister').update({ logo: url }).eq('user_id', user.id)
+      if (error) throw error
+      const alt = pfadAusUrl(profil.logo)
+      if (alt) await supabase.storage.from('profilbilder').remove([alt])
+      setBildMeldung('Logo gespeichert'); await loadProfil(user.id)
+    } catch (err: any) { setBildMeldung('Fehler beim Upload: ' + (err?.message || err)) }
+    setLogoLaden(false)
+  }
+
+  async function logoEntfernen() {
+    if (!user || !profil?.logo) return
+    const { error } = await supabase.from('dienstleister').update({ logo: null }).eq('user_id', user.id)
+    if (error) { setBildMeldung('Fehler: ' + error.message); return }
+    const alt = pfadAusUrl(profil.logo)
+    if (alt) await supabase.storage.from('profilbilder').remove([alt])
+    setBildMeldung('Logo entfernt'); await loadProfil(user.id)
+  }
+
+  async function fotosHochladen(e: React.ChangeEvent<HTMLInputElement>) {
+    const dateien = Array.from(e.target.files || [])
+    e.target.value = ''
+    if (!dateien.length || !user || !profil) return
+    const vorhanden = profil.fotos || []
+    const frei = MAX_FOTOS - vorhanden.length
+    if (frei <= 0) { setBildMeldung('Fehler: Du hast schon ' + MAX_FOTOS + ' Fotos. Entferne erst eins.'); return }
+    const auswahl = dateien.slice(0, frei)
+    for (const f of auswahl) { const fehler = bildPruefen(f); if (fehler) { setBildMeldung('Fehler: ' + f.name + ': ' + fehler); return } }
+    setFotosLaden(true); setBildMeldung('')
+    try {
+      const neu: string[] = []
+      for (const f of auswahl) neu.push(await datenHochladen(f, 'foto'))
+      const { error } = await supabase.from('dienstleister').update({ fotos: [...vorhanden, ...neu] }).eq('user_id', user.id)
+      if (error) throw error
+      setBildMeldung(dateien.length > frei ? `${neu.length} Foto(s) gespeichert. Mehr als ${MAX_FOTOS} Fotos sind nicht möglich.` : `${neu.length} Foto(s) gespeichert`)
+      await loadProfil(user.id)
+    } catch (err: any) { setBildMeldung('Fehler beim Upload: ' + (err?.message || err)) }
+    setFotosLaden(false)
+  }
+
+  async function fotoEntfernen(url: string) {
+    if (!user || !profil) return
+    const rest = (profil.fotos || []).filter(f => f !== url)
+    const { error } = await supabase.from('dienstleister').update({ fotos: rest }).eq('user_id', user.id)
+    if (error) { setBildMeldung('Fehler: ' + error.message); return }
+    const pfad = pfadAusUrl(url)
+    if (pfad) await supabase.storage.from('profilbilder').remove([pfad])
+    setBildMeldung('Foto entfernt'); await loadProfil(user.id)
+  }
+
   async function saveProfil() {
     if (!user) return
     setSaving(true)
@@ -141,232 +223,206 @@ export default function DashboardPage() {
   const firstName = profil?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'dort'
 
   if (loading) return (
-    <div style={{ minHeight:'100vh', background:C.bg, display:'flex', alignItems:'center', justifyContent:'center' }}>
-      <span style={{ color:C.copper }}>Laden</span>
-    </div>
+    <div><Kopfzeile aktiv="dashboard" /><div className="mw-laden">Laden…</div></div>
   )
 
+  const fotos = profil?.fotos || []
+  const istFehler = (m: string) => m.startsWith('Fehler')
+  const menu: [Reiter, string, string][] = [
+    ['profil', 'Mein Profil', 'user'],
+    ['bilder', 'Logo und Fotos', 'eye'],
+    ['kalender', 'Kalender', 'calendar'],
+    ['abo', 'Abo', 'euro'],
+    ['konto', 'Konto', 'lock'],
+  ]
+
   return (
-    <div style={{ minHeight:'100vh', background:C.bg, color:C.text, fontFamily:'system-ui' }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px', height:52, background:C.bg2, borderBottom:'1px solid ' + C.copperBord, position:'sticky', top:0, zIndex:100 }}>
-        <div style={{ fontFamily:'Georgia,serif', fontSize:19, fontWeight:700, cursor:'pointer' }} onClick={() => router.push('/')}>Mi-<span style={{ color:C.copper }}>Werk</span></div>
-        <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-          <span style={{ fontSize:12, color:C.textMid }}>{user?.email}</span>
-          <button onClick={logout} style={{ fontSize:11, color:C.textDim, cursor:'pointer', padding:'5px 12px', borderRadius:6, border:'1px solid ' + C.border, background:'none', fontFamily:'inherit' }}>Abmelden</button>
-        </div>
-      </div>
-
-      <div style={{ maxWidth:660, margin:'0 auto', padding:'28px 20px', display:'flex', flexDirection:'column', gap:14 }}>
-
-        <div style={{ marginBottom:4 }}>
-          <div style={{ fontSize:22, fontWeight:500, marginBottom:4 }}>Willkommen, <span style={{ color:C.copper }}>{firstName}</span></div>
-          <div style={{ fontSize:12, color:C.textDim }}>{profil ? 'Hier kannst du dein Profil verwalten.' : 'Leg dein Profil an.'}</div>
-        </div>
-
-        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
-          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>Profilbild</div>
-          <div style={{ display:'flex', alignItems:'center', gap:20 }}>
-            <div style={{ width:80, height:80, borderRadius:'50%', overflow:'hidden', background:C.bg3, border:'2px solid ' + C.copperBord, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              {profil?.profilbild ? <img src={profil.profilbild} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <span style={{ fontSize:32 }}>{profil?.emoji || '🔧'}</span>}
-            </div>
-            <div>
-              <div style={{ fontSize:13, color:C.textMid, marginBottom:10 }}>{profil?.profilbild ? 'Profilbild hochgeladen' : 'Noch kein Profilbild'}</div>
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={bildHochladen} style={{ display:'none' }} />
-              <button onClick={() => fileInputRef.current?.click()} disabled={bildLaden} style={{ fontSize:12, padding:'7px 16px', borderRadius:7, border:'1px solid ' + C.copperBord, background:'transparent', color:C.copper, cursor:'pointer', fontFamily:'inherit' }}>
-                {bildLaden ? 'Wird hochgeladen...' : 'Bild hochladen'}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12 }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', borderBottom:'1px solid ' + C.border }}>
-            <div>
-              <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:2 }}>Öffentliches Profil</div>
-              <div style={{ fontSize:12, color:C.textDim }}>So sehen dich Kunden auf mi-werk.de</div>
-            </div>
-            {!editMode && <button onClick={() => setEditMode(true)} style={{ fontSize:12, padding:'7px 16px', borderRadius:7, border:'1px solid ' + C.border, background:'transparent', color:C.textMid, cursor:'pointer', fontFamily:'inherit' }}>Bearbeiten</button>}
-          </div>
-          <div style={{ padding:'20px' }}>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:14 }}>
-              <Field label="Name" value={form.name || ''} edit={editMode} onChange={v => setForm(f=>({...f,name:v}))} />
-              <Field label="Gewerk / Kategorie" value={form.gewerk || ''} edit={editMode} onChange={v => setForm(f=>({...f,gewerk:v}))} />
-              <Field label="Ort" value={form.ort || ''} edit={editMode} onChange={v => setForm(f=>({...f,ort:v}))} />
-              <Field label="PLZ" value={form.postleitzahl || ''} edit={editMode} onChange={v => setForm(f=>({...f,postleitzahl:v}))} placeholder="z.B. 50667" />
-              <Field label="Preis" value={form.preis || ''} edit={editMode} onChange={v => setForm(f=>({...f,preis:v}))} placeholder="z.B. ab 50 Euro/Std." />
-              <Field label="Emoji" value={form.emoji || ''} edit={editMode} onChange={v => setForm(f=>({...f,emoji:v}))} placeholder="z.B. 🔧" />
-            </div>
-            <div style={{ marginBottom:14 }}>
-              <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase' as const, letterSpacing:'0.8px', color:C.textDim, marginBottom:6 }}>Beschreibung</div>
-              {editMode ? (
-                <textarea value={form.beschreibung || ''} onChange={e => setForm(f=>({...f,beschreibung:e.target.value}))} placeholder="Was bietest du an?"
-                  style={{ width:'100%', background:C.bg3, border:'1px solid ' + C.border, borderRadius:8, padding:'9px 12px', fontSize:13, color:C.text, fontFamily:'inherit', outline:'none', resize:'vertical', minHeight:90 }} />
-              ) : (
-                <div style={{ fontSize:13, color: form.beschreibung ? C.text : C.textDim, lineHeight:1.7 }}>{form.beschreibung || 'Noch keine Beschreibung'}</div>
-              )}
-            </div>
-            <div style={{ borderTop:'1px solid ' + C.border, paddingTop:14, marginBottom:14 }}>
-              <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase' as const, letterSpacing:1, color:C.textDim, marginBottom:12 }}>Optional</div>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:14 }}>
-                <Field label="Telefon" value={(form as any).telefon || ''} edit={editMode} onChange={v => setForm(f=>({...f, telefon:v} as any))} placeholder="z.B. 0151 12345678" />
-                <Field label="Website" value={(form as any).website || ''} edit={editMode} onChange={v => setForm(f=>({...f, website:v} as any))} placeholder="z.B. www.meine-seite.de" />
-              </div>
-              <div>
-                <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase' as const, letterSpacing:'0.8px', color:C.textDim, marginBottom:6 }}>Qualifikationen</div>
-                {editMode ? (
-                  <textarea value={(form as any).qualifikationen || ''} onChange={e => setForm(f=>({...f, qualifikationen:e.target.value} as any))} placeholder="z.B. Meisterbrief, 10 Jahre Erfahrung..."
-                    style={{ width:'100%', background:C.bg3, border:'1px solid ' + C.border, borderRadius:8, padding:'9px 12px', fontSize:13, color:C.text, fontFamily:'inherit', outline:'none', resize:'vertical', minHeight:70 }} />
-                ) : (
-                  <div style={{ fontSize:13, color: (form as any).qualifikationen ? C.text : C.textDim, lineHeight:1.7 }}>{(form as any).qualifikationen || '-'}</div>
-                )}
-              </div>
-            </div>
-            {!editMode && profil && (
-              <div style={{ marginTop:20, paddingTop:18, borderTop:'1px solid ' + C.border }}>
-                <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:10 }}>Vorschau</div>
-                <div style={{ display:'flex', alignItems:'center', gap:14, background:C.bg3, border:'1px solid ' + C.copperBord, borderRadius:10, padding:'14px 16px' }}>
-                  <div style={{ width:48, height:48, borderRadius:'50%', overflow:'hidden', background:C.bg2, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    {profil.profilbild ? <img src={profil.profilbild} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <span style={{ fontSize:24 }}>{profil.emoji || '🔧'}</span>}
-                  </div>
-                  <div>
-                    <div style={{ fontSize:15, fontWeight:500, marginBottom:3 }}>{profil.name}</div>
-                    <div style={{ fontSize:12, color:C.textMid, marginBottom:2 }}>{profil.gewerk} · {profil.ort}</div>
-                    <div style={{ fontSize:12, color:C.copper }}>{profil.preis}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-            {editMode && (
-              <div style={{ display:'flex', gap:10, marginTop:20 }}>
-                <button onClick={saveProfil} disabled={saving} style={{ padding:'10px 22px', borderRadius:8, background:C.copper, color:'#fff', fontSize:13, fontWeight:500, border:'none', cursor:'pointer', fontFamily:'inherit', opacity: saving ? 0.7 : 1 }}>
-                  {saving ? 'Speichern...' : 'Speichern'}
-                </button>
-                <button onClick={() => { setEditMode(false); setForm(profil || {}) }} style={{ padding:'10px 16px', borderRadius:8, background:'transparent', color:C.textMid, fontSize:13, border:'1px solid ' + C.border, cursor:'pointer', fontFamily:'inherit' }}>
-                  Abbrechen
-                </button>
-              </div>
-            )}
-            {message && (
-              <div style={{ marginTop:12, fontSize:13, padding:'8px 12px', borderRadius:7, background:'rgba(255,255,255,0.04)', color: message.startsWith('Fehler') ? C.red : C.green }}>
-                {message}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
-          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>Google Kalender</div>
-          {!googleSession ? (
-            <div>
-              <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>Verbinde deinen Google Kalender — Kunden sehen automatisch wann du verfügbar bist.</div>
-              <button onClick={() => signIn('google', { callbackUrl: 'https://www.mi-werk.de/dashboard' })} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#fff', color:'#333', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
-                <Icon name="calendar" size={16} /> Mit Google verbinden
-              </button>
-            </div>
-          ) : (
-            <div>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
-                <div style={{ fontSize:13, color:C.green }}>✓ Google Kalender verbunden ({googleSession.user?.email})</div>
-                <button onClick={() => signOut()} style={{ fontSize:11, color:C.textDim, background:'none', border:'1px solid ' + C.border, borderRadius:6, padding:'4px 10px', cursor:'pointer', fontFamily:'inherit' }}>Trennen</button>
-              </div>
-              <button onClick={kalenderAbrufen} disabled={kalenderLaden} style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background:C.copper, color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit', marginBottom:12 }}>
-                {kalenderLaden ? 'Lädt...' : 'Termine abrufen'}
-              </button>
-              {kalenderEvents.length > 0 && (
-                <div style={{ fontSize:12, color:C.green, marginTop:8 }}>
-                  ✓ {kalenderEvents.length} Termine synchronisiert — Kunden sehen nur frei/belegt.
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
-          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>Outlook Kalender</div>
-          {!googleSession || googleSession.provider !== 'microsoft-entra-id' ? (
-            <div>
-              <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>Verbinde deinen Outlook Kalender.</div>
-              <button onClick={() => signIn('microsoft-entra-id', { callbackUrl: 'https://www.mi-werk.de/dashboard' })} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 20px', background:'#0078D4', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'inherit' }}>
-                <Icon name="mail" size={16} /> Mit Outlook verbinden
-              </button>
-            </div>
-          ) : (
-            <div>
-              <div style={{ fontSize:13, color:C.green, marginBottom:12 }}>✓ Outlook verbunden ({googleSession.user?.email})</div>
-            </div>
-          )}
-        </div>
-
-        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
-          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>iPhone / Apple-Kalender</div>
-          <div style={{ fontSize:13, color:C.textMid, marginBottom:12, lineHeight:1.6 }}>
-            Nutzt du den Apple-Kalender auf dem iPhone (kein Google- oder Outlook-Konto)? Dann verbinde ihn per Link:
-          </div>
-          <div style={{ fontSize:12, color:C.copper, background:'rgba(200,149,108,0.08)', border:'1px solid ' + C.copperBord, borderRadius:8, padding:'10px 13px', marginBottom:14, lineHeight:1.6 }}>
-            <Icon name="calendar" size={13} style={{ verticalAlign:'-2px', marginRight:4 }} /> Auf dem iPhone: <strong>Kalender-App → Kalender → dein Kalender → „Kalender freigeben" → „Öffentlicher Kalender" aktivieren → Link kopieren</strong> und hier einfügen.
-          </div>
-          <div style={{ display:'flex', gap:8, marginBottom:10 }}>
-            <input value={icsUrlInput} onChange={e => setIcsUrlInput(e.target.value)} placeholder="webcal://... oder https://..."
-              style={{ flex:1, background:C.bg3, border:'1px solid ' + C.border, borderRadius:8, padding:'10px 13px', fontSize:13, color:C.text, fontFamily:'inherit', outline:'none' }} />
-            <button onClick={icsVerbinden} disabled={icsSpeichern || !icsUrlInput} style={{ fontSize:12, padding:'0 16px', borderRadius:8, background:C.copper, color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit', opacity: icsSpeichern ? 0.7 : 1 }}>
-              {icsSpeichern ? 'Verbinde...' : 'Verbinden'}
-            </button>
-          </div>
-          {icsEvents.length > 0 && (
-            <div style={{ fontSize:12, color:C.green }}>✓ {icsEvents.length} Termine synchronisiert — Kunden sehen nur frei/belegt.</div>
-          )}
-          {icsFehler && (
-            <div style={{ fontSize:12, color:C.red }}>{icsFehler}</div>
-          )}
-        </div>
-
-        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
-          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:16 }}>Abo verwalten</div>
-          {profil?.stripe_customer_id ? (
-            <div>
-              <div style={{ fontSize:13, color:C.textMid, marginBottom:12 }}>
-                Zahlungsmethode ändern oder Abo kündigen — verwaltest du direkt bei Stripe.
-              </div>
-              <button onClick={aboVerwalten} disabled={portalLaden} style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background:C.copper, color:'#fff', border:'none', cursor:'pointer', fontFamily:'inherit', opacity: portalLaden ? 0.7 : 1 }}>
-                {portalLaden ? 'Öffnet...' : 'Abo verwalten'}
-              </button>
-            </div>
-          ) : profil ? (
-            <div style={{ fontSize:13, color:C.textMid }}>
-              Du bist aktuell in der kostenlosen Phase. Sobald du ein Abo abgeschlossen hast, kannst du hier Zahlungsmethode und Kündigung verwalten.
-              <div style={{ marginTop:12 }}>
-                <button onClick={() => router.push('/abo')} style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background:'transparent', border:'1px solid ' + C.copperBord, color:C.copper, cursor:'pointer', fontFamily:'inherit' }}>
-                  Abo abschließen
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div style={{ fontSize:13, color:C.textMid }}>
-              Bitte lege zuerst dein Profil an, bevor du ein Abo abschließt.
-              <div style={{ marginTop:12 }}>
-                <button onClick={() => setEditMode(true)} style={{ fontSize:12, padding:'8px 16px', borderRadius:8, background:'transparent', border:'1px solid ' + C.border, color:C.textDim, cursor:'pointer', fontFamily:'inherit' }}>
-                  Profil anlegen
-                </button>
-              </div>
-            </div>
-          )}
-          {portalFehler && (
-            <div style={{ marginTop:12, fontSize:13, padding:'8px 12px', borderRadius:7, background:'rgba(255,255,255,0.04)', color:C.red }}>
-              {portalFehler}
-            </div>
-          )}
-        </div>
-
-        <div style={{ background:C.bg2, border:'1px solid ' + C.border, borderRadius:12, padding:20 }}>
-          <div style={{ fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:1, color:C.textDim, marginBottom:14 }}>Konto</div>
-          {[['E-Mail', user?.email], ['Mitglied seit', user?.created_at ? new Date(user.created_at).toLocaleDateString('de-DE') : '-'], ['Konto-ID', user?.id]].map(([k, v]) => (
-            <div key={k} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 0', borderBottom:'1px solid ' + C.border, fontSize:13 }}>
-              <span style={{ color:C.textDim, fontSize:12 }}>{k}</span>
-              <span style={{ color: k === 'Konto-ID' ? C.textDim : C.text, fontSize: k === 'Konto-ID' ? 11 : 13 }}>{v}</span>
-            </div>
+    <div>
+      <Kopfzeile aktiv="dashboard" />
+      <div className="mw-wrap mw-dash">
+        <nav className="mw-karte mw-dash-menu" aria-label="Dashboard-Bereiche">
+          {menu.map(([key, text, icon]) => (
+            <button key={key} className={reiter === key ? 'an' : ''} onClick={() => setReiter(key)}><Icon name={icon} size={18} />{text}</button>
           ))}
-        </div>
+        </nav>
 
+        <div>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap', marginBottom:20 }}>
+            <div>
+              <h1 className="mw-h1" style={{ fontSize:30 }}>Willkommen, {firstName}</h1>
+              <p className="mw-muted" style={{ margin:'4px 0 0' }}>{profil ? 'Hier verwaltest du dein Profil.' : 'Leg dein Profil an.'}</p>
+            </div>
+            <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+              {profil?.id && <a className="mw-btn zwei klein" href={'/profil/' + profil.id}>Mein Profil ansehen</a>}
+              <button className="mw-btn zwei klein" onClick={logout}>Abmelden</button>
+            </div>
+          </div>
+
+          {reiter === 'profil' && (
+            <div className="mw-karte mw-block">
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, marginBottom:16 }}>
+                <div>
+                  <h2 className="mw-h3">Öffentliches Profil</h2>
+                  <div className="mw-muted" style={{ fontSize:14 }}>So sehen dich Kunden auf mi-werk.de</div>
+                </div>
+                {!editMode && <button className="mw-btn zwei klein" onClick={() => setEditMode(true)}>Bearbeiten</button>}
+              </div>
+              <div className="mw-zwei-spalten" style={{ marginBottom:14 }}>
+                <Field label="Name" value={form.name || ''} edit={editMode} onChange={v => setForm(f=>({...f,name:v}))} />
+                <Field label="Gewerk / Kategorie" value={form.gewerk || ''} edit={editMode} onChange={v => setForm(f=>({...f,gewerk:v}))} />
+                <Field label="Ort" value={form.ort || ''} edit={editMode} onChange={v => setForm(f=>({...f,ort:v}))} />
+                <Field label="PLZ" value={form.postleitzahl || ''} edit={editMode} onChange={v => setForm(f=>({...f,postleitzahl:v}))} placeholder="z. B. 44787" />
+                <Field label="Preis" value={form.preis || ''} edit={editMode} onChange={v => setForm(f=>({...f,preis:v}))} placeholder="z. B. ab 50 €/Std." />
+                <Field label="Telefon (optional)" value={form.telefon || ''} edit={editMode} onChange={v => setForm(f=>({...f, telefon:v}))} placeholder="z. B. 0151 12345678" />
+                <Field label="Website (optional)" value={form.website || ''} edit={editMode} onChange={v => setForm(f=>({...f, website:v}))} placeholder="z. B. www.meine-seite.de" />
+              </div>
+              <Feldtext label="Beschreibung" value={form.beschreibung || ''} edit={editMode} onChange={v => setForm(f=>({...f,beschreibung:v}))} placeholder="Was bietest du an?" leer="Noch keine Beschreibung" />
+              <Feldtext label="Qualifikationen (optional)" value={form.qualifikationen || ''} edit={editMode} onChange={v => setForm(f=>({...f, qualifikationen:v}))} placeholder="z. B. Meisterbrief, 10 Jahre Erfahrung …" leer="–" />
+              {editMode && (
+                <div style={{ display:'flex', gap:10, marginTop:20 }}>
+                  <button className="mw-btn" onClick={saveProfil} disabled={saving}>{saving ? 'Speichern…' : 'Speichern'}</button>
+                  <button className="mw-btn zwei" onClick={() => { setEditMode(false); setForm(profil || {}) }}>Abbrechen</button>
+                </div>
+              )}
+              {message && <div className={'mw-meldung ' + (istFehler(message) ? 'fehler' : 'ok')}>{message}</div>}
+            </div>
+          )}
+
+          {reiter === 'bilder' && (
+            <>
+              {!profil && <div className="mw-meldung fehler" style={{ marginTop:0, marginBottom:16 }}>Bitte lege zuerst unter „Mein Profil“ dein Profil an.</div>}
+              <div className="mw-karte mw-block">
+                <h2 className="mw-h3">Profilbild</h2>
+                <div className="mw-upload-reihe">
+                  <div className="mw-upload-bild">{profil?.profilbild ? <img src={profil.profilbild} alt="Profilbild" /> : <Icon name="user" size={36} />}</div>
+                  <div>
+                    <p className="mw-muted" style={{ margin:'0 0 10px', fontSize:14 }}>Ein Foto von dir. JPG oder PNG.</p>
+                    <input ref={fileInputRef} type="file" accept="image/*" onChange={bildHochladen} hidden />
+                    <button className="mw-btn zwei klein" onClick={() => fileInputRef.current?.click()} disabled={bildLaden || !profil}>{bildLaden ? 'Wird hochgeladen…' : 'Bild auswählen'}</button>
+                  </div>
+                </div>
+                {message && reiter === 'bilder' && <div className={'mw-meldung ' + (istFehler(message) ? 'fehler' : 'ok')}>{message}</div>}
+              </div>
+
+              <div className="mw-karte mw-block">
+                <h2 className="mw-h3">Logo</h2>
+                <div className="mw-upload-reihe">
+                  <div className="mw-upload-bild eckig">{profil?.logo ? <img src={profil.logo} alt="Logo" /> : <span style={{ fontSize:13 }}>Logo</span>}</div>
+                  <div>
+                    <p className="mw-muted" style={{ margin:'0 0 10px', fontSize:14 }}>Dein Firmenlogo, am besten PNG mit transparentem Hintergrund. Höchstens 5 MB.</p>
+                    <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                      <label className={'mw-btn zwei klein'} style={{ opacity: (logoLaden || !profil) ? 0.6 : 1, pointerEvents: (logoLaden || !profil) ? 'none' : 'auto' }}>
+                        {logoLaden ? 'Wird hochgeladen…' : profil?.logo ? 'Logo ersetzen' : 'Logo auswählen'}
+                        <input type="file" accept="image/*" onChange={logoHochladen} hidden />
+                      </label>
+                      {profil?.logo && <button className="mw-link" onClick={logoEntfernen}>Entfernen</button>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mw-karte mw-block">
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
+                  <h2 className="mw-h3">Fotos</h2>
+                  <span className="mw-muted" style={{ fontSize:14 }}>{fotos.length} von {MAX_FOTOS}</span>
+                </div>
+                <p className="mw-muted" style={{ margin:'0 0 14px', fontSize:14 }}>Bis zu {MAX_FOTOS} Fotos von deiner Arbeit, deinen Räumen oder deinem Team. Je höchstens 5 MB.</p>
+                <div className="mw-fotos">
+                  {fotos.map((f, i) => (
+                    <div key={f} className="mw-foto-slot voll">
+                      <img src={f} alt={'Foto ' + (i + 1)} />
+                      <button className="mw-foto-weg" onClick={() => fotoEntfernen(f)} aria-label={'Foto ' + (i + 1) + ' entfernen'}>×</button>
+                    </div>
+                  ))}
+                  {fotos.length < MAX_FOTOS && (
+                    <label className="mw-foto-slot" style={{ opacity: (fotosLaden || !profil) ? 0.6 : 1, pointerEvents: (fotosLaden || !profil) ? 'none' : 'auto' }}>
+                      <Icon name="eye" size={22} />
+                      <span>{fotosLaden ? 'Wird hochgeladen…' : 'Fotos hinzufügen'}</span>
+                      <input type="file" accept="image/*" multiple onChange={fotosHochladen} hidden />
+                    </label>
+                  )}
+                </div>
+                {bildMeldung && <div className={'mw-meldung ' + (istFehler(bildMeldung) ? 'fehler' : 'ok')}>{bildMeldung}</div>}
+              </div>
+            </>
+          )}
+
+          {reiter === 'kalender' && (
+            <div className="mw-karte mw-block">
+              <h2 className="mw-h3">Kalender verbinden</h2>
+              <div className="mw-hinweis" style={{ marginBottom:16 }}>
+                <Icon name="lock" size={18} /><span>Kunden sehen nur, ob du <b>frei oder belegt</b> bist, nie Titel, Ort oder Details deiner Termine.</span>
+              </div>
+
+              <h3 className="mw-label" style={{ fontSize:15, marginTop:4 }}>Google Kalender</h3>
+              {!googleSession ? (
+                <button className="mw-kal-knopf" onClick={() => signIn('google', { callbackUrl: 'https://www.mi-werk.de/dashboard' })}><Icon name="calendar" size={20} />Mit Google verbinden</button>
+              ) : (
+                <div style={{ marginBottom:14 }}>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, marginBottom:10, flexWrap:'wrap' }}>
+                    <div style={{ color:'var(--mw-frei)', fontSize:14 }}>✓ Google Kalender verbunden ({googleSession.user?.email})</div>
+                    <button className="mw-link" onClick={() => signOut()}>Trennen</button>
+                  </div>
+                  <button className="mw-btn klein" onClick={kalenderAbrufen} disabled={kalenderLaden}>{kalenderLaden ? 'Lädt…' : 'Termine abrufen'}</button>
+                  {kalenderEvents.length > 0 && <div className="mw-meldung ok">✓ {kalenderEvents.length} Termine synchronisiert. Kunden sehen nur frei/belegt.</div>}
+                </div>
+              )}
+
+              <h3 className="mw-label" style={{ fontSize:15, marginTop:16 }}>Outlook Kalender</h3>
+              {!googleSession || googleSession.provider !== 'microsoft-entra-id' ? (
+                <button className="mw-kal-knopf" onClick={() => signIn('microsoft-entra-id', { callbackUrl: 'https://www.mi-werk.de/dashboard' })}><Icon name="mail" size={20} />Mit Outlook verbinden</button>
+              ) : (
+                <div style={{ color:'var(--mw-frei)', fontSize:14, marginBottom:14 }}>✓ Outlook verbunden ({googleSession.user?.email})</div>
+              )}
+
+              <h3 className="mw-label" style={{ fontSize:15, marginTop:16 }}>iPhone / Apple-Kalender</h3>
+              <p className="mw-muted" style={{ fontSize:14, margin:'0 0 8px', lineHeight:1.6 }}>
+                Auf dem iPhone: <b>Kalender-App → Kalender → dein Kalender → „Kalender freigeben“ → „Öffentlicher Kalender“ aktivieren → Link kopieren</b> und hier einfügen.
+              </p>
+              <div style={{ display:'flex', gap:8 }}>
+                <input className="mw-feld" value={icsUrlInput} onChange={e => setIcsUrlInput(e.target.value)} placeholder="webcal://… oder https://…" />
+                <button className="mw-btn" onClick={icsVerbinden} disabled={icsSpeichern || !icsUrlInput}>{icsSpeichern ? 'Verbinde…' : 'Verbinden'}</button>
+              </div>
+              {icsEvents.length > 0 && <div className="mw-meldung ok">✓ {icsEvents.length} Termine synchronisiert. Kunden sehen nur frei/belegt.</div>}
+              {icsFehler && <div className="mw-meldung fehler">{icsFehler}</div>}
+            </div>
+          )}
+
+          {reiter === 'abo' && (
+            <div className="mw-karte mw-block">
+              <h2 className="mw-h3">Abo verwalten</h2>
+              {profil?.stripe_customer_id ? (
+                <>
+                  <p className="mw-muted" style={{ margin:'0 0 14px' }}>Zahlungsmethode ändern oder Abo kündigen verwaltest du direkt bei Stripe.</p>
+                  <button className="mw-btn" onClick={aboVerwalten} disabled={portalLaden}>{portalLaden ? 'Öffnet…' : 'Abo verwalten'}</button>
+                </>
+              ) : profil ? (
+                <>
+                  <p className="mw-muted" style={{ margin:'0 0 14px' }}>Du bist aktuell in der kostenlosen Phase. Sobald du ein Abo abgeschlossen hast, kannst du hier Zahlungsmethode und Kündigung verwalten.</p>
+                  <button className="mw-btn zwei" onClick={() => router.push('/abo')}>Abo abschließen</button>
+                </>
+              ) : (
+                <>
+                  <p className="mw-muted" style={{ margin:'0 0 14px' }}>Bitte lege zuerst dein Profil an, bevor du ein Abo abschließt.</p>
+                  <button className="mw-btn zwei" onClick={() => { setReiter('profil'); setEditMode(true) }}>Profil anlegen</button>
+                </>
+              )}
+              {portalFehler && <div className="mw-meldung fehler">{portalFehler}</div>}
+            </div>
+          )}
+
+          {reiter === 'konto' && (
+            <div className="mw-karte mw-block">
+              <h2 className="mw-h3">Konto</h2>
+              {[['E-Mail', user?.email], ['Mitglied seit', user?.created_at ? new Date(user.created_at).toLocaleDateString('de-DE') : '-'], ['Konto-ID', user?.id]].map(([k, v]) => (
+                <div key={k} className="mw-detail">
+                  <span className="mw-muted">{k}</span>
+                  <span style={{ fontSize: k === 'Konto-ID' ? 12 : 14, color: k === 'Konto-ID' ? 'var(--mw-muted)' : 'inherit', overflowWrap:'anywhere', textAlign:'right' }}>{v}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -375,12 +431,24 @@ export default function DashboardPage() {
 function Field({ label, value, edit, onChange, placeholder }: { label: string; value: string; edit: boolean; onChange: (v: string) => void; placeholder?: string }) {
   return (
     <div>
-      <div style={{ fontSize:10, fontWeight:500, textTransform:'uppercase' as const, letterSpacing:'0.8px', color:'#5A5550', marginBottom:5 }}>{label}</div>
+      <div className="mw-label">{label}</div>
       {edit ? (
-        <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder || label}
-          style={{ width:'100%', background:'#181818', border:'1px solid rgba(255,255,255,0.06)', borderRadius:8, padding:'9px 12px', fontSize:13, color:'#E8DDD4', fontFamily:'inherit', outline:'none' }} />
+        <input className="mw-feld" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder || label} />
       ) : (
-        <div style={{ fontSize:14, color: value ? '#E8DDD4' : '#5A5550', padding:'8px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>{value || '-'}</div>
+        <div style={{ fontSize:15, color: value ? 'var(--mw-text)' : 'var(--mw-muted)', padding:'8px 0', borderBottom:'1px solid var(--mw-line)' }}>{value || '–'}</div>
+      )}
+    </div>
+  )
+}
+
+function Feldtext({ label, value, edit, onChange, placeholder, leer }: { label: string; value: string; edit: boolean; onChange: (v: string) => void; placeholder?: string; leer: string }) {
+  return (
+    <div style={{ marginBottom:14 }}>
+      <div className="mw-label">{label}</div>
+      {edit ? (
+        <textarea className="mw-feld" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={4} />
+      ) : (
+        <div style={{ fontSize:15, color: value ? 'var(--mw-text)' : 'var(--mw-muted)', lineHeight:1.7, whiteSpace:'pre-line' }}>{value || leer}</div>
       )}
     </div>
   )
