@@ -22,6 +22,7 @@ export default function ProfilSeite({ params }) {
   const [bewertungen, setBewertungen] = useState([])
   const [neuerName, setNeuerName] = useState('')
   const [neueSterne, setNeueSterne] = useState(5)
+  const [sterneVorschau, setSterneVorschau] = useState(null)
   const [neuerKommentar, setNeuerKommentar] = useState('')
   const [bewertungSpeichern, setBewertungSpeichern] = useState(false)
   const [bewertungFehler, setBewertungFehler] = useState('')
@@ -122,9 +123,14 @@ export default function ProfilSeite({ params }) {
   const wochentage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
   const anzahl = bewertungen.length
   const schnitt = anzahl ? bewertungen.reduce((sum, b) => sum + b.sterne, 0) / anzahl : 0
-  const sterneText = (n) => '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n))
-  const fotos = Array.isArray(profil.fotos) ? profil.fotos.filter(Boolean).slice(0, 6) : []
   const zahl = (n) => n.toFixed(1).replace('.', ',')
+  // Sterne inkl. halber Sterne: graue Sterne, darüber goldene, auf die passende Breite gekürzt
+  const Sterne = ({ wert, groesse = undefined }: { wert: any; groesse?: number }) => (
+    <span className="mw-sterne-anz" style={groesse ? { fontSize: groesse } : undefined} aria-label={zahl(Number(wert)) + ' von 5 Sternen'}>
+      ★★★★★<span style={{ width: (Math.max(0, Math.min(5, Number(wert))) / 5 * 100) + '%' }}>★★★★★</span>
+    </span>
+  )
+  const fotos = Array.isArray(profil.fotos) ? profil.fotos.filter(Boolean).slice(0, 6) : []
   const amAnfang = kalenderMonat.getFullYear() === heute.getFullYear() && kalenderMonat.getMonth() === heute.getMonth()
 
   return (
@@ -155,7 +161,7 @@ export default function ProfilSeite({ params }) {
               <div style={{ color:'var(--mw-cta)', fontWeight:600, margin:'2px 0 10px' }}>{profil.gewerk}</div>
               <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
                 {anzahl > 0
-                  ? <a className="mw-chip" href="#bewertungen"><span className="mw-sterne">{sterneText(schnitt)}</span>{zahl(schnitt)} ({anzahl})</a>
+                  ? <a className="mw-chip" href="#bewertungen"><Sterne wert={schnitt} />{zahl(schnitt)} ({anzahl})</a>
                   : <span className="mw-chip">Noch keine Bewertungen</span>}
                 {profil.ort && <span className="mw-chip"><Icon name="pin" size={14} />{profil.ort}{profil.postleitzahl ? ' ' + profil.postleitzahl : ''}{profil.umkreis ? ' (+' + profil.umkreis + ')' : ''}</span>}
                 {profil.preis && <span className="mw-chip"><Icon name="euro" size={14} />{profil.preis}</span>}
@@ -200,12 +206,12 @@ export default function ProfilSeite({ params }) {
               <div style={{ display:'grid', gridTemplateColumns:'auto 1fr', gap:24, alignItems:'center', marginBottom:10 }}>
                 <div style={{ textAlign:'center' }}>
                   <div className="mw-serif" style={{ fontSize:44, fontWeight:700, color:'var(--mw-ink)', lineHeight:1 }}>{zahl(schnitt)}</div>
-                  <div className="mw-sterne">{sterneText(schnitt)}</div>
+                  <div style={{ margin:'4px 0' }}><Sterne wert={schnitt} groesse={18} /></div>
                   <div className="mw-muted" style={{ fontSize:13 }}>{anzahl} {anzahl === 1 ? 'Bewertung' : 'Bewertungen'}</div>
                 </div>
                 <div>
                   {[5, 4, 3, 2, 1].map(st => {
-                    const c = bewertungen.filter(b => b.sterne === st).length
+                    const c = bewertungen.filter(b => Math.floor(Number(b.sterne)) === st).length
                     return <div key={st} className="mw-balken"><span>{st} ★</span><div><i style={{ width: (c / anzahl * 100) + '%' }} /></div><span>{c}</span></div>
                   })}
                 </div>
@@ -218,7 +224,7 @@ export default function ProfilSeite({ params }) {
               <div key={b.id} className="mw-bewertung">
                 <div style={{ display:'flex', justifyContent:'space-between', gap:10 }}>
                   <b style={{ color:'var(--mw-ink)' }}>{b.name}</b>
-                  <span className="mw-sterne" aria-label={b.sterne + ' von 5 Sternen'}>{sterneText(b.sterne)}</span>
+                  <Sterne wert={b.sterne} />
                 </div>
                 {b.kommentar && <p style={{ margin:'4px 0 0', color:'var(--mw-text2)' }}>{b.kommentar}</p>}
               </div>
@@ -226,11 +232,23 @@ export default function ProfilSeite({ params }) {
 
             <div style={{ borderTop:'1px solid var(--mw-line)', marginTop:8, paddingTop:18 }}>
               <b style={{ color:'var(--mw-ink)' }}>Eigene Bewertung abgeben</b>
-              <div className="mw-stern-wahl" role="radiogroup" aria-label="Sterne wählen" style={{ margin:'8px 0' }}>
-                {[1, 2, 3, 4, 5].map(n => (
-                  <button key={n} type="button" role="radio" aria-checked={neueSterne === n} aria-label={n + (n === 1 ? ' Stern' : ' Sterne')}
-                    className={n <= neueSterne ? 'an' : ''} onClick={() => setNeueSterne(n)}>★</button>
-                ))}
+              <div style={{ display:'flex', alignItems:'center', gap:12, margin:'8px 0' }}>
+                <div className="mw-stern-wahl" role="radiogroup" aria-label="Sterne wählen (halbe Sterne möglich)" onMouseLeave={() => setSterneVorschau(null)}>
+                  {[1, 2, 3, 4, 5].map(n => {
+                    const wert = sterneVorschau ?? neueSterne
+                    const fuellung = wert >= n ? 100 : wert >= n - 0.5 ? 50 : 0
+                    return (
+                      <span key={n} className="mw-stern-feld">
+                        <span className="mw-stern-gold" style={{ width: fuellung + '%' }}>★</span>★
+                        {[n - 0.5, n].map((w, i) => (
+                          <button key={w} type="button" role="radio" aria-checked={neueSterne === w} aria-label={zahl(w) + ' Sterne'}
+                            className={i === 0 ? 'links' : 'rechts'} onMouseEnter={() => setSterneVorschau(w)} onFocus={() => setSterneVorschau(w)} onBlur={() => setSterneVorschau(null)} onClick={() => setNeueSterne(w)} />
+                        ))}
+                      </span>
+                    )
+                  })}
+                </div>
+                <b style={{ color:'var(--mw-ink)' }}>{zahl(sterneVorschau ?? neueSterne)}</b>
               </div>
               <input className="mw-feld" value={neuerName} onChange={e => setNeuerName(e.target.value)} placeholder="Dein Name" style={{ marginBottom:10 }} />
               <textarea className="mw-feld" value={neuerKommentar} onChange={e => setNeuerKommentar(e.target.value)} placeholder="Wie war deine Erfahrung? (optional)" rows={3} style={{ marginBottom:10 }} />

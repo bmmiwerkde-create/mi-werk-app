@@ -169,8 +169,15 @@ textarea.mw-feld { resize: vertical; }
 .mw-legende i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 .mw-bewertung { padding: 14px 0; border-bottom: 1px solid var(--mw-line); }
 .mw-bewertung:last-child { border-bottom: none; }
-.mw-stern-wahl button { font-size: 30px; cursor: pointer; color: #D9D2C7; background: none; border: none; padding: 0 2px; line-height: 1; }
-.mw-stern-wahl button.an { color: var(--mw-stern); }
+.mw-sterne-anz { position: relative; display: inline-block; color: #D3CABD; letter-spacing: 1px; line-height: 1; white-space: nowrap; }
+.mw-sterne-anz > span { position: absolute; left: 0; top: 0; overflow: hidden; color: var(--mw-stern); white-space: nowrap; }
+.mw-stern-wahl { display: inline-flex; gap: 4px; }
+.mw-stern-feld { position: relative; display: inline-block; font-size: 34px; line-height: 1; color: #D9D2C7; user-select: none; }
+.mw-stern-gold { position: absolute; left: 0; top: 0; overflow: hidden; color: var(--mw-stern); pointer-events: none; }
+.mw-stern-feld button { position: absolute; top: 0; height: 100%; width: 50%; background: none; border: none; padding: 0; cursor: pointer; }
+.mw-stern-feld button.links { left: 0; }
+.mw-stern-feld button.rechts { right: 0; }
+.mw-stern-feld button:focus-visible { outline: 2px solid var(--mw-ink); outline-offset: 1px; border-radius: 3px; }
 .mw-balken { display: grid; grid-template-columns: 30px 1fr 24px; gap: 8px; align-items: center; font-size: 13px; color: var(--mw-muted); margin-bottom: 4px; }
 .mw-balken div { height: 8px; background: var(--mw-soft); border-radius: 4px; overflow: hidden; }
 .mw-balken div i { display: block; height: 100%; background: var(--mw-stern); }
