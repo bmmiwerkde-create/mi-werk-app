@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../Lib/supabase";
 import { KATEGORIEN } from "../Lib/kategorien";
-import { Icon, iconNameFuerKategorie } from "../components/Icons";
+import { IconBadge, iconNameFuerKategorie } from "../components/Icons";
+import Kopfzeile from "@/components/Kopfzeile";
 
 export default function AboPage() {
   const router = useRouter();
@@ -31,11 +32,7 @@ export default function AboPage() {
   }, [router]);
 
   if (pruefeLogin) {
-    return (
-      <main style={{ backgroundColor: "#0a0a0a", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ color: "#b87333" }}>Laden...</span>
-      </main>
-    );
+    return <div><Kopfzeile aktiv="dashboard" /><div className="mw-laden">Laden…</div></div>;
   }
 
   const handleCheckout = async (kategorie, typ) => {
@@ -54,39 +51,41 @@ export default function AboPage() {
     setLoading(null);
   };
 
+  const euro = (n) => n.toFixed(2).replace(".", ",") + " €";
+
   return (
-    <main style={{ backgroundColor: "#0a0a0a", minHeight: "100vh", padding: "4rem 1.5rem" }}>
-      <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-        <h1 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#b87333", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>
-          Abo wählen
-        </h1>
-        <p style={{ color: "#888", marginBottom: "3rem", fontSize: "0.95rem" }}>
-          Die ersten 12 Monate sind kostenlos. Danach bleibt dein Profil mit einem Abo sichtbar.
-        </p>
-        <div style={{ display: "grid", gap: "1.5rem" }}>
+    <div>
+      <Kopfzeile aktiv="dashboard" />
+      <main className="mw-wrap" style={{ maxWidth: 900, padding: "40px 20px 72px" }}>
+        <h1 className="mw-h1" style={{ fontSize: 32, marginBottom: 6 }}>Abo wählen</h1>
+        <p className="mw-muted" style={{ margin: "0 0 28px" }}>Die ersten 12 Monate sind kostenlos. Danach bleibt dein Profil mit einem Abo sichtbar.</p>
+        <div style={{ display: "grid", gap: 12 }}>
           {KATEGORIEN.map((kat) => (
-            <div key={kat.key} style={{ backgroundColor: "#111", border: userKategorie === kat.key ? "1px solid #b87333" : "1px solid #222", borderRadius: "8px", padding: "1.5rem" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
-                <div>
-                  <h2 style={{ color: "#fff", fontSize: "1.1rem", fontWeight: 700, marginBottom: "0.25rem" }}>
-                    <Icon name={iconNameFuerKategorie(kat.label)} size={18} style={{ color: "#b87333", marginRight: 10, verticalAlign: "-3px" }} />{kat.label}
-                    {userKategorie === kat.key && <span style={{ marginLeft: "0.75rem", fontSize: "0.75rem", color: "#b87333", fontWeight: 400 }}>Deine Kategorie</span>}
-                  </h2>
-                  <p style={{ color: "#666", fontSize: "0.85rem", margin: 0 }}>{kat.beschreibung}</p>
+            <div key={kat.key} className="mw-karte" style={{ padding: 20, borderColor: userKategorie === kat.key ? "var(--mw-cta)" : undefined }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
+                <div style={{ display: "flex", gap: 12, alignItems: "center", flex: "1 1 280px", minWidth: 0 }}>
+                  <IconBadge name={iconNameFuerKategorie(kat.label)} size={40} />
+                  <div style={{ minWidth: 0 }}>
+                    <h2 className="mw-h3" style={{ fontSize: 18 }}>
+                      {kat.label}
+                      {userKategorie === kat.key && <span className="mw-badge mw-frei" style={{ marginLeft: 10, verticalAlign: 2 }}>Deine Kategorie</span>}
+                    </h2>
+                    <p className="mw-muted" style={{ fontSize: 13, margin: 0 }}>{kat.beschreibung}</p>
+                  </div>
                 </div>
-                <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-                  <button onClick={() => handleCheckout(kat.key, "einfuehrung")} disabled={!!loading} style={{ background: "transparent", border: "1px solid #b87333", color: "#b87333", padding: "0.5rem 1rem", borderRadius: "4px", fontSize: "0.85rem", cursor: "pointer" }}>
-                    {loading === `${kat.key}-einfuehrung` ? "..." : `Einführung ${kat.einfuehrung}€/Monat`}
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <button className="mw-btn zwei klein" onClick={() => handleCheckout(kat.key, "einfuehrung")} disabled={!!loading}>
+                    {loading === `${kat.key}-einfuehrung` ? "…" : `Einführung ${euro(kat.einfuehrung)}/Monat`}
                   </button>
-                  <button onClick={() => handleCheckout(kat.key, "regulaer")} disabled={!!loading} style={{ background: "#b87333", border: "none", color: "#0a0a0a", padding: "0.5rem 1rem", borderRadius: "4px", fontSize: "0.85rem", fontWeight: 700, cursor: "pointer" }}>
-                    {loading === `${kat.key}-regulaer` ? "..." : `Regulär ${kat.regulaer}€/Monat`}
+                  <button className="mw-btn klein" onClick={() => handleCheckout(kat.key, "regulaer")} disabled={!!loading}>
+                    {loading === `${kat.key}-regulaer` ? "…" : `Regulär ${euro(kat.regulaer)}/Monat`}
                   </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
