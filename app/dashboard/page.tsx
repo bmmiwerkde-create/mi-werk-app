@@ -12,7 +12,7 @@ type Dienstleister = {
   id: string; name: string; gewerk: string; ort: string
   beschreibung: string; preis: string; emoji?: string
   profilbild?: string; telefon?: string; website?: string
-  qualifikationen?: string; user_id?: string; postleitzahl?: string
+  qualifikationen?: string; user_id?: string; postleitzahl?: string; email?: string
   abo_aktiv?: boolean; stripe_customer_id?: string | null; ics_url?: string | null
   logo?: string | null; fotos?: string[] | null
 }
@@ -282,6 +282,7 @@ export default function DashboardPage() {
                 <Field label="Ort" value={form.ort || ''} edit={editMode} onChange={v => setForm(f=>({...f,ort:v}))} />
                 <Field label="PLZ" value={form.postleitzahl || ''} edit={editMode} onChange={v => setForm(f=>({...f,postleitzahl:v}))} placeholder="z. B. 44787" />
                 <Field label="Preis" value={form.preis || ''} edit={editMode} onChange={v => setForm(f=>({...f,preis:v}))} placeholder="z. B. ab 50 €/Std." />
+                <Field label="E-Mail für Anfragen" value={form.email || ''} edit={editMode} onChange={v => setForm(f=>({...f, email:v}))} placeholder="z. B. info@meine-firma.de" />
                 <Field label="Telefon (optional)" value={form.telefon || ''} edit={editMode} onChange={v => setForm(f=>({...f, telefon:v}))} placeholder="z. B. 0151 12345678" />
                 <Field label="Website (optional)" value={form.website || ''} edit={editMode} onChange={v => setForm(f=>({...f, website:v}))} placeholder="z. B. www.meine-seite.de" />
               </div>
