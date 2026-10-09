@@ -1,6 +1,7 @@
 import { getToken } from 'next-auth/jwt'
 import { NextResponse, NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { nutzerAusAnfrage } from '../../Lib/supabaseAdmin'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,7 +15,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Nicht mit Microsoft eingeloggt' }, { status: 401 })
   }
 
-  const userId = req.nextUrl.searchParams.get('userId')
+  // Termine nur ins eigene Profil schreiben: Nutzer aus der Supabase-Anmeldung, nicht aus der Anfrage
+  const nutzer = await nutzerAusAnfrage(req)
+  if (!nutzer) return NextResponse.json({ error: 'Bitte melde dich erneut an.' }, { status: 401 })
+  const userId = nutzer.id
 
   const now = new Date().toISOString()
   const inDreiMonaten = new Date()

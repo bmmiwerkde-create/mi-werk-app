@@ -92,7 +92,8 @@ export default function Onboarding() {
     setIcsFehler('')
     const { error } = await supabase.from('dienstleister').update({ ics_url: icsUrlInput }).eq('user_id', user.id)
     if (error) { setIcsFehler('Fehler: ' + error.message); setIcsSpeichern(false); return }
-    const res = await fetch('/api/kalender-ics?userId=' + user.id)
+    const { data: { session: sitzung } } = await supabase.auth.getSession()
+    const res = await fetch('/api/kalender-ics', { headers: { Authorization: 'Bearer ' + (sitzung?.access_token || '') } })
     const data = await res.json()
     if (data.events) setIcsVerbunden(true)
     else setIcsFehler(data.error || 'Kalender konnte nicht abgerufen werden')

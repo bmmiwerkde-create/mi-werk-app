@@ -51,7 +51,8 @@ export default function DashboardPage() {
 
   async function kalenderAbrufen() {
     setKalenderLaden(true)
-    const res = await fetch('/api/kalender?userId=' + user?.id)
+    const { data: { session: sitzung } } = await supabase.auth.getSession()
+    const res = await fetch('/api/kalender', { headers: { Authorization: 'Bearer ' + (sitzung?.access_token || '') } })
     const data = await res.json()
     if (data.events) setKalenderEvents(data.events)
     setKalenderLaden(false)
@@ -102,7 +103,8 @@ export default function DashboardPage() {
     setIcsFehler('')
     const { error } = await supabase.from('dienstleister').update({ ics_url: icsUrlInput }).eq('user_id', user.id)
     if (error) { setIcsFehler('Fehler: ' + error.message); setIcsSpeichern(false); return }
-    const res = await fetch('/api/kalender-ics?userId=' + user.id)
+    const { data: { session: sitzung } } = await supabase.auth.getSession()
+    const res = await fetch('/api/kalender-ics', { headers: { Authorization: 'Bearer ' + (sitzung?.access_token || '') } })
     const data = await res.json()
     if (data.events) { setIcsEvents(data.events); setIcsGespeichert(true) }
     else { setIcsEvents(null); setIcsFehler(data.error || 'Kalender konnte nicht abgerufen werden') }
