@@ -68,6 +68,10 @@ body {
 .mw-label { display: block; font-size: 14px; font-weight: 700; color: var(--mw-ink); margin-bottom: 6px; }
 .mw-feld { width: 100%; background: #fff; border: 1.5px solid #D3C9BB; border-radius: 10px; padding: 12px 14px; font-size: 16px; color: var(--mw-text); outline: none; font-family: inherit; box-sizing: border-box; }
 .mw-feld:focus { border-color: var(--mw-ink); }
+.mw-feld { min-width: 0; max-width: 100%; }
+/* iPad/iPhone-Safari: Datum- und Uhrzeitfelder haben sonst eine feste Mindestbreite und ragen über ihre Spalte */
+input[type="date"].mw-feld, input[type="time"].mw-feld { -webkit-appearance: none; appearance: none; display: block; min-height: 50px; line-height: 1.3; }
+input[type="date"].mw-feld::-webkit-date-and-time-value, input[type="time"].mw-feld::-webkit-date-and-time-value { text-align: left; }
 .mw-feld::placeholder { color: #66707A; opacity: 1; }
 /* Leere Datums-/Uhrzeitfelder (Safari zeigt dort ein graues Beispiel) */
 .mw-feld.leer { color: #66707A; }
@@ -120,6 +124,7 @@ textarea.mw-feld { resize: vertical; }
 .mw-such-kopf { padding: 36px 0 28px; background: var(--mw-card); border-bottom: 1px solid var(--mw-line); }
 .mw-filter { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 18px; }
 .mw-filter .breit { grid-column: span 2; }
+.mw-filter > div { min-width: 0; }
 .mw-kat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .mw-kat { display: flex; align-items: center; gap: 12px; padding: 14px; cursor: pointer; border: 1px solid var(--mw-line); background: var(--mw-card); border-radius: 12px; text-align: left; font-family: inherit; }
 .mw-kat:hover, .mw-gw:hover { border-color: var(--mw-ink); }
