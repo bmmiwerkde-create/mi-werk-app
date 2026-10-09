@@ -8,9 +8,9 @@ export async function GET(req: Request) {
 
   const { data } = await supabaseAdmin
     .from('dienstleister')
-    .select('ics_url, stripe_customer_id')
+    .select('ics_url, stripe_customer_id, kalender_sync_am')
     .eq('user_id', user.id)
     .maybeSingle()
 
-  return NextResponse.json({ ics_url: data?.ics_url || '', hat_stripe: !!data?.stripe_customer_id })
+  return NextResponse.json({ ics_url: data?.ics_url || '', hat_stripe: !!data?.stripe_customer_id, kalender_sync_am: data?.kalender_sync_am || null })
 }

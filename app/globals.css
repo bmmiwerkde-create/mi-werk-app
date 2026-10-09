@@ -218,6 +218,15 @@ textarea.mw-feld { resize: vertical; }
 .mw-abo-kachel:hover { border-color: var(--mw-ink); }
 .mw-abo-kachel.an { border-color: var(--mw-cta); background: var(--mw-cta-soft); box-shadow: 0 0 0 2px var(--mw-cta); }
 
+/* ---------- Aufklappbare Anleitungen ---------- */
+.mw-aufklapp { border: 1px solid var(--mw-line); border-radius: 10px; padding: 0; margin-bottom: 8px; background: #fff; }
+.mw-aufklapp summary { cursor: pointer; list-style: none; padding: 12px 40px 12px 14px; position: relative; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-size: 15px; color: var(--mw-ink); }
+.mw-aufklapp summary::-webkit-details-marker { display: none; }
+.mw-aufklapp summary::after { content: "+"; position: absolute; right: 14px; top: 10px; font-size: 18px; color: var(--mw-cta); font-weight: 700; }
+.mw-aufklapp[open] summary::after { content: "–"; }
+.mw-aufklapp summary span { font-size: 13px; }
+.mw-aufklapp p { margin: 0; padding: 0 14px 14px; font-size: 14px; line-height: 1.6; color: var(--mw-text2); }
+
 /* ---------- Login / Onboarding ---------- */
 .mw-tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--mw-soft); border-radius: 12px; padding: 4px; margin-bottom: 22px; }
 .mw-tabs button { border: none; background: none; padding: 10px; border-radius: 9px; cursor: pointer; font-weight: 600; color: var(--mw-muted); font-family: inherit; font-size: 15px; }

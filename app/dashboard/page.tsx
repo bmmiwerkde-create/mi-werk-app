@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { useSession, signIn, signOut } from 'next-auth/react'
 import { supabase } from '../Lib/supabase'
 import { Icon } from '../components/Icons'
 import Kopfzeile from '@/components/Kopfzeile'
+import KalenderAnleitung from '@/components/KalenderAnleitung'
 import { PROFIL_FELDER, nurBearbeitbare } from '@/app/Lib/profilFelder'
 
 type Dienstleister = {
@@ -37,9 +37,6 @@ export default function DashboardPage() {
   const [bildMeldung, setBildMeldung] = useState('')
   const [logoLaden, setLogoLaden] = useState(false)
   const [fotosLaden, setFotosLaden] = useState(false)
-  const { data: googleSession } = useSession()
-  const [kalenderEvents, setKalenderEvents] = useState<any[]>([])
-  const [kalenderLaden, setKalenderLaden] = useState(false)
   const [icsUrlInput, setIcsUrlInput] = useState('')
   const [icsSpeichern, setIcsSpeichern] = useState(false)
   const [icsEvents, setIcsEvents] = useState<any[] | null>(null)
@@ -48,15 +45,7 @@ export default function DashboardPage() {
   const [portalFehler, setPortalFehler] = useState('')
   const [icsGespeichert, setIcsGespeichert] = useState(false)
   const [hatStripe, setHatStripe] = useState(false)
-
-  async function kalenderAbrufen() {
-    setKalenderLaden(true)
-    const { data: { session: sitzung } } = await supabase.auth.getSession()
-    const res = await fetch('/api/kalender', { headers: { Authorization: 'Bearer ' + (sitzung?.access_token || '') } })
-    const data = await res.json()
-    if (data.events) setKalenderEvents(data.events)
-    setKalenderLaden(false)
-  }
+  const [kalenderSyncAm, setKalenderSyncAm] = useState<string | null>(null)
 
   async function aboVerwalten() {
     setPortalLaden(true)
@@ -93,7 +82,7 @@ export default function DashboardPage() {
     const { data: { session } } = await supabase.auth.getSession()
     if (session) {
       const res = await fetch('/api/mein-status', { headers: { Authorization: 'Bearer ' + session.access_token } })
-      if (res.ok) { const st = await res.json(); setIcsUrlInput(st.ics_url || ''); setIcsGespeichert(!!st.ics_url); setHatStripe(!!st.hat_stripe) }
+      if (res.ok) { const st = await res.json(); setIcsUrlInput(st.ics_url || ''); setIcsGespeichert(!!st.ics_url); setHatStripe(!!st.hat_stripe); setKalenderSyncAm(st.kalender_sync_am || null) }
     }
   }
 
@@ -361,38 +350,15 @@ export default function DashboardPage() {
 
           {reiter === 'kalender' && (
             <div className="mw-karte mw-block">
-              <h2 className="mw-h3">Kalender verbinden</h2>
+              <h2 className="mw-h3" style={{ marginBottom:4 }}>Kalender verbinden</h2>
+              <p className="mw-muted" style={{ margin:'0 0 14px', fontSize:15 }}>Füge den Link deines Kalenders ein. Mi-Werk aktualisiert ihn danach automatisch.</p>
               <div className="mw-hinweis" style={{ marginBottom:16 }}>
                 <Icon name="lock" size={18} /><span>Kunden sehen nur, ob du <b>frei oder belegt</b> bist, nie Titel, Ort oder Details deiner Termine.</span>
               </div>
 
-              <h3 className="mw-label" style={{ fontSize:15, marginTop:4 }}>Google Kalender</h3>
-              {!googleSession ? (
-                <button className="mw-kal-knopf" onClick={() => signIn('google', { callbackUrl: 'https://www.mi-werk.de/dashboard' })}><Icon name="calendar" size={20} />Mit Google verbinden</button>
-              ) : (
-                <div style={{ marginBottom:14 }}>
-                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, marginBottom:10, flexWrap:'wrap' }}>
-                    <div style={{ color:'var(--mw-frei)', fontSize:14 }}>✓ Google Kalender verbunden ({googleSession.user?.email})</div>
-                    <button className="mw-link" onClick={() => signOut()}>Trennen</button>
-                  </div>
-                  <button className="mw-btn klein" onClick={kalenderAbrufen} disabled={kalenderLaden}>{kalenderLaden ? 'Lädt…' : 'Termine abrufen'}</button>
-                  {kalenderEvents.length > 0 && <div className="mw-meldung ok">✓ {kalenderEvents.length} Termine synchronisiert. Kunden sehen nur frei/belegt.</div>}
-                </div>
-              )}
-
-              <h3 className="mw-label" style={{ fontSize:15, marginTop:16 }}>Outlook Kalender</h3>
-              {!googleSession || googleSession.provider !== 'microsoft-entra-id' ? (
-                <button className="mw-kal-knopf" onClick={() => signIn('microsoft-entra-id', { callbackUrl: 'https://www.mi-werk.de/dashboard' })}><Icon name="mail" size={20} />Mit Outlook verbinden</button>
-              ) : (
-                <div style={{ color:'var(--mw-frei)', fontSize:14, marginBottom:14 }}>✓ Outlook verbunden ({googleSession.user?.email})</div>
-              )}
-
-              <h3 className="mw-label" style={{ fontSize:15, marginTop:16 }}>iPhone / Apple-Kalender</h3>
-              <p className="mw-muted" style={{ fontSize:14, margin:'0 0 8px', lineHeight:1.6 }}>
-                Auf dem iPhone: <b>Kalender-App öffnen → unten auf das Kalender-Symbol → beim iCloud-Kalender auf ⓘ → „Öffentlicher Kalender“ einschalten → „Link teilen …“ → „Kopieren“</b> und hier einfügen. Neue Termine übernimmst du mit einem erneuten Tipp auf „Verbinden“.
-              </p>
+              <label className="mw-label" htmlFor="d-kal">Dein Kalender-Link</label>
               <div style={{ display:'flex', gap:8 }}>
-                <input className="mw-feld" value={icsUrlInput} onChange={e => setIcsUrlInput(e.target.value)} placeholder="webcal://… oder https://…" />
+                <input id="d-kal" className="mw-feld" value={icsUrlInput} onChange={e => setIcsUrlInput(e.target.value)} placeholder="webcal://… oder https://…ics" />
                 <button className="mw-btn" onClick={icsVerbinden} disabled={icsSpeichern || !icsUrlInput}>{icsSpeichern ? 'Verbinde…' : 'Verbinden'}</button>
               </div>
               {icsEvents && (
@@ -403,9 +369,12 @@ export default function DashboardPage() {
                 </div>
               )}
               {!icsEvents && icsGespeichert && !icsFehler && (
-                <p className="mw-muted" style={{ fontSize:13, margin:'10px 0 0' }}>Ein iPhone-Kalender ist hinterlegt. Tippe auf „Verbinden“, um neue Termine zu übernehmen.</p>
+                <p style={{ fontSize:13, margin:'10px 0 0', color:'var(--mw-frei)' }}>
+                  {('✓ Kalender verbunden, wird automatisch aktualisiert' + (kalenderSyncAm ? ', zuletzt ' + seit(kalenderSyncAm) : '') + '.').replace('..', '.')}
+                </p>
               )}
               {icsFehler && <div className="mw-meldung fehler">{icsFehler}</div>}
+              <KalenderAnleitung />
             </div>
           )}
 
@@ -447,6 +416,15 @@ export default function DashboardPage() {
       </div>
     </div>
   )
+}
+
+// "vor 3 Min." / "vor 2 Std." / "am 08.10."
+function seit(iso: string) {
+  const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000)
+  if (min < 1) return 'gerade eben'
+  if (min < 60) return 'vor ' + min + ' Min.'
+  if (min < 24 * 60) return 'vor ' + Math.round(min / 60) + ' Std.'
+  return 'am ' + new Date(iso).toLocaleDateString('de-DE')
 }
 
 function Field({ label, value, edit, onChange, placeholder }: { label: string; value: string; edit: boolean; onChange: (v: string) => void; placeholder?: string }) {

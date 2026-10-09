@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useSession, signIn } from 'next-auth/react'
 import { supabase } from '../Lib/supabase'
 import { Icon } from '../components/Icons'
 import Kopfzeile from '@/components/Kopfzeile'
+import KalenderAnleitung from '@/components/KalenderAnleitung'
 
 
 export default function Onboarding() {
   const router = useRouter()
-  const { data: googleSession } = useSession()
   const [pruefeStatus, setPruefeStatus] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [schritt, setSchritt] = useState<1 | 2>(1)
@@ -104,7 +103,7 @@ export default function Onboarding() {
     return <div><Kopfzeile /><div className="mw-laden">Laden…</div></div>
   }
 
-  const kalenderVerbunden = !!googleSession || icsVerbunden
+  const kalenderVerbunden = icsVerbunden
 
   return (
     <div>
@@ -153,34 +152,20 @@ export default function Onboarding() {
               <Icon name="lock" size={18} /><span>Wir übertragen ausschließlich, ob du <b>frei oder beschäftigt</b> bist, nie Titel, Ort oder Details deiner Termine.</span>
             </div>
 
-            {!googleSession ? (
-              <>
-                <button className="mw-kal-knopf" onClick={() => signIn('google', { callbackUrl: 'https://www.mi-werk.de/dashboard' })}><Icon name="calendar" size={20} />Mit Google Kalender verbinden</button>
-                <button className="mw-kal-knopf" onClick={() => signIn('microsoft-entra-id', { callbackUrl: 'https://www.mi-werk.de/dashboard' })}><Icon name="mail" size={20} />Mit Outlook verbinden</button>
-              </>
-            ) : (
-              <div className="mw-meldung ok" style={{ marginTop:0, marginBottom:14 }}>✓ Kalender verbunden ({googleSession.user?.email})</div>
-            )}
-
-            <div style={{ display:'flex', alignItems:'center', gap:10, margin:'10px 0 14px' }}>
-              <div style={{ flex:1, height:1, background:'var(--mw-line)' }} />
-              <span className="mw-muted" style={{ fontSize:13 }}>oder</span>
-              <div style={{ flex:1, height:1, background:'var(--mw-line)' }} />
-            </div>
-
+            <label className="mw-label" htmlFor="o-kal">Dein Kalender-Link</label>
             {!icsVerbunden ? (
-              <div style={{ marginBottom:18 }}>
-                <p style={{ fontSize:14, margin:'0 0 8px', color:'var(--mw-text2)' }}>Nutzt du den <b>Apple-Kalender auf dem iPhone</b>? Dann per Link verbinden:</p>
-                <p className="mw-muted" style={{ fontSize:13, margin:'0 0 10px', lineHeight:1.5 }}>Kalender-App öffnen → unten auf das Kalender-Symbol → beim iCloud-Kalender auf ⓘ → „Öffentlicher Kalender“ einschalten → „Link teilen …“ → „Kopieren“.</p>
+              <>
                 <div style={{ display:'flex', gap:8 }}>
-                  <input className="mw-feld" value={icsUrlInput} onChange={e => setIcsUrlInput(e.target.value)} placeholder="webcal://… oder https://…" />
-                  <button className="mw-btn" onClick={icsVerbindenOnboarding} disabled={icsSpeichern || !icsUrlInput}>{icsSpeichern ? '…' : 'OK'}</button>
+                  <input id="o-kal" className="mw-feld" value={icsUrlInput} onChange={e => setIcsUrlInput(e.target.value)} placeholder="webcal://… oder https://…ics" />
+                  <button className="mw-btn" onClick={icsVerbindenOnboarding} disabled={icsSpeichern || !icsUrlInput}>{icsSpeichern ? '…' : 'Verbinden'}</button>
                 </div>
                 {icsFehler && <div className="mw-meldung fehler">{icsFehler}</div>}
-              </div>
+              </>
             ) : (
-              <div className="mw-meldung ok" style={{ marginTop:0, marginBottom:18 }}>✓ Apple-Kalender verbunden</div>
+              <div className="mw-meldung ok" style={{ marginTop:0 }}>✓ Kalender verbunden. Er wird ab jetzt automatisch aktualisiert.</div>
             )}
+            <KalenderAnleitung />
+            <div style={{ height:20 }} />
 
             <button className={'mw-btn voll' + (kalenderVerbunden ? '' : ' zwei')} onClick={() => router.push('/dashboard')}>
               {kalenderVerbunden ? 'Fertig, zum Dashboard' : 'Später verbinden, zum Dashboard'}
