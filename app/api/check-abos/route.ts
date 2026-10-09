@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '../../Lib/supabaseAdmin'
+import { veralteteAuffrischen } from '../../Lib/kalenderSync'
 import { Resend } from 'resend'
 
 export async function GET(request: Request) {
@@ -127,8 +128,12 @@ export async function GET(request: Request) {
     }
   }
 
+  // Alle verbundenen Kalender einmal täglich auffrischen
+  const kalender = await veralteteAuffrischen().catch(() => [])
+
   return NextResponse.json({
     message: `${sent} Mails gesendet`,
+    kalenderAktualisiert: kalender.length,
     fuenfMonate: fuenfMonateEmpfaenger.length,
     einMonat: einMonatEmpfaenger.length,
   })

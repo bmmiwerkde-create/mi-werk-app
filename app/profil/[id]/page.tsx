@@ -49,6 +49,17 @@ export default function ProfilSeite({ params }) {
       setNurVorschau(!!data && !data.abo_aktiv)
       setProfil(data)
       if (data) fetch('/api/kalender-status?id=' + data.id).then(r => r.json()).then(k => setKalenderVerbunden(!!k.verbunden)).catch(() => {})
+      // Kalender im Hintergrund auffrischen; wurde er neu abgeholt, Termine neu laden
+      if (data?.user_id) {
+        fetch('/api/kalender-auffrischen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: [data.id] }) })
+          .then(r => r.json())
+          .then(async a => {
+            if (!a.aktualisiert?.includes(data.id)) return
+            const { data: neu } = await supabase.from('kalender_events').select('*').eq('user_id', data.user_id)
+            setEvents(neu || [])
+          })
+          .catch(() => {})
+      }
       if (data?.user_id) {
         const { data: evs } = await supabase
           .from('kalender_events')

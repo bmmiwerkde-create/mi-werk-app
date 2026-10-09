@@ -197,6 +197,17 @@ export default function Home() {
     const { data: events } = await supabase.from('kalender_events').select('*')
     if (events) setKalenderEvents(events)
     setGeladen(true)
+    // Kalender im Hintergrund auffrischen und bei Änderungen neu laden
+    if (data && data.length) {
+      fetch('/api/kalender-auffrischen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: data.map((d: any) => d.id) }) })
+        .then(r => r.json())
+        .then(async a => {
+          if (!a.aktualisiert?.length) return
+          const { data: neu } = await supabase.from('kalender_events').select('*')
+          if (neu) setKalenderEvents(neu)
+        })
+        .catch(() => {})
+    }
   }
 
   // Wie auf dem Profil: Ein Tag gilt als belegt, wenn um 12 Uhr ein Termin läuft
