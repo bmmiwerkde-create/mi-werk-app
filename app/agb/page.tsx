@@ -6,10 +6,10 @@ export default function AGB() {
       <Kopfzeile />
       <div className="mw-text-seite">
         <h1 className="mw-h1" style={{ marginBottom: 8 }}>Allgemeine Geschäftsbedingungen</h1>
-        <p className="mw-muted">Stand: Juni 2026</p>
+        <p className="mw-muted">Stand: Oktober 2026</p>
         <section>
           <h2>1. Geltungsbereich</h2>
-          <p>Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der Plattform Mi-Werk, erreichbar unter mi-werk.de, betrieben von Ursula Middeldorf (nachfolgend „Betreiber"). Mit der Registrierung oder Nutzung der Plattform akzeptiert der Nutzer diese AGB in ihrer jeweils gültigen Fassung.</p>
+          <p>Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der Plattform Mi-Werk, erreichbar unter mi-werk.de, betrieben von der Mi-Werk UG (haftungsbeschränkt), Forstring 24, 44869 Bochum, vertreten durch Ben Middeldorf (nachfolgend „Betreiber"). Mit der Registrierung oder Nutzung der Plattform akzeptiert der Nutzer diese AGB in ihrer jeweils gültigen Fassung.</p>
         </section>
         <section>
           <h2>2. Leistungsbeschreibung</h2>
