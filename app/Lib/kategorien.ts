@@ -12,7 +12,7 @@ export const KATEGORIEN = [
   { key: "auto", label: "Fahrzeuge & Mobilität", emoji: "🚗", beschreibung: "KFZ-Werkstätten, Pannenhilfe, Umzugshelfer, Fahrdienste", einfuehrung: 19.99, regulaer: 34.99 },
   { key: "transport", label: "Transport & Logistik", emoji: "🚛", beschreibung: "Entrümpelung, Möbelmontage, Schwertransport, Umzugsservice", einfuehrung: 34.99, regulaer: 49.99 },
   { key: "gesundheit", label: "Gesundheit", emoji: "🏥", beschreibung: "Ärzte, Zahnärzte, Physiotherapeuten, Psychologen, Heilpraktiker", einfuehrung: 29.99, regulaer: 44.99 },
-  { key: "it", label: "IT & Digital", emoji: "💻", beschreibung: "Webentwicklung, App-Entwicklung, Grafikdesign, SEO/Marketing, Videoproduktion", einfuehrung: 29.99, regulaer: 44.99 },
+  { key: "it", label: "IT & Digital", emoji: "💻", beschreibung: "Webdesign, Webentwicklung, App-Entwicklung, Grafikdesign, SEO/Marketing, Videoproduktion", einfuehrung: 29.99, regulaer: 44.99 },
   { key: "personal", label: "Personal", emoji: "🧑‍💼", beschreibung: "Personaler, Personalvermittlung, Lohnabrechnung, Vergütungsberatung, Fehlzeitenmanagement, Mitarbeiterbenefits", einfuehrung: 19.99, regulaer: 34.99 },
 ] as const
 
