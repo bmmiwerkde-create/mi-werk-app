@@ -190,6 +190,25 @@ export default function Home() {
     laden()
   }, [])
 
+  // Suche von der Startseite übernehmen: /suche?was=…&ort=…&datum=… oder ?kat=…
+  useEffect(() => {
+    if (!geladen) return
+    const p = new URLSearchParams(window.location.search)
+    const kat = p.get('kat')
+    if (kat && hauptkategorien.some(k => k.name === kat)) {
+      setAktiveKategorie(kat)
+      return
+    }
+    const was = p.get('was') || '', ort = p.get('ort') || '', datum = p.get('datum') || ''
+    if (!was && !ort && !datum) return
+    const istPlz = /^\d+$/.test(ort)
+    setSuche(was); setDatumFilter(datum)
+    if (istPlz) setPlzFilter(ort); else setStadtFilter(ort)
+    anwenden(was, istPlz ? '' : ort, istPlz ? ort : '', datum, '')
+    setTimeout(() => document.getElementById('ergebnisse')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geladen])
+
   async function laden() {
     const { data } = await supabase.from('dienstleister').select(PROFIL_FELDER).eq('abo_aktiv', true)
     if (data) { setDienstleister(data); setGefiltert(data) }
