@@ -86,6 +86,7 @@ const hauptkategorien = [
     gewerke: [
       { name: 'Grafikdesign' },
       { name: 'Fotografie' },
+      { name: 'Webdesign' },
       { name: 'Webentwicklung' },
       { name: 'App-Entwicklung' },
       { name: 'SEO / Marketing' },
