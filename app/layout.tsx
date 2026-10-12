@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Mi-Werk – Handwerker & Dienstleister finden",
-  description: "Finde geprüfte Handwerker, Reinigungskräfte, Personal Trainer und mehr in deiner Region. Kostenlos, direkt und ohne Vermittler kontaktieren.",
+  description: "Finde Handwerker, Reinigungskräfte, Personal Trainer und mehr in deiner Region. Kostenlos, direkt und ohne Vermittler kontaktieren.",
   keywords: ["Handwerker finden", "Dienstleister", "Elektriker", "Reinigung", "Personal Trainer", "Babysitter", "Nachhilfe", "Heimservice", "lokal", "Deutschland"],
   openGraph: {
     title: "Mi-Werk – Handwerker & Dienstleister finden",
