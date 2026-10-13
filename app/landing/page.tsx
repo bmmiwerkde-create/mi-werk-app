@@ -212,7 +212,10 @@ export default function LandingPage() {
                 die Mi-Werk UG (haftungsbeschränkt). Mi-Werk ist neu und wächst gerade Profi für Profi –
                 wenn du Fragen hast, schreib mir einfach.
               </p>
-              <a className="mw-link" href="/kontakt" style={{ display: 'inline-block', marginTop: 12 }}>Kontakt aufnehmen →</a>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 24px', marginTop: 12 }}>
+                <a className="mw-link" href="/kontakt">Kontakt aufnehmen →</a>
+                <a className="mw-link" href="https://www.instagram.com/miwerk.de/" target="_blank" rel="noopener noreferrer">Instagram: @miwerk.de →</a>
+              </div>
             </div>
           </div>
         </section>
