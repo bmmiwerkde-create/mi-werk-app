@@ -58,6 +58,8 @@ export function freieZeiten(tag: Date, termine: Termin[], az: Arbeitszeiten): { 
 
 export function tagStatus(tag: Date, termine: Termin[], az: Arbeitszeiten): TagStatus {
   if (!az.tage.includes(wochentag(tag))) return 'geschlossen'
+  // Heute nach Feierabend: nicht „belegt“, sondern vorbei
+  if (Date.now() >= zeitAm(tag, az.bis).getTime()) return 'geschlossen'
   const frei = freieZeiten(tag, termine, az)
   if (frei.length === 0) return 'belegt'
   const tagStart = zeitAm(tag, az.von).getTime(), tagEnde = zeitAm(tag, az.bis).getTime()
