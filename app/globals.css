@@ -374,4 +374,4 @@ textarea.mw-feld { resize: vertical; }
 .mw-datum .mw-feld.fehler { border-color: var(--mw-belegt); }
 .mw-datum button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 8px; color: var(--mw-muted); cursor: pointer; border-radius: 8px; display: flex; }
 .mw-datum button:hover { background: var(--mw-soft); color: var(--mw-ink); }
-.mw-datum input[type="date"] { position: absolute; right: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; border: 0; padding: 0; }
+.mw-datum input[type="date"], .mw-datum input[type="time"] { position: absolute; right: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; border: 0; padding: 0; }

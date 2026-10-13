@@ -5,6 +5,7 @@ import { supabase } from '../Lib/supabase'
 import Kopfzeile from '@/components/Kopfzeile'
 import { Icon, IconBadge, iconNameFuerKategorie } from '../components/Icons'
 import DatumFeld from '../components/DatumFeld'
+import UhrzeitFeld from '../components/UhrzeitFeld'
 
 const BELIEBT = ['Friseur', 'Nachhilfe', 'Personal Trainer', 'Webdesign', 'Kosmetik', 'Hundetrainer']
 
@@ -135,7 +136,7 @@ export default function LandingPage() {
               </div>
               <div>
                 <label className="mw-label" htmlFor="s-zeit">Uhrzeit</label>
-                <input id="s-zeit" className={'mw-feld' + (zeit ? '' : ' leer')} type="time" value={zeit} onChange={e => setZeit(e.target.value)} />
+                <UhrzeitFeld id="s-zeit" value={zeit} onChange={setZeit} />
               </div>
               <div>
                 <label className="mw-label" htmlFor="s-preis">Max. Preis (€/Std.)</label>

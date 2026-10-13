@@ -6,6 +6,7 @@ import { supabase } from '../Lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Icon, IconBadge, iconNameFuerKategorie } from '../components/Icons'
 import DatumFeld from '../components/DatumFeld'
+import UhrzeitFeld from '../components/UhrzeitFeld'
 import Kopfzeile from '@/components/Kopfzeile'
 import { PROFIL_FELDER } from '@/app/Lib/profilFelder'
 
@@ -366,7 +367,7 @@ export default function Home() {
             </div>
             <div>
               <label className="mw-label" htmlFor="f-zeit">Uhrzeit</label>
-              <input id="f-zeit" className={'mw-feld' + (uhrzeitFilter ? '' : ' leer')} type="time" value={uhrzeitFilter} onChange={e => filterUhrzeit(e.target.value)} />
+              <UhrzeitFeld id="f-zeit" value={uhrzeitFilter} onChange={filterUhrzeit} onKeyDown={enter} />
             </div>
             <div>
               <label className="mw-label" htmlFor="f-preis">Max. Preis (€/Std.)</label>
