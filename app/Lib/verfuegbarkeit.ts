@@ -35,8 +35,10 @@ function uhrzeit(d: Date) {
 // Freie Zeitfenster eines Tages innerhalb der Arbeitszeit
 export function freieZeiten(tag: Date, termine: Termin[], az: Arbeitszeiten): { von: string; bis: string }[] {
   if (!az.tage.includes(wochentag(tag))) return []
-  const start = zeitAm(tag, az.von).getTime()
   const ende = zeitAm(tag, az.bis).getTime()
+  // Heute zählt nur die restliche Zeit, auf die nächste Viertelstunde aufgerundet
+  const viertel = 15 * 60000
+  const start = Math.max(zeitAm(tag, az.von).getTime(), Math.ceil(Date.now() / viertel) * viertel)
   if (ende <= start) return []
 
   const belegt = termine
@@ -58,8 +60,9 @@ export function tagStatus(tag: Date, termine: Termin[], az: Arbeitszeiten): TagS
   if (!az.tage.includes(wochentag(tag))) return 'geschlossen'
   const frei = freieZeiten(tag, termine, az)
   if (frei.length === 0) return 'belegt'
-  const ganzerTag = frei.length === 1 && frei[0].von === uhrzeit(zeitAm(tag, az.von)) && frei[0].bis === uhrzeit(zeitAm(tag, az.bis))
-  return ganzerTag ? 'frei' : 'teilweise'
+  const tagStart = zeitAm(tag, az.von).getTime(), tagEnde = zeitAm(tag, az.bis).getTime()
+  const hatTermin = termine.some(t => new Date(t.start_zeit).getTime() < tagEnde && new Date(t.end_zeit).getTime() > tagStart)
+  return hatTermin ? 'teilweise' : 'frei'
 }
 
 // Ist der Dienstleister zu genau diesem Zeitpunkt verfügbar?
