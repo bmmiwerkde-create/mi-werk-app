@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { supabase } from '../Lib/supabase'
 import Kopfzeile from '@/components/Kopfzeile'
 import { Icon, IconBadge, iconNameFuerKategorie } from '../components/Icons'
 
@@ -23,8 +24,13 @@ const SCHRITTE: [string, string][] = [
   ['Direkt melden', 'Per Telefon oder E-Mail – ohne Umweg.'],
 ]
 
-// Beispielkarte im Kopfbereich: zeigt, wie ein Profil mit Kalender aussieht (keine echte Person)
-const BEISPIEL_WOCHE: [string, boolean][] = [['Mo', true], ['Di', false], ['Mi', true], ['Do', true], ['Fr', false]]
+const VERTRAUEN: [string, string][] = [
+  ['shield', 'Unternehmen aus Bochum'],
+  ['check', 'Keine Provision, kein Vermittler'],
+  ['lock', 'Für Suchende kostenlos'],
+]
+
+type Profi = { id: number; name: string; gewerk: string | null; ort: string | null; logo: string | null; profilbild: string | null }
 
 export default function LandingPage() {
   const [was, setWas] = useState('')
@@ -32,6 +38,14 @@ export default function LandingPage() {
   const [wann, setWann] = useState('')
   const [warteliste, setWarteliste] = useState({ was: '', wo: '', email: '' })
   const [gemeldet, setGemeldet] = useState(false)
+  const [profis, setProfis] = useState<Profi[]>([])
+
+  // Echte Dienstleister zeigen statt erfundener Beispiele
+  useEffect(() => {
+    supabase.from('dienstleister').select('id, name, gewerk, ort, logo, profilbild')
+      .eq('abo_aktiv', true).order('id', { ascending: false }).limit(3)
+      .then(({ data }) => { if (data) setProfis(data as Profi[]) })
+  }, [])
 
   function suchen(e: React.FormEvent) {
     e.preventDefault()
@@ -79,28 +93,33 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="mw-karte mw-start-beispiel" aria-hidden="true">
-              <div className="mw-start-beispiel-kopf">
-                <div className="mw-start-avatar"><Icon name="beauty" size={24} /></div>
-                <div>
-                  <b>Studio Lena</b>
-                  <div className="mw-muted">Kosmetik · Bochum</div>
-                </div>
-              </div>
-              <div className="mw-sterne">★★★★★ <span className="mw-muted">4,9</span></div>
-              <div className="mw-start-woche">
-                {BEISPIEL_WOCHE.map(([tag, frei]) => (
-                  <div key={tag}>
-                    <small>{tag}</small>
-                    <span className={'mw-badge ' + (frei ? 'mw-frei' : 'mw-belegt')}>{frei ? 'frei' : 'belegt'}</span>
-                  </div>
+            {profis.length > 0 && (
+              <div className="mw-karte mw-start-profis">
+                <div className="mw-kicker" style={{ marginBottom: 12 }}>Neu auf Mi-Werk</div>
+                {profis.map(p => (
+                  <a key={p.id} className="mw-start-profi" href={'/profil/' + p.id}>
+                    {p.logo || p.profilbild
+                      ? <img src={(p.logo || p.profilbild) as string} alt="" />
+                      : <span className="mw-start-avatar"><Icon name="user" size={22} /></span>}
+                    <div>
+                      <b>{p.name}</b>
+                      <div className="mw-muted">{[p.gewerk, p.ort].filter(Boolean).join(' · ')}</div>
+                    </div>
+                    <Icon name="arrow" size={18} />
+                  </a>
                 ))}
+                <a className="mw-link" href="/suche" style={{ display: 'inline-block', marginTop: 10, fontSize: 14 }}>Alle Dienstleister ansehen →</a>
               </div>
-              <div className="mw-start-beispiel-fuss"><Icon name="clock" size={14} /> Kalender live verbunden</div>
-              <span className="mw-start-beispiel-label">Beispiel</span>
-            </div>
+            )}
           </div>
         </section>
+
+        {/* Vertrauen */}
+        <div className="mw-start-vertrauen">
+          <div className="mw-wrap">
+            {VERTRAUEN.map(([icon, text]) => <span key={text}><Icon name={icon} size={18} />{text}</span>)}
+          </div>
+        </div>
 
         {/* Vorteile */}
         <section className="mw-abschnitt">
@@ -157,9 +176,11 @@ export default function LandingPage() {
               <div className="mw-kicker">Wer steckt dahinter?</div>
               <h2 className="mw-h2" style={{ marginBottom: 12 }}>Hi, ich bin Ben – 22, aus Bochum.</h2>
               <p style={{ margin: 0, lineHeight: 1.65, maxWidth: 620 }}>
-                Ich habe Mi-Werk gebaut, weil es mich genervt hat, ewig herumzutelefonieren – nur um zu hören,
-                dass keiner Zeit hat. Hier siehst du das vorher. Mi-Werk ist neu und wächst gerade Profi für Profi.
+                Hinter Mi-Werk steht keine anonyme Plattform, sondern ein junges Unternehmen aus Bochum:
+                die Mi-Werk UG (haftungsbeschränkt). Mi-Werk ist neu und wächst gerade Profi für Profi –
+                wenn du Fragen hast, schreib mir einfach.
               </p>
+              <a className="mw-link" href="/kontakt" style={{ display: 'inline-block', marginTop: 12 }}>Kontakt aufnehmen →</a>
             </div>
           </div>
         </section>
