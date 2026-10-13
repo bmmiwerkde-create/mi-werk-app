@@ -25,7 +25,6 @@ const SCHRITTE: [string, string][] = [
 ]
 
 const VERTRAUEN: [string, string][] = [
-  ['shield', 'Unternehmen aus Bochum'],
   ['check', 'Keine Provision, kein Vermittler'],
   ['lock', 'Für Suchende kostenlos'],
 ]
