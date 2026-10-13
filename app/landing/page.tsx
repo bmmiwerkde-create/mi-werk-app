@@ -96,6 +96,10 @@ export default function LandingPage() {
         <section className="mw-start-kopf">
           <div className="mw-wrap mw-start-raster">
             <div>
+              <div className="mw-start-wahl" role="group" aria-label="Was möchtest du tun?">
+                <a className="an" href="#suche">Ich suche einen Dienstleister</a>
+                <a href="/fuer-dienstleister">Ich bin Dienstleister</a>
+              </div>
               <div className="mw-kicker">Neu · gestartet in Bochum</div>
               <h1 className="mw-h1 mw-start-titel">Finde Dienstleister in deiner Nähe – und sieh sofort, <span>wer Zeit hat.</span></h1>
             </div>
@@ -104,7 +108,7 @@ export default function LandingPage() {
           </div>
           <div className="mw-wrap">
           {/* Gleiche Filter wie auf der Suchseite */}
-          <form className="mw-karte mw-start-filter" onSubmit={suchen}>
+          <form id="suche" className="mw-karte mw-start-filter" onSubmit={suchen}>
             <div className="mw-filter" style={{ marginTop: 0 }}>
               <div className="breit">
                 <label className="mw-label" htmlFor="s-was">Was suchst du?</label>

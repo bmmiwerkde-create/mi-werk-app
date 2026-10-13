@@ -359,3 +359,7 @@ textarea.mw-feld { resize: vertical; }
   .mw-nur-gross { display: none; }
   .mw-nur-klein { display: block; margin-top: 28px; }
 }
+.mw-start-wahl { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; background: var(--mw-soft); border-radius: 12px; margin-bottom: 22px; }
+.mw-start-wahl a { padding: 10px 16px; border-radius: 9px; font-size: 15px; font-weight: 600; color: var(--mw-ink); text-decoration: none; }
+.mw-start-wahl a.an { background: #fff; box-shadow: 0 1px 4px rgba(20, 50, 74, .12); }
+.mw-start-wahl a:not(.an):hover { background: rgba(255, 255, 255, .6); }
