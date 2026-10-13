@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { Icon, IconBadge, iconNameFuerKategorie } from '../components/Icons'
 import DatumFeld from '../components/DatumFeld'
 import UhrzeitFeld from '../components/UhrzeitFeld'
+import { arbeitszeitenVon, tagStatus, zeitpunktFrei, STATUS_TEXT } from '../Lib/verfuegbarkeit'
 import Kopfzeile from '@/components/Kopfzeile'
 import { PROFIL_FELDER } from '@/app/Lib/profilFelder'
 
@@ -232,11 +233,13 @@ export default function Home() {
     }
   }
 
-  // Wie auf dem Profil: Ein Tag gilt als belegt, wenn um 12 Uhr ein Termin läuft
-  function tagBelegt(userId: string, tag: Date) {
-    const mittag = new Date(tag)
-    mittag.setHours(12, 0, 0, 0)
-    return kalenderEvents.some(e => e.user_id === userId && mittag >= new Date(e.start_zeit) && mittag <= new Date(e.end_zeit))
+  function termineVon(userId: string) {
+    return kalenderEvents.filter(e => e.user_id === userId)
+  }
+
+  // Wie auf dem Profil: frei, teilweise frei, belegt oder geschlossen – nach Arbeitszeiten und Terminen
+  function statusAm(d: any, tag: Date) {
+    return tagStatus(tag, termineVon(d.user_id), arbeitszeitenVon(d.arbeitszeiten))
   }
 
   function naechsteTage(anzahl: number) {
@@ -268,20 +271,10 @@ export default function Home() {
     if (datum_) {
       result = result.filter(d => !d.verfuegbar_ab || d.verfuegbar_ab <= datum_)
     }
-    // Uhrzeitfilter: Dienstleister ausblenden die zu Datum+Uhrzeit belegt sind
+    // Uhrzeitfilter: nur Dienstleister, die zu Datum+Uhrzeit arbeiten und keinen Termin haben
     if (datum_ && uhrzeit_) {
-      const checkStr = datum_ + 'T' + uhrzeit_
-      result = result.filter(d => {
-        if (!d.user_id) return true
-        const meineEvents = kalenderEvents.filter(e => e.user_id === d.user_id)
-        if (meineEvents.length === 0) return true
-        const belegt = meineEvents.some(e => {
-          const startStr = e.start_zeit.slice(0, 16).replace(' ', 'T')
-          const endStr = e.end_zeit.slice(0, 16).replace(' ', 'T')
-          return checkStr >= startStr && checkStr < endStr
-        })
-        return !belegt
-      })
+      const zeitpunkt = new Date(datum_ + 'T' + uhrzeit_)
+      result = result.filter(d => !d.user_id || zeitpunktFrei(zeitpunkt, termineVon(d.user_id), arbeitszeitenVon(d.arbeitszeiten)))
     }
     if (preis_) {
       const maxPreis = parseInt(preis_)
@@ -439,7 +432,7 @@ export default function Home() {
           <div className="mw-treffer">
             {gefiltert.map((d: any) => {
               const hatKalender = d.user_id && kalenderEvents.some(e => e.user_id === d.user_id)
-              const amTagBelegt = datumFilter && d.user_id ? tagBelegt(d.user_id, new Date(datumFilter + 'T00:00')) : null
+              const statusAmTag = datumFilter && d.user_id ? statusAm(d, new Date(datumFilter + 'T00:00')) : null
               return (
                 <a key={d.id} href={`/profil/${d.id}`} className="mw-karte mw-treffer-karte">
                   <div style={{ display:'flex', gap:14, alignItems:'center' }}>
@@ -450,8 +443,8 @@ export default function Home() {
                       <b style={{ color:'var(--mw-ink)', fontSize:17 }}>{d.name}</b>
                       <div className="mw-muted" style={{ fontSize:14 }}>{d.gewerk}{d.ort ? ' · ' + d.ort : ''}{d.postleitzahl ? ' ' + d.postleitzahl : ''}</div>
                     </div>
-                    {datumFilter && hatKalender && (
-                      <span className={'mw-badge ' + (amTagBelegt ? 'mw-belegt' : 'mw-frei')}>{amTagBelegt ? 'Belegt' : 'Frei'}</span>
+                    {statusAmTag && (hatKalender || statusAmTag === 'geschlossen') && (
+                      <span className={'mw-badge mw-status-' + statusAmTag}>{STATUS_TEXT[statusAmTag]}</span>
                     )}
                   </div>
                   {d.beschreibung && (
@@ -464,8 +457,8 @@ export default function Home() {
                           <div className="mw-muted" style={{ fontSize:12, marginBottom:4 }}>Nächste 7 Tage</div>
                           <div className="mw-mini-woche" aria-label="Verfügbarkeit der nächsten 7 Tage">
                             {woche.map(tag => {
-                              const b = tagBelegt(d.user_id, tag)
-                              return <i key={tag.toISOString()} className={b ? 'b' : 'f'} title={tag.toLocaleDateString('de-DE', { weekday:'short', day:'numeric', month:'numeric' }) + (b ? ' belegt' : ' frei')} />
+                              const st = statusAm(d, tag)
+                              return <i key={tag.toISOString()} className={'mw-status-' + st} title={tag.toLocaleDateString('de-DE', { weekday:'short', day:'numeric', month:'numeric' }) + ' ' + STATUS_TEXT[st]} />
                             })}
                           </div>
                         </>

@@ -6,6 +6,7 @@ import { supabase } from '../Lib/supabase'
 import { Icon } from '../components/Icons'
 import Kopfzeile from '@/components/Kopfzeile'
 import KalenderAnleitung from '@/components/KalenderAnleitung'
+import ArbeitszeitenKarte from '../components/ArbeitszeitenKarte'
 import { PROFIL_FELDER, nurBearbeitbare } from '@/app/Lib/profilFelder'
 
 type Dienstleister = {
@@ -14,7 +15,7 @@ type Dienstleister = {
   profilbild?: string; telefon?: string; website?: string
   qualifikationen?: string; user_id?: string; postleitzahl?: string; email?: string
   abo_aktiv?: boolean; stripe_customer_id?: string | null; ics_url?: string | null
-  logo?: string | null; fotos?: string[] | null
+  logo?: string | null; fotos?: string[] | null; arbeitszeiten?: unknown
 }
 
 const MAX_FOTOS = 6
@@ -346,6 +347,10 @@ export default function DashboardPage() {
                 {bildMeldung && <div className={'mw-meldung ' + (istFehler(bildMeldung) ? 'fehler' : 'ok')}>{bildMeldung}</div>}
               </div>
             </>
+          )}
+
+          {reiter === 'kalender' && profil?.id && (
+            <ArbeitszeitenKarte key={profil.id} profilId={Number(profil.id)} gespeichert={profil.arbeitszeiten} nachSpeichern={() => loadProfil(user.id)} />
           )}
 
           {reiter === 'kalender' && (

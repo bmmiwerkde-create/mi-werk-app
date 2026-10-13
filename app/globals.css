@@ -375,3 +375,25 @@ textarea.mw-feld { resize: vertical; }
 .mw-datum button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 8px; color: var(--mw-muted); cursor: pointer; border-radius: 8px; display: flex; }
 .mw-datum button:hover { background: var(--mw-soft); color: var(--mw-ink); }
 .mw-datum input[type="date"], .mw-datum input[type="time"] { position: absolute; right: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; border: 0; padding: 0; }
+
+/* Verfügbarkeit: frei / teilweise frei / belegt / geschlossen */
+.mw-kal button { font: inherit; font-size: 14px; text-align: center; padding: 8px 0; border-radius: 8px; border: none; cursor: pointer; }
+.mw-kal button.gewaehlt { box-shadow: 0 0 0 2px var(--mw-cta); }
+.mw-kal .mw-status-frei, .mw-legende i.mw-status-frei { background: var(--mw-frei-bg); color: var(--mw-frei); }
+.mw-kal .mw-status-teilweise, .mw-legende i.mw-status-teilweise { background: #FFF1D6; color: #8A5A00; }
+.mw-kal .mw-status-belegt, .mw-legende i.mw-status-belegt { background: var(--mw-belegt-bg); color: var(--mw-belegt); }
+.mw-kal .mw-status-geschlossen, .mw-legende i.mw-status-geschlossen { background: #EEF0F3; color: #8A939B; }
+.mw-legende { flex-wrap: wrap; gap: 8px 16px; }
+.mw-mini-woche i.mw-status-frei { background: #9FCDB0; }
+.mw-mini-woche i.mw-status-teilweise { background: #F2C978; }
+.mw-mini-woche i.mw-status-belegt { background: #E3A99F; }
+.mw-mini-woche i.mw-status-geschlossen { background: #D9DDE2; }
+.mw-badge.mw-status-frei { background: var(--mw-frei-bg); color: var(--mw-frei); }
+.mw-badge.mw-status-teilweise { background: #FFF1D6; color: #8A5A00; }
+.mw-badge.mw-status-belegt { background: var(--mw-belegt-bg); color: var(--mw-belegt); }
+.mw-badge.mw-status-geschlossen { background: #EEF0F3; color: #5B6570; }
+.mw-tag-detail { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: var(--mw-soft); font-size: 14px; display: flex; flex-direction: column; gap: 2px; }
+.mw-tag-detail b { color: var(--mw-ink); }
+.mw-tage-wahl { display: flex; flex-wrap: wrap; gap: 6px; }
+.mw-tage-wahl button { min-width: 46px; padding: 10px 0; border-radius: 10px; border: 1.5px solid var(--mw-line); background: #fff; font: inherit; font-weight: 600; color: var(--mw-muted); cursor: pointer; }
+.mw-tage-wahl button.an { background: var(--mw-ink); border-color: var(--mw-ink); color: #fff; }

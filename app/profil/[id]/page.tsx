@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js'
 import { Icon } from '../../components/Icons'
 import Kopfzeile from '@/components/Kopfzeile'
 import { PROFIL_FELDER } from '@/app/Lib/profilFelder'
+import { arbeitszeitenVon, arbeitszeitenText as azText, tagStatus, freieZeiten, STATUS_TEXT, WOCHENTAGE } from '@/app/Lib/verfuegbarkeit'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -19,6 +20,7 @@ export default function ProfilSeite({ params }) {
   const [loading, setLoading] = useState(true)
   const [events, setEvents] = useState([])
   const [kalenderMonat, setKalenderMonat] = useState(new Date())
+  const [gewaehlterTag, setGewaehlterTag] = useState(null)
   const [bewertungen, setBewertungen] = useState([])
   const [neuerName, setNeuerName] = useState('')
   const [neueSterne, setNeueSterne] = useState(5)
@@ -91,16 +93,6 @@ export default function ProfilSeite({ params }) {
     await bewertungenLaden()
   }
 
-  function istBelegt(datum) {
-    return events.some(e => {
-      const start = new Date(e.start_zeit)
-      const end = new Date(e.end_zeit)
-      const d = new Date(datum)
-      d.setHours(12, 0, 0, 0)
-      return d >= start && d <= end
-    })
-  }
-
   function kalenderTage() {
     const jahr = kalenderMonat.getFullYear()
     const monat = kalenderMonat.getMonth()
@@ -131,7 +123,9 @@ export default function ProfilSeite({ params }) {
   const heute = new Date()
   heute.setHours(0, 0, 0, 0)
   const tage = kalenderTage()
-  const wochentage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+  const wochentage = WOCHENTAGE
+  const arbeitszeiten = arbeitszeitenVon(profil?.arbeitszeiten)
+  const arbeitszeitenText = azText(arbeitszeiten)
   const anzahl = bewertungen.length
   const schnitt = anzahl ? bewertungen.reduce((sum, b) => sum + b.sterne, 0) / anzahl : 0
   const zahl = (n) => n.toFixed(1).replace('.', ',')
@@ -283,20 +277,42 @@ export default function ProfilSeite({ params }) {
               {wochentage.map(w => <b key={w}>{w}</b>)}
               {tage.map((tag, i) => {
                 if (!tag) return <i key={i} />
-                const vergangen = tag < heute
-                const belegt = !vergangen && istBelegt(tag)
+                const vergangen = tag < heute && tag.toDateString() !== heute.toDateString()
+                const status = vergangen ? null : tagStatus(tag, events, arbeitszeiten)
                 const istHeute = tag.toDateString() === heute.toDateString()
+                const gewaehlt = gewaehlterTag && tag.toDateString() === gewaehlterTag.toDateString()
+                if (!status) return <i key={i} className={'v' + (istHeute ? ' heute' : '')}>{tag.getDate()}</i>
                 return (
-                  <i key={i} className={(vergangen ? 'v' : belegt ? 'b' : 'f') + (istHeute ? ' heute' : '')} title={vergangen ? '' : belegt ? 'belegt' : 'frei'}>
+                  <button key={i} type="button" className={'mw-status-' + status + (istHeute ? ' heute' : '') + (gewaehlt ? ' gewaehlt' : '')}
+                    title={STATUS_TEXT[status]} onClick={() => setGewaehlterTag(gewaehlt ? null : tag)}>
                     {tag.getDate()}
-                  </i>
+                  </button>
                 )
               })}
             </div>
             <div className="mw-legende">
-              <span><i style={{ background:'var(--mw-frei-bg)' }} />frei</span>
-              <span><i style={{ background:'var(--mw-belegt-bg)' }} />belegt</span>
+              <span><i className="mw-status-frei" />frei</span>
+              <span><i className="mw-status-teilweise" />teilweise frei</span>
+              <span><i className="mw-status-belegt" />belegt</span>
+              <span><i className="mw-status-geschlossen" />geschlossen</span>
             </div>
+            {gewaehlterTag && (() => {
+              const status = tagStatus(gewaehlterTag, events, arbeitszeiten)
+              const frei = freieZeiten(gewaehlterTag, events, arbeitszeiten)
+              return (
+                <div className="mw-tag-detail">
+                  <b>{gewaehlterTag.toLocaleDateString('de-DE', { weekday:'long', day:'numeric', month:'long' })}</b>
+                  {status === 'geschlossen' && <span>An diesem Tag nicht im Einsatz.</span>}
+                  {status === 'belegt' && <span>Ausgebucht.</span>}
+                  {(status === 'frei' || status === 'teilweise') && (
+                    <span>Frei: {frei.map(f => `${f.von}–${f.bis} Uhr`).join(', ')}</span>
+                  )}
+                </div>
+              )
+            })()}
+            <p className="mw-muted" style={{ fontSize:13, margin:'10px 0 0' }}>
+              Arbeitszeiten: {arbeitszeitenText}
+            </p>
             {events.length === 0 && (
               <p className="mw-muted" style={{ fontSize:13, margin:'12px 0 0' }}>
                 {kalenderVerbunden ? 'Kalender verbunden, aktuell keine Termine eingetragen.' : 'Kein Kalender verbunden'}
