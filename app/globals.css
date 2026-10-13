@@ -367,3 +367,11 @@ textarea.mw-feld { resize: vertical; }
 .mw-start-wahl a:hover { transform: translateY(-1px); }
 .mw-start-wahl a:not(.an):hover { background: var(--mw-soft); }
 @media (max-width: 520px) { .mw-start-wahl { grid-template-columns: 1fr; } }
+
+/* Datumsfeld zum Tippen mit Kalender-Knopf */
+.mw-datum { position: relative; }
+.mw-datum .mw-feld { padding-right: 46px; }
+.mw-datum .mw-feld.fehler { border-color: var(--mw-belegt); }
+.mw-datum button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 8px; color: var(--mw-muted); cursor: pointer; border-radius: 8px; display: flex; }
+.mw-datum button:hover { background: var(--mw-soft); color: var(--mw-ink); }
+.mw-datum input[type="date"] { position: absolute; right: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; border: 0; padding: 0; }

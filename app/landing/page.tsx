@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../Lib/supabase'
 import Kopfzeile from '@/components/Kopfzeile'
 import { Icon, IconBadge, iconNameFuerKategorie } from '../components/Icons'
+import DatumFeld from '../components/DatumFeld'
 
 const BELIEBT = ['Friseur', 'Nachhilfe', 'Personal Trainer', 'Webdesign', 'Kosmetik', 'Hundetrainer']
 
@@ -130,7 +131,7 @@ export default function LandingPage() {
               </div>
               <div>
                 <label className="mw-label" htmlFor="s-datum">Datum</label>
-                <input id="s-datum" className={'mw-feld' + (wann ? '' : ' leer')} type="date" value={wann} onChange={e => setWann(e.target.value)} />
+                <DatumFeld id="s-datum" value={wann} onChange={setWann} />
               </div>
               <div>
                 <label className="mw-label" htmlFor="s-zeit">Uhrzeit</label>

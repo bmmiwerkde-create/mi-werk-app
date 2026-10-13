@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import { supabase } from '../Lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Icon, IconBadge, iconNameFuerKategorie } from '../components/Icons'
+import DatumFeld from '../components/DatumFeld'
 import Kopfzeile from '@/components/Kopfzeile'
 import { PROFIL_FELDER } from '@/app/Lib/profilFelder'
 
@@ -361,7 +362,7 @@ export default function Home() {
             </div>
             <div>
               <label className="mw-label" htmlFor="f-datum">Datum</label>
-              <input id="f-datum" className={'mw-feld' + (datumFilter ? '' : ' leer')} type="date" value={datumFilter} onChange={e => setDatumFilter(e.target.value)} onKeyDown={enter} />
+              <DatumFeld id="f-datum" value={datumFilter} onChange={setDatumFilter} onKeyDown={enter} />
             </div>
             <div>
               <label className="mw-label" htmlFor="f-zeit">Uhrzeit</label>
