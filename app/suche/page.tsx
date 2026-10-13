@@ -200,12 +200,12 @@ export default function Home() {
       setAktiveKategorie(kat)
       return
     }
-    const was = p.get('was') || '', ort = p.get('ort') || '', datum = p.get('datum') || ''
-    if (!was && !ort && !datum) return
-    const istPlz = /^\d+$/.test(ort)
-    setSuche(was); setDatumFilter(datum)
-    if (istPlz) setPlzFilter(ort); else setStadtFilter(ort)
-    anwenden(was, istPlz ? '' : ort, istPlz ? ort : '', datum, '')
+    const was = p.get('was') || '', datum = p.get('datum') || '', zeit = p.get('zeit') || '', preis = p.get('preis') || ''
+    let ort = p.get('ort') || '', plz = p.get('plz') || ''
+    if (!plz && /^\d+$/.test(ort)) { plz = ort; ort = '' }
+    if (!was && !ort && !plz && !datum && !zeit && !preis) return
+    setSuche(was); setStadtFilter(ort); setPlzFilter(plz); setDatumFilter(datum); setUhrzeitFilter(zeit); setPreisFilter(preis)
+    anwenden(was, ort, plz, datum, zeit, preis)
     setTimeout(() => document.getElementById('ergebnisse')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geladen])
@@ -245,7 +245,7 @@ export default function Home() {
     return tage
   }
 
-  function anwenden(suche_: string, stadt_: string, plz_: string, datum_: string, uhrzeit_: string = uhrzeitFilter) {
+  function anwenden(suche_: string, stadt_: string, plz_: string, datum_: string, uhrzeit_: string = uhrzeitFilter, preis_: string = preisFilter) {
     let result = dienstleister
     if (suche_) {
       const q = suche_.toLowerCase()
@@ -281,8 +281,8 @@ export default function Home() {
         return !belegt
       })
     }
-    if (preisFilter) {
-      const maxPreis = parseInt(preisFilter)
+    if (preis_) {
+      const maxPreis = parseInt(preis_)
       result = result.filter(d => {
         if (!d.preis) return true
         const zahl = parseInt(d.preis.replace(/[^0-9]/g, ''))

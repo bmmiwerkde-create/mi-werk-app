@@ -352,3 +352,10 @@ textarea.mw-feld { resize: vertical; }
 .mw-start-vertrauen .mw-wrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 40px; }
 .mw-start-vertrauen span { display: inline-flex; align-items: center; gap: 8px; }
 .mw-start-vertrauen svg { color: #F0B48F; }
+.mw-start-filter { padding: 20px; margin-top: 28px; box-shadow: 0 10px 30px rgba(20, 50, 74, .07); }
+.mw-start-titel { margin-bottom: 18px; }
+.mw-nur-klein { display: none; }
+@media (max-width: 900px) {
+  .mw-nur-gross { display: none; }
+  .mw-nur-klein { display: block; margin-top: 28px; }
+}
