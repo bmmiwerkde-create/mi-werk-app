@@ -227,7 +227,9 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Warteliste */}
+        {/* Warteliste: ausgeblendet, bis die Einträge in der Datenbank gespeichert werden */}
+        {false && (
+          <>
         <section className="mw-abschnitt">
           <div className="mw-wrap">
             <div className="mw-karte mw-start-warteliste">
@@ -248,6 +250,9 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+          </>
+        )}
 
         {/* Für Dienstleister */}
         <section className="mw-start-band">
