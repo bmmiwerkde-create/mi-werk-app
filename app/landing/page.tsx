@@ -97,8 +97,15 @@ export default function LandingPage() {
           <div className="mw-wrap mw-start-raster">
             <div>
               <div className="mw-start-wahl" role="group" aria-label="Was möchtest du tun?">
-                <a className="an" href="#suche">Ich suche einen Dienstleister</a>
-                <a href="/fuer-dienstleister">Ich bin Dienstleister</a>
+                <a className="an" href="#suche">
+                  <Icon name="search" size={26} />
+                  <span><b>Ich suche</b>einen Dienstleister</span>
+                </a>
+                <a href="/fuer-dienstleister">
+                  <Icon name="user" size={26} />
+                  <span><b>Ich bin</b>Dienstleister</span>
+                  <Icon name="arrow" size={20} />
+                </a>
               </div>
               <div className="mw-kicker">Neu · gestartet in Bochum</div>
               <h1 className="mw-h1 mw-start-titel">Finde Dienstleister in deiner Nähe – und sieh sofort, <span>wer Zeit hat.</span></h1>

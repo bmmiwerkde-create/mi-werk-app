@@ -359,7 +359,11 @@ textarea.mw-feld { resize: vertical; }
   .mw-nur-gross { display: none; }
   .mw-nur-klein { display: block; margin-top: 28px; }
 }
-.mw-start-wahl { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; background: var(--mw-soft); border-radius: 12px; margin-bottom: 22px; }
-.mw-start-wahl a { padding: 10px 16px; border-radius: 9px; font-size: 15px; font-weight: 600; color: var(--mw-ink); text-decoration: none; }
-.mw-start-wahl a.an { background: #fff; box-shadow: 0 1px 4px rgba(20, 50, 74, .12); }
-.mw-start-wahl a:not(.an):hover { background: rgba(255, 255, 255, .6); }
+.mw-start-wahl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; max-width: 620px; }
+.mw-start-wahl a { display: flex; align-items: center; gap: 14px; padding: 18px 20px; border-radius: 14px; border: 2px solid var(--mw-ink); color: var(--mw-ink); text-decoration: none; background: #fff; transition: background .15s, transform .15s; }
+.mw-start-wahl a span { flex: 1; font-size: 15px; line-height: 1.3; }
+.mw-start-wahl a b { display: block; font-size: 21px; font-weight: 800; letter-spacing: -0.4px; }
+.mw-start-wahl a.an { background: var(--mw-ink); color: #fff; }
+.mw-start-wahl a:hover { transform: translateY(-1px); }
+.mw-start-wahl a:not(.an):hover { background: var(--mw-soft); }
+@media (max-width: 520px) { .mw-start-wahl { grid-template-columns: 1fr; } }
