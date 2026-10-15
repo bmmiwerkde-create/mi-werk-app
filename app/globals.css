@@ -53,6 +53,8 @@ body {
 
 .mw-logo { font-family: inherit; font-weight: 800; letter-spacing: -0.6px; font-size: 23px; color: var(--mw-ink); text-decoration: none; white-space: nowrap; }
 .mw-logo span { color: var(--mw-cta); }
+.mw-logo { display: inline-flex; align-items: center; }
+.mw-logo-zeichen { width: 1.45em; height: 1.45em; margin-right: 0.38em; flex: none; }
 
 .mw-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--mw-cta); color: #fff; border: none; border-radius: 10px; padding: 12px 20px; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; white-space: nowrap; font-family: inherit; transition: background .15s; }
 .mw-btn:hover { background: var(--mw-cta-h); }

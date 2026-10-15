@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="mw-footer">
       <div className="mw-wrap">
         <div>
-          <a className="mw-logo" href="/" style={{ fontSize: 19 }}>Mi-<span>Werk</span></a>
+          <a className="mw-logo" href="/" style={{ fontSize: 19 }}><img className="mw-logo-zeichen" src="/logo/mi-werk-zeichen.svg" alt="" />Mi-<span>Werk</span></a>
           <div style={{ marginTop: 4 }}>Dienstleister in deiner Region · © {new Date().getFullYear()}</div>
         </div>
         <nav aria-label="Rechtliches">
