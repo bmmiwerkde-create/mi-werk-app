@@ -387,8 +387,8 @@ export default function Home() {
               <div className="mw-kat-grid">
                 {hauptkategorien.map(kat => (
                   <button key={kat.name} className="mw-kat" onClick={() => setAktiveKategorie(kat.name)}>
-                    <IconBadge name={iconNameFuerKategorie(kat.name)} size={40} />
-                    <span><b>{kat.name}</b><small>{kat.gewerke.length} Gewerke</small></span>
+                    <img className="mw-kat-bild" src={`/kategorien/${iconNameFuerKategorie(kat.name)}.jpg`} alt="" loading="lazy" />
+                    <span className="mw-kat-text"><b>{kat.name}</b><small>{kat.gewerke.length} Gewerke</small></span>
                   </button>
                 ))}
               </div>

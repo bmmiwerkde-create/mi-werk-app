@@ -5,17 +5,17 @@ import { nutzerAusAnfrage } from '../../Lib/supabaseAdmin'
 const esc = (v: unknown) => String(v ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string))
 
 // Farben wie auf der Webseite
-const INK = '#14324A'
-const KUPFER = '#A9552A'
-const HELL = '#FBF8F3'
-const TEXT = '#33414D'
-const GRAU = '#5B6670'
+const INK = '#17231D'
+const GRUEN = '#1E7A4F'
+const HELL = '#F1F4F2'
+const TEXT = '#34403A'
+const GRAU = '#55615A'
 
 function schritt(nr: number, titel: string, text: string) {
   return `
     <tr><td style="padding:0 0 14px">
       <table role="presentation" cellpadding="0" cellspacing="0" width="100%"><tr>
-        <td width="40" valign="top"><div style="width:30px;height:30px;border-radius:15px;background:${KUPFER};color:#fff;font:bold 15px/30px Arial,sans-serif;text-align:center">${nr}</div></td>
+        <td width="40" valign="top"><div style="width:30px;height:30px;border-radius:15px;background:${GRUEN};color:#fff;font:bold 15px/30px Arial,sans-serif;text-align:center">${nr}</div></td>
         <td valign="top" style="font:15px/1.5 Arial,sans-serif;color:${TEXT}"><b style="color:${INK}">${titel}</b><br>${text}</td>
       </tr></table>
     </td></tr>`
@@ -27,15 +27,15 @@ function mailHtml(name: string) {
 <html lang="de"><body style="margin:0;padding:0;background:${HELL}">
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:${HELL};padding:24px 12px">
 <tr><td align="center">
-  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:560px;background:#ffffff;border:1px solid #E7E0D5;border-radius:16px;overflow:hidden">
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:560px;background:#ffffff;border:1px solid #E2E8E4;border-radius:16px;overflow:hidden">
     <tr><td style="background:${INK};padding:22px 28px">
-      <span style="font:bold 26px Georgia,serif;color:#ffffff">Mi-<span style="color:#E7B48C">Werk</span></span>
-      <div style="font:13px Arial,sans-serif;color:#C9D6E2;margin-top:4px">Dienstleister in deiner Region</div>
+      <span style="font:bold 26px Arial,sans-serif;color:#ffffff">Mi-<span style="color:#8FD3AE">Werk</span></span>
+      <div style="font:13px Arial,sans-serif;color:#B9CCC1;margin-top:4px">Dienstleister in deiner Region</div>
     </td></tr>
     <tr><td style="padding:28px 28px 8px">
-      <h1 style="margin:0 0 12px;font:bold 24px/1.25 Georgia,serif;color:${INK}">${hallo}</h1>
+      <h1 style="margin:0 0 12px;font:bold 24px/1.25 Arial,sans-serif;color:${INK}">${hallo}</h1>
       <p style="margin:0 0 14px;font:15px/1.6 Arial,sans-serif;color:${TEXT}">Schön, dass du dabei bist. Dein Profil ist angelegt. Kundinnen und Kunden in deiner Region können dich jetzt finden und direkt kontaktieren, ganz ohne Vermittler.</p>
-      <div style="background:#F6EDE4;border-radius:12px;padding:14px 16px;margin:0 0 22px;font:15px/1.5 Arial,sans-serif;color:${INK}">
+      <div style="background:#E7F4EC;border-radius:12px;padding:14px 16px;margin:0 0 22px;font:15px/1.5 Arial,sans-serif;color:${INK}">
         <b>Die ersten 12 Monate sind für dich kostenlos.</b>
       </div>
       <p style="margin:0 0 12px;font:bold 16px Arial,sans-serif;color:${INK}">So holst du das Beste aus deinem Profil:</p>
@@ -48,10 +48,10 @@ function mailHtml(name: string) {
       </table>
     </td></tr>
     <tr><td align="center" style="padding:10px 28px 30px">
-      <a href="https://www.mi-werk.de/dashboard" style="display:inline-block;background:${KUPFER};color:#ffffff;text-decoration:none;font:bold 16px Arial,sans-serif;padding:14px 28px;border-radius:10px">Zum Dashboard</a>
+      <a href="https://www.mi-werk.de/dashboard" style="display:inline-block;background:${GRUEN};color:#ffffff;text-decoration:none;font:bold 16px Arial,sans-serif;padding:14px 28px;border-radius:10px">Zum Dashboard</a>
     </td></tr>
-    <tr><td style="padding:18px 28px;border-top:1px solid #E7E0D5;font:13px/1.6 Arial,sans-serif;color:${GRAU}">
-      Fragen? Antworte einfach an <a href="mailto:bm.miwerk.de@gmail.com" style="color:${KUPFER}">bm.miwerk.de@gmail.com</a>.<br>
+    <tr><td style="padding:18px 28px;border-top:1px solid #E2E8E4;font:13px/1.6 Arial,sans-serif;color:${GRAU}">
+      Fragen? Antworte einfach an <a href="mailto:bm.miwerk.de@gmail.com" style="color:${GRUEN}">bm.miwerk.de@gmail.com</a>.<br>
       Mi-Werk UG (haftungsbeschränkt) · Forstring 24 · 44869 Bochum ·
       <a href="https://www.mi-werk.de/impressum" style="color:${GRAU}">Impressum</a> ·
       <a href="https://www.mi-werk.de/datenschutz" style="color:${GRAU}">Datenschutz</a>

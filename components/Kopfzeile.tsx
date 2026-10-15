@@ -25,7 +25,7 @@ export default function Kopfzeile({ aktiv }: { aktiv?: Aktiv }) {
   return (
     <header className="mw-nav">
       <div className="mw-wrap mw-nav-innen">
-        <a className="mw-logo" href="/">Mi-<span>Werk</span></a>
+        <a className="mw-logo" href="/"><img className="mw-logo-zeichen" src="/logo/mi-werk-zeichen.svg" alt="" />Mi-<span>Werk</span></a>
         <nav className="mw-nav-links" aria-label="Hauptmenü">
           {links.map(([href, text, key]) => (
             <a key={href} href={href} className={aktiv === key ? 'aktiv' : ''}>{text}</a>
