@@ -41,7 +41,7 @@ export default function CookieBanner() {
         flexDirection: "column",
         gap: "0.9rem",
         zIndex: 9999,
-        boxShadow: "0 10px 32px rgba(20,50,74,0.18)",
+        boxShadow: "0 10px 32px rgba(23,35,29,0.18)",
       }}
     >
       <p style={{ color: "var(--mw-text)", fontSize: "0.9rem", lineHeight: 1.6, margin: 0 }}>

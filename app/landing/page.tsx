@@ -182,8 +182,8 @@ export default function LandingPage() {
             <div className="mw-kat-grid">
               {KATEGORIEN.map(k => (
                 <a key={k} className="mw-kat" href={'/suche?kat=' + encodeURIComponent(k)} style={{ textDecoration: 'none' }}>
-                  <IconBadge name={iconNameFuerKategorie(k)} size={40} />
-                  <b>{k}</b>
+                  <img className="mw-kat-bild" src={`/kategorien/${iconNameFuerKategorie(k)}.jpg`} alt="" loading="lazy" />
+                  <span className="mw-kat-text"><b>{k}</b></span>
                 </a>
               ))}
             </div>
